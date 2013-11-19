@@ -1,5 +1,5 @@
 var config={
-    port:8082,
+    port:8081,
     apps:{
         
     },
@@ -28,7 +28,7 @@ console.log('config.rootDIR is '+config.rootDIR);
 
 function prod(){
     console.log('launched as prod');
-    config.port=8083;
+    config.port=8080;
     return config;
 }
 
