@@ -14,6 +14,14 @@ System
 * `` Environment : dev ``  
 * `` Server Root : Current directory where command to launch script is run from ``
 
+## Setting Custom Port
+`` SERVER_PORT `` = any available port
+
+    export SERVER_PORT=8888
+    node ../server/http/http.js
+    * OR *
+    SERVER_PORT=8888 node ../server/http/http.js
+
 ## Setting System Variables
 `` NODE_ENV `` = dev | prod
 
