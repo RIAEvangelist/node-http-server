@@ -1,5 +1,12 @@
+var defaults={
+    ports : {
+        prod: 8080,
+        dev : 8081
+    },
+    serverRoot:process.cwd()
+}
 var config={
-    port:8081,
+    port:false,
     apps:{
         
     },
@@ -19,22 +26,40 @@ var config={
 }
 
 if(!process.env.SERVER_ROOT){
-    console.log('SERVER_ROOT not specified, defaulting to current working dir.')
-    process.env.SERVER_ROOT=process.cwd();
+    console.log('SERVER_ROOT not specified, defaulting to '+defaults.serverRoot);
+    process.env.SERVER_ROOT=defaults.serverRoot;
+}
+
+if(process.env.SERVER_PORT){
+    config.port=process.env.SERVER_PORT;
 }
 
 config.rootDIR=process.env.SERVER_ROOT
 console.log('config.rootDIR is '+config.rootDIR);
 
 function prod(){
-    console.log('launched as prod');
-    config.port=8080;
+    if(!config.port)
+        config.port=defaults.ports.prod;
+    logLaunchData('prod');
     return config;
 }
 
 function dev(){
-    console.log('launched as dev');
+    if(!config.port)
+        config.port=defaults.ports.dev;
+    logLaunchData('dev');
     return config;
+}
+
+function logLaunchData(){
+    console.log(
+        'launched as '+
+        (
+            process.env.NODE_ENV||
+            'dev'
+        )
+    );
+    console.log(config);
 }
 
 function init(){
@@ -44,7 +69,6 @@ function init(){
         case 'prod':
             return prod();
         default:
-            console.log('NODE_ENV not specified so defaulting to dev.');
             return dev();
     }
 }
