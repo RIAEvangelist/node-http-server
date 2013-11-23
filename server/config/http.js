@@ -18,7 +18,11 @@ var config={
         html: 'text/html',
         css : 'text/css',
         js  : 'text/javascript',
-        txt : 'text/plain'
+        txt : 'text/plain',
+        jpeg: 'image/jpeg',
+        jpg : 'image/jpeg',
+        png : 'image/png',
+        gif : 'image/gif'
     },
     restrictedType:{
         
