@@ -23,7 +23,9 @@ var config={
         jpeg: 'image/jpeg',
         jpg : 'image/jpeg',
         png : 'image/png',
-        gif : 'image/gif'
+        gif : 'image/gif',
+        //firefox web app header
+        webapp :'application/x-web-app-manifest+json'
     },
     restrictedType:{
         
