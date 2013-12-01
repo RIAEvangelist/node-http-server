@@ -15,16 +15,17 @@ var config={
         noCache : true
     },
     contentType:{
-        html: 'text/html',
-        css : 'text/css',
-        js  : 'text/javascript',
-        json: 'application/json',
-        txt : 'text/plain',
-        jpeg: 'image/jpeg',
-        jpg : 'image/jpeg',
-        png : 'image/png',
-        gif : 'image/gif',
-        ico : 'image/x-icon'
+        html    : 'text/html',
+        css     : 'text/css',
+        js      : 'text/javascript',
+        json    : 'application/json',
+        txt     : 'text/plain',
+        jpeg    : 'image/jpeg',
+        jpg     : 'image/jpeg',
+        png     : 'image/png',
+        gif     : 'image/gif',
+        ico     : 'image/x-icon',
+        appcache: 'text/cache-manifest'
     },
     restrictedType:{
         
