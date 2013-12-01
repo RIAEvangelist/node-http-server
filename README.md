@@ -12,7 +12,7 @@ Ports
 System
 
 * `` Environment : dev ``  
-* `` Server Root : Current directory where command to launch script is run from ``
+* `` Server Root : Current directory where command to launch script is run from - full path ``
 
 ## Setting Custom Port
 `` SERVER_PORT `` = any available port
