@@ -9,7 +9,7 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
 
 ## Defaults
 ---
-####currently modifiable via any interface, commandline, bash, node etc.
+#### currently modifiable via any interface, commandline, bash, node etc.
 
     port    : 8080
     root    : Current Working Directory (where you execute the command from)
@@ -26,7 +26,7 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
 `` noCache `` should the server prevent caching
 
 ---
-####currently modifiable via node
+#### currently modifiable via node
 
     contentType :   {
                         html    : 'text/html',
@@ -60,11 +60,6 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
 
 ---
 
-##Start from node app
-*documentation coming soon*
-
----
-
 ## Commandline / bash use
 `` launch `` is an argument that specifies to launch the server now with the provided arguments and defaults
 
@@ -73,6 +68,73 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
 you can specify any of the variables frpom the ***currently modifiable via any interface, commandline, bash, node etc.*** section above. The order does not matter.
 
     node ~/git/node-http-server/server/http.js root=~/myApp/ port=8888 verbose=true launch=now
+
+---
+
+## node app use
+
+    var server=require('../server/http.js');
+
+`` server `` has 2 methods, `` deploy `` and `` configTemplate ``
+
+`` server.configTemplate `` will generate a complete config file based off of the default values and arguments passed in when launching the app. **DO NOT USE launch=now** as an argument for a node app. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.
+
+`` server.deploy `` will accept any config params and merge them with a fresh configTemplate, so passing a modified config based off of `` server.configTemplate() `` will result in using only the values from the modified config passed when deploying as it will override all of the defaults. ***The passed config object only merges to one level deep*** so if you pass a multi level object like `` contentTypes `` it will overwrite the default config with what you sent for that object rather than merging your object with the default.
+
+---
+
+#### node examples
+can be found in the examples folder
+
+#### basic
+this app could be launched as  
+`` node basicApp.js verbose=true  ``  
+to force verbose logging. This can be helpful if you have many servers in a single app and want them all to be verbose right now for debugging or testing purposes.
+    
+    var server=require('../server/http.js');
+
+    console.log(server);
+    
+    server.deploy(
+        {
+            port:8000,
+            root:'~/myApp/'
+        }
+    ); 
+    
+---
+#### verbose
+
+    var server=require('../server/http.js');
+
+    console.log(server);
+    
+    server.deploy(
+        {
+            verbose:true,
+            port:8001,
+            root:'~/myApp/'
+        }
+    );
+    
+---
+#### advanced
+    
+    var server=require('../server/http.js');
+
+    console.log(server);
+    
+    var config=server.configTemplate();
+    config.errors['404']    = 'These are not the files you are looking for...';
+    config.contentType.mp4  = 'video/mp4';
+    config.port             = 8005;
+    config.verbose          = true;
+    config.root             = '~/myApp/'
+    
+    server.deploy(config);
+
+---
+
 
 ---
 
