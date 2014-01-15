@@ -18,7 +18,7 @@ for(var i=0; i<argCount; i++){
     args[data[0]]=data[1];
 }
 
-if(args.launch='now')
+if(args.launch=='now')
     deploy();
 
 /**************************************\
@@ -228,6 +228,6 @@ function deploy(userConfig){
 }
 
 module.exports={
-    deply           : deploy,
+    deploy           : deploy,
     configTemplate  : config
 }
