@@ -22,10 +22,10 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
     verbose : false
     noCache : true
 
-`` port `` the port on which the server should run
-`` root `` the absolute location to the root dir for the public file system
-`` domain `` the domain which this server applies to. You can add more servers via the node `` domains `` implementation described below than you can via bash or commandline. If you want to accept incoming requests for ***ANY Applicable Domain*** use `` 0.0.0.0 `` this will allow any request that is pointed at this machine on the specified port to use this server config.
-`` index `` the default file to look for in a dir. if not found a **404** will be displayed 
+`` port `` the port on which the server should run  
+`` root `` the absolute location to the root dir for the public file system  
+`` domain `` the domain which this server applies to. You can add more servers via the node `` domains `` implementation described below than you can via bash or commandline. If you want to accept incoming requests for ***ANY Applicable Domain*** use `` 0.0.0.0 `` this will allow any request that is pointed at this machine on the specified port to use this server config.  
+`` index `` the default file to look for in a dir. if not found a **404** will be displayed   
 `` verbose `` should the server display detailed info about what it is doing
 `` noCache `` should the server prevent caching
 
@@ -60,10 +60,10 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
                     500: '500 {{err}}'
                 }
 
-`` domains `` this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.
-`` contentType `` mapping of file extension to header content type
-`` restrictedType `` extensions to which external access will be denied
-`` errors `` error headers and error strings, these can be anything you like from html to text etc. just make sure they all can use the same headers. The **500** error will replace `` {{err}} `` in the specified value with the actual error message from the server.
+`` domains `` this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.  
+`` contentType `` mapping of file extension to header content type.  
+`` restrictedType `` extensions to which external access will be denied.  
+`` errors `` error headers and error strings, these can be anything you like from html to text etc. just make sure they all can use the same headers. The **500** error will replace `` {{err}} `` in the specified value with the actual error message from the server.  
 
 ---
 
