@@ -9,7 +9,7 @@ var passedArgs  = process.argv.splice(2),
     defaults    = {
         port    : 8080,
         root    : process.cwd(),
-        domain  : 'localhost',
+        domain  : '0.0.0.0',
         index   : 'index.html'
     };
 
@@ -220,7 +220,7 @@ function deploy(userConfig){
         var hostname= request.headers.host.split(':'),
             root    = server.config.root;
         
-        if(hostname[0]!=server.config.domain){
+        if(hostname[0]!=server.config.domain && server.config.domain!='0.0.0.0'){
             if(!server.config.domains[hostname[0]]){
                 serveFile(hostname[0],false,response);
                 return;

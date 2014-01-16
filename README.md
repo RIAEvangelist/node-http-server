@@ -17,14 +17,14 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
 
     port    : 8080
     root    : Current Working Directory (where you execute the command from)
-    domain  : localhost
+    domain  : 0.0.0.0
     index   : index.html
     verbose : false
     noCache : true
 
 `` port `` the port on which the server should run
 `` root `` the absolute location to the root dir for the public file system
-`` domain `` the domain which this server applies to - ***this is not yet implemented***
+`` domain `` the domain which this server applies to. You can add more servers via the node `` domains `` implementation described below than you can via bash or commandline. If you want to accept incoming requests for ***ANY Applicable Domain*** use `` 0.0.0.0 `` this will allow any request that is pointed at this machine on the specified port to use this server config.
 `` index `` the default file to look for in a dir. if not found a **404** will be displayed 
 `` verbose `` should the server display detailed info about what it is doing
 `` noCache `` should the server prevent caching
@@ -32,6 +32,8 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
 ---
 #### currently modifiable via node
 
+    domains     :   {}
+    
     contentType :   {
                         html    : 'text/html',
                         css     : 'text/css',
@@ -58,6 +60,7 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
                     500: '500 {{err}}'
                 }
 
+`` domains `` this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.
 `` contentType `` mapping of file extension to header content type
 `` restrictedType `` extensions to which external access will be denied
 `` errors `` error headers and error strings, these can be anything you like from html to text etc. just make sure they all can use the same headers. The **500** error will replace `` {{err}} `` in the specified value with the actual error message from the server.
@@ -77,7 +80,7 @@ you can specify any of the variables frpom the ***currently modifiable via any i
 
 ## node app use
 
-    var server=require('../server/http.js');
+    var server=require('node-http-server');
 
 `` server `` has 2 methods, `` deploy `` and `` configTemplate ``
 
@@ -95,7 +98,7 @@ this app could be launched as
 `` node basicApp.js verbose=true  ``  
 to force verbose logging. This can be helpful if you have many servers in a single app and want them all to be verbose right now for debugging or testing purposes.
     
-    var server=require('../server/http.js');
+    var server=require('node-http-server');
 
     console.log(server);
     
@@ -109,7 +112,7 @@ to force verbose logging. This can be helpful if you have many servers in a sing
 ---
 #### verbose
 
-    var server=require('../server/http.js');
+    var server=require('node-http-server');
 
     console.log(server);
     
@@ -124,7 +127,7 @@ to force verbose logging. This can be helpful if you have many servers in a sing
 ---
 #### advanced
     
-    var server=require('../server/http.js');
+    var server=require('node-http-server');
 
     console.log(server);
     
@@ -138,7 +141,24 @@ to force verbose logging. This can be helpful if you have many servers in a sing
     server.deploy(config);
 
 ---
+#### multiple domains or subdomains
 
+    var server=require('node-http-server');
+
+    console.log(server);
+    
+    server.deploy(
+        {
+            verbose:true,
+            port:8010,
+            root:process.env.HOME+'/myApp/',
+            domain:'myapp',
+            domains:{
+                'a.myapp':process.env.HOME+'/myApp/mySubdomain/',
+                'yourapp.com':process.env.HOME+'/www/yourApp/'
+            }
+        }
+    );    
 
 ---
 
