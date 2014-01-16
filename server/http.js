@@ -36,9 +36,14 @@ function config(userConfig){
         port        : args.port||defaults.port,
         root        : args.root||defaults.root,
         domain      : args.domain||defaults.domain,
-        subdomain   : {
-            // sub  : /that/sub's/root/dir
-            // you may need to edit your hosts file so *.domain goes to 127.0.0.1 for local development
+        domains   : {
+            /*******************\
+             * domain  : /that/domains/root/dir
+             * 
+             * for sub domains, specify the whole host i.e. "my.sub.domain"
+             * you may need to edit your hosts file, cnames or iptable 
+             * domain or my.domain etc. goes to 127.0.0.1 for local development
+             * *****************/
         },
         server      : {
             index   : args.index||defaults.index,
@@ -207,14 +212,32 @@ function deploy(userConfig){
     }
     
     function requestRecieved(request,response){
-        if(server.config.verbose)
-                console.log(server.config.logID+' REQUEST ###\n\n',request.headers,'\n\n');
-        var uri = url.parse(request.url).pathname;
+        var uri = url.parse(request.url);
+        uri=uri.pathname;
         if (uri=='/')
             uri='/'+server.config.server.index;
         
+        var hostname= request.headers.host.split(':'),
+            root    = server.config.root;
+        
+        if(hostname[0]!=server.config.domain){
+            if(!server.config.domains[hostname[0]]){
+                serveFile(hostname[0],false,response);
+                return;
+            }
+            root=server.config.domains[hostname[0]];
+        }
+        
+        if(server.config.verbose){
+                console.log(server.config.logID+' REQUEST ###\n\n',
+                    request.headers,'\n',
+                    uri,'\n\n',
+                    hostname,'\n\n'
+                );
+        }
+        
         var filename = path.join(
-            server.config.root, 
+            root, 
             uri
         );
         
