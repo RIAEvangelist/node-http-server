@@ -1,0 +1,148 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'publish' ]
+2 info using npm@1.3.14
+3 info using node@v0.10.22
+4 verbose node symlink /usr/bin/node
+5 verbose publish [ '.' ]
+6 verbose cache add [ '.', null ]
+7 verbose cache add name=undefined spec="." args=[".",null]
+8 verbose parsed url { protocol: null,
+8 verbose parsed url   slashes: null,
+8 verbose parsed url   auth: null,
+8 verbose parsed url   host: null,
+8 verbose parsed url   port: null,
+8 verbose parsed url   hostname: null,
+8 verbose parsed url   hash: null,
+8 verbose parsed url   search: null,
+8 verbose parsed url   query: null,
+8 verbose parsed url   pathname: '.',
+8 verbose parsed url   path: '.',
+8 verbose parsed url   href: '.' }
+9 silly lockFile 3a52ce78- .
+10 verbose lock . /home/brandon/.npm/3a52ce78-.lock
+11 verbose tar pack [ '/home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/tmp.tgz',
+11 verbose tar pack   '.' ]
+12 verbose tarball /home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/tmp.tgz
+13 verbose folder .
+14 info prepublish node-http-server@1.5.1
+15 silly lockFile 1f1177db-tar tar://.
+16 verbose lock tar://. /home/brandon/.npm/1f1177db-tar.lock
+17 silly lockFile 5e42b63a-214067-0-678535892162472-tmp-tgz tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/tmp.tgz
+18 verbose lock tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/tmp.tgz /home/brandon/.npm/5e42b63a-214067-0-678535892162472-tmp-tgz.lock
+19 silly lockFile 1f1177db-tar tar://.
+20 silly lockFile 1f1177db-tar tar://.
+21 silly lockFile 5e42b63a-214067-0-678535892162472-tmp-tgz tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/tmp.tgz
+22 silly lockFile 5e42b63a-214067-0-678535892162472-tmp-tgz tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/tmp.tgz
+23 verbose tar unpack /home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/tmp.tgz
+24 silly lockFile 0ee44071-214067-0-678535892162472-package tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/package
+25 verbose lock tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/package /home/brandon/.npm/0ee44071-214067-0-678535892162472-package.lock
+26 silly lockFile 5e42b63a-214067-0-678535892162472-tmp-tgz tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/tmp.tgz
+27 verbose lock tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/tmp.tgz /home/brandon/.npm/5e42b63a-214067-0-678535892162472-tmp-tgz.lock
+28 silly gunzTarPerm modes [ '755', '644' ]
+29 silly gunzTarPerm extractEntry package.json
+30 silly gunzTarPerm extractEntry README.md
+31 silly gunzTarPerm extractEntry example/advancedApp.js
+32 silly gunzTarPerm extractEntry example/basicApp.js
+33 silly gunzTarPerm extractEntry example/multipleDomains.js
+34 silly gunzTarPerm extractEntry example/verboseApp.js
+35 silly gunzTarPerm extractEntry server/http.js
+36 silly lockFile 0ee44071-214067-0-678535892162472-package tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/package
+37 silly lockFile 0ee44071-214067-0-678535892162472-package tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/package
+38 silly lockFile 5e42b63a-214067-0-678535892162472-tmp-tgz tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/tmp.tgz
+39 silly lockFile 5e42b63a-214067-0-678535892162472-tmp-tgz tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/tmp.tgz
+40 verbose tar pack [ '/home/brandon/.npm/node-http-server/1.5.1/package.tgz',
+40 verbose tar pack   '/home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/package' ]
+41 verbose tarball /home/brandon/.npm/node-http-server/1.5.1/package.tgz
+42 verbose folder /home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/package
+43 silly lockFile 0ee44071-214067-0-678535892162472-package tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/package
+44 verbose lock tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/package /home/brandon/.npm/0ee44071-214067-0-678535892162472-package.lock
+45 silly lockFile c22bdfd1-de-http-server-1-5-1-package-tgz tar:///home/brandon/.npm/node-http-server/1.5.1/package.tgz
+46 verbose lock tar:///home/brandon/.npm/node-http-server/1.5.1/package.tgz /home/brandon/.npm/c22bdfd1-de-http-server-1-5-1-package-tgz.lock
+47 silly lockFile 0ee44071-214067-0-678535892162472-package tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/package
+48 silly lockFile 0ee44071-214067-0-678535892162472-package tar:///home/brandon/tmp/npm-4733-IVUhNrFF/1390020214067-0.678535892162472/package
+49 silly lockFile c22bdfd1-de-http-server-1-5-1-package-tgz tar:///home/brandon/.npm/node-http-server/1.5.1/package.tgz
+50 silly lockFile c22bdfd1-de-http-server-1-5-1-package-tgz tar:///home/brandon/.npm/node-http-server/1.5.1/package.tgz
+51 silly lockFile 818dd184-m-node-http-server-1-5-1-package /home/brandon/.npm/node-http-server/1.5.1/package
+52 verbose lock /home/brandon/.npm/node-http-server/1.5.1/package /home/brandon/.npm/818dd184-m-node-http-server-1-5-1-package.lock
+53 silly lockFile 818dd184-m-node-http-server-1-5-1-package /home/brandon/.npm/node-http-server/1.5.1/package
+54 silly lockFile 818dd184-m-node-http-server-1-5-1-package /home/brandon/.npm/node-http-server/1.5.1/package
+55 verbose tar unpack /home/brandon/.npm/node-http-server/1.5.1/package.tgz
+56 silly lockFile 3188029f-m-node-http-server-1-5-1-package tar:///home/brandon/.npm/node-http-server/1.5.1/package
+57 verbose lock tar:///home/brandon/.npm/node-http-server/1.5.1/package /home/brandon/.npm/3188029f-m-node-http-server-1-5-1-package.lock
+58 silly lockFile c22bdfd1-de-http-server-1-5-1-package-tgz tar:///home/brandon/.npm/node-http-server/1.5.1/package.tgz
+59 verbose lock tar:///home/brandon/.npm/node-http-server/1.5.1/package.tgz /home/brandon/.npm/c22bdfd1-de-http-server-1-5-1-package-tgz.lock
+60 silly gunzTarPerm modes [ '755', '644' ]
+61 silly gunzTarPerm extractEntry package.json
+62 silly gunzTarPerm extractEntry README.md
+63 silly gunzTarPerm extractEntry example/advancedApp.js
+64 silly gunzTarPerm extractEntry example/basicApp.js
+65 silly gunzTarPerm extractEntry example/multipleDomains.js
+66 silly gunzTarPerm extractEntry example/verboseApp.js
+67 silly gunzTarPerm extractEntry server/http.js
+68 silly lockFile 3188029f-m-node-http-server-1-5-1-package tar:///home/brandon/.npm/node-http-server/1.5.1/package
+69 silly lockFile 3188029f-m-node-http-server-1-5-1-package tar:///home/brandon/.npm/node-http-server/1.5.1/package
+70 silly lockFile c22bdfd1-de-http-server-1-5-1-package-tgz tar:///home/brandon/.npm/node-http-server/1.5.1/package.tgz
+71 silly lockFile c22bdfd1-de-http-server-1-5-1-package-tgz tar:///home/brandon/.npm/node-http-server/1.5.1/package.tgz
+72 verbose chmod /home/brandon/.npm/node-http-server/1.5.1/package.tgz 644
+73 verbose chown /home/brandon/.npm/node-http-server/1.5.1/package.tgz [ 1000, 1000 ]
+74 silly lockFile 3a52ce78- .
+75 silly lockFile 3a52ce78- .
+76 silly publish { name: 'node-http-server',
+76 silly publish   version: '1.5.1',
+76 silly publish   description: 'A very simple and fast http server for node, bash, and spawnable from C, Python etc. It is lightweight and great for embedded solutions as well as everyday development or public facing apps.',
+76 silly publish   main: 'server/http.js',
+76 silly publish   directories: { example: 'example' },
+76 silly publish   scripts: { test: 'echo "Error: no test specified" && exit 1' },
+76 silly publish   repository:
+76 silly publish    { type: 'git',
+76 silly publish      url: 'https://github.com/RIAEvangelist/node-http-server.git' },
+76 silly publish   keywords:
+76 silly publish    [ 'http',
+76 silly publish      'server',
+76 silly publish      'embedded',
+76 silly publish      'fast',
+76 silly publish      'light',
+76 silly publish      'lightweight',
+76 silly publish      'bash',
+76 silly publish      'c',
+76 silly publish      'python',
+76 silly publish      'html',
+76 silly publish      'js',
+76 silly publish      'img',
+76 silly publish      'css' ],
+76 silly publish   author: { name: 'Brandon Nozaki Miller' },
+76 silly publish   license: 'DBAD',
+76 silly publish   bugs: { url: 'https://github.com/RIAEvangelist/node-http-server/issues' },
+76 silly publish   homepage: 'https://github.com/RIAEvangelist/node-http-server',
+76 silly publish   readme: 'Node http server\n================\n----\n\nSimple to use stand alone node HTTP Server you can spin up from node apps, bash scripts, the commandline, C or python apps etc.\n\n    npm install node-http-server\n\n[![alt node-http-server npm downloads](https://nodei.co/npm-dl/node-http-server.png "number of times the node-http-server package has been downloaded from npm")](https://npmjs.org/package/node-http-server)\n\n----\n\n\n## Defaults\n---\n#### currently modifiable via any interface, commandline, bash, node etc.\n\n    port    : 8080\n    root    : Current Working Directory (where you execute the command from)\n    domain  : 0.0.0.0\n    index   : index.html\n    verbose : false\n    noCache : true\n\n`` port `` the port on which the server should run  \n`` root `` the absolute location to the root dir for the public file system  \n`` domain `` the domain which this server applies to. You can add more servers via the node `` domains `` implementation described below than you can via bash or commandline. If you want to accept incoming requests for ***ANY Applicable Domain*** use `` 0.0.0.0 `` this will allow any request that is pointed at this machine on the specified port to use this server config.  \n`` index `` the default file to look for in a dir. if not found a **404** will be displayed   \n`` verbose `` should the server display detailed info about what it is doing\n`` noCache `` should the server prevent caching\n\n---\n#### currently modifiable via node\n\n    domains     :   {}\n    \n    contentType :   {\n                        html    : \'text/html\',\n                        css     : \'text/css\',\n                        js      : \'text/javascript\',\n                        json    : \'application/json\',\n                        txt     : \'text/plain\',\n                        jpeg    : \'image/jpeg\',\n                        jpg     : \'image/jpeg\',\n                        png     : \'image/png\',\n                        gif     : \'image/gif\',\n                        ico     : \'image/x-icon\',\n                        appcache: \'text/cache-manifest\'\n                    }\n    \n    restrictedType: {}\n    \n    errors  :   {\n                    headers : {\n                        \'Content-Type\' : \'text/plain\'\n                    },\n                    404: \'404 MIA\',\n                    415: \'415 File type not supported\',\n                    403: \'403 Access Denied\',\n                    500: \'500 {{err}}\'\n                }\n\n`` domains `` this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.  \n`` contentType `` mapping of file extension to header content type.  \n`` restrictedType `` extensions to which external access will be denied.  \n`` errors `` error headers and error strings, these can be anything you like from html to text etc. just make sure they all can use the same headers. The **500** error will replace `` {{err}} `` in the specified value with the actual error message from the server.  \n\n---\n\n## Commandline / bash use\n`` launch `` is an argument that specifies to launch the server now with the provided arguments and defaults\n\n    node ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now\n\nyou can specify any of the variables frpom the ***currently modifiable via any interface, commandline, bash, node etc.*** section above. The order does not matter.\n\n    node ~/git/node-http-server/server/http.js root=~/myApp/ port=8888 verbose=true launch=now\n\n---\n\n## node app use\n\n    var server=require(\'node-http-server\');\n\n`` server `` has 2 methods, `` deploy `` and `` configTemplate ``\n\n`` server.configTemplate `` will generate a complete config file based off of the default values and arguments passed in when launching the app. **DO NOT USE launch=now** as an argument for a node app. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.\n\n`` server.deploy `` will accept any config params and merge them with a fresh configTemplate, so passing a modified config based off of `` server.configTemplate() `` will result in using only the values from the modified config passed when deploying as it will override all of the defaults. ***The passed config object only merges to one level deep*** so if you pass a multi level object like `` contentTypes `` it will overwrite the default config with what you sent for that object rather than merging your object with the default.\n\n---\n\n#### node examples\ncan be found in the examples folder\n\n#### basic\nthis app could be launched as  \n`` node basicApp.js verbose=true  ``  \nto force verbose logging. This can be helpful if you have many servers in a single app and want them all to be verbose right now for debugging or testing purposes.\n    \n    var server=require(\'node-http-server\');\n\n    console.log(server);\n    \n    server.deploy(\n        {\n            port:8000,\n            root:\'~/myApp/\'\n        }\n    ); \n    \n---\n#### verbose\n\n    var server=require(\'node-http-server\');\n\n    console.log(server);\n    \n    server.deploy(\n        {\n            verbose:true,\n            port:8001,\n            root:\'~/myApp/\'\n        }\n    );\n    \n---\n#### advanced\n    \n    var server=require(\'node-http-server\');\n\n    console.log(server);\n    \n    var config=server.configTemplate();\n    config.errors[\'404\']    = \'These are not the files you are looking for...\';\n    config.contentType.mp4  = \'video/mp4\';\n    config.port             = 8005;\n    config.verbose          = true;\n    config.root             = \'~/myApp/\'\n    \n    server.deploy(config);\n\n---\n#### multiple domains or subdomains\n\n    var server=require(\'node-http-server\');\n\n    console.log(server);\n    \n    server.deploy(\n        {\n            verbose:true,\n            port:8010,\n            root:process.env.HOME+\'/myApp/\',\n            domain:\'myapp\',\n            domains:{\n                \'a.myapp\':process.env.HOME+\'/myApp/mySubdomain/\',\n                \'yourapp.com\':process.env.HOME+\'/www/yourApp/\'\n            }\n        }\n    );    \n\n---\n\n## Starting with forever\n*It is helpful especially when running multiple servers to label them*  with `` --uid `` for easy to remember process names\n\n*when starting the same server many times, **like every time the system boots** you will want to append to the same log file* so use `` -a ``. Without `` -a `` forever will throw an error stating that the log file for the `` --uid `` already exists.\n\n    forever --uid nodeServer -a start ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now\n    \nThis can be set as a ``.profile`` command or a ``.bash_rc`` command as well if you want to launch the server every time the computer boots up.\n',
+76 silly publish   readmeFilename: 'README.md',
+76 silly publish   _id: 'node-http-server@1.5.1',
+76 silly publish   dist: { shasum: '5ea3801de248f376565a448a72999999715bb24e' },
+76 silly publish   _from: '.' }
+77 verbose url raw node-http-server
+78 verbose url resolving [ 'https://registry.npmjs.org/', './node-http-server' ]
+79 verbose url resolved https://registry.npmjs.org/node-http-server
+80 info trying registry request attempt 1 at 20:43:35
+81 http PUT https://registry.npmjs.org/node-http-server
+82 http 409 https://registry.npmjs.org/node-http-server
+83 verbose url raw node-http-server
+84 verbose url resolving [ 'https://registry.npmjs.org/', './node-http-server' ]
+85 verbose url resolved https://registry.npmjs.org/node-http-server
+86 info trying registry request attempt 1 at 20:43:35
+87 http GET https://registry.npmjs.org/node-http-server
+88 http 200 https://registry.npmjs.org/node-http-server
+89 error publish fail Cannot publish over existing version.
+89 error publish fail Update the 'version' field in package.json and try again.
+89 error publish fail
+89 error publish fail If the previous version was published in error, see:
+89 error publish fail     npm help unpublish
+89 error publish fail
+89 error publish fail To automatically increment version numbers, see:
+89 error publish fail     npm help version
+90 error System Linux 3.11.0-15-generic
+91 error command "/usr/bin/node" "/usr/bin/npm" "publish"
+92 error cwd /home/brandon/git/node-http-server
+93 error node -v v0.10.22
+94 error npm -v 1.3.14
+95 error code EPUBLISHCONFLICT
+96 verbose exit [ 1, true ]

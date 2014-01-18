@@ -9,7 +9,7 @@ var passedArgs  = process.argv.splice(2),
     defaults    = {
         port    : 8080,
         root    : process.cwd(),
-        domain  : '0.0.0.0',
+        domain  : 'localhost',
         index   : 'index.html'
     };
 
@@ -36,14 +36,9 @@ function config(userConfig){
         port        : args.port||defaults.port,
         root        : args.root||defaults.root,
         domain      : args.domain||defaults.domain,
-        domains   : {
-            /*******************\
-             * domain  : /that/domains/root/dir
-             * 
-             * for sub domains, specify the whole host i.e. "my.sub.domain"
-             * you may need to edit your hosts file, cnames or iptable 
-             * domain or my.domain etc. goes to 127.0.0.1 for local development
-             * *****************/
+        subdomain   : {
+            // sub  : /that/sub's/root/dir
+            // you may need to edit your hosts file so *.domain goes to 127.0.0.1 for local development
         },
         server      : {
             index   : args.index||defaults.index,
@@ -60,6 +55,7 @@ function config(userConfig){
             png     : 'image/png',
             gif     : 'image/gif',
             ico     : 'image/x-icon',
+            webapp  : 'application/x-web-app-manifest+json',
             appcache: 'text/cache-manifest'
         },
         restrictedType: {
@@ -212,32 +208,14 @@ function deploy(userConfig){
     }
     
     function requestRecieved(request,response){
-        var uri = url.parse(request.url);
-        uri=uri.pathname;
+        if(server.config.verbose)
+                console.log(server.config.logID+' REQUEST ###\n\n',request.headers,'\n\n');
+        var uri = url.parse(request.url).pathname;
         if (uri=='/')
             uri='/'+server.config.server.index;
         
-        var hostname= request.headers.host.split(':'),
-            root    = server.config.root;
-        
-        if(hostname[0]!=server.config.domain && server.config.domain!='0.0.0.0'){
-            if(!server.config.domains[hostname[0]]){
-                serveFile(hostname[0],false,response);
-                return;
-            }
-            root=server.config.domains[hostname[0]];
-        }
-        
-        if(server.config.verbose){
-                console.log(server.config.logID+' REQUEST ###\n\n',
-                    request.headers,'\n',
-                    uri,'\n\n',
-                    hostname,'\n\n'
-                );
-        }
-        
         var filename = path.join(
-            root, 
+            server.config.root, 
             uri
         );
         
