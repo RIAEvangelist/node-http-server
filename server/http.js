@@ -60,7 +60,6 @@ function config(userConfig){
             png     : 'image/png',
             gif     : 'image/gif',
             ico     : 'image/x-icon',
-            webapp  : 'application/x-web-app-manifest+json',
             appcache: 'text/cache-manifest'
         },
         restrictedType: {
@@ -237,6 +236,9 @@ function deploy(userConfig){
                 );
         }
         
+        if(uri.slice(-1)=='/')
+            uri+=server.config.server.index;
+            
         var filename = path.join(
             root, 
             uri
@@ -252,6 +254,6 @@ function deploy(userConfig){
 }
 
 module.exports={
-    deploy           : deploy,
+    deploy          : deploy,
     configTemplate  : config
 }
