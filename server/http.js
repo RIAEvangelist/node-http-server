@@ -258,6 +258,5 @@ function deploy(userConfig){
 
 module.exports={
     deploy          : deploy,
-    kill            : kill,
     configTemplate  : config
 }
