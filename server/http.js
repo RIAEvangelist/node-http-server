@@ -86,7 +86,7 @@ function config(userConfig){
 };
 
 function deploy(userConfig){
-    var server=server=http.createServer(
+    var server=http.createServer(
         requestRecieved
     );
     server.config=config(userConfig);
@@ -251,9 +251,13 @@ function deploy(userConfig){
             }
         );
     }
+    
+    
+    return server;
 }
 
 module.exports={
     deploy          : deploy,
+    kill            : kill,
     configTemplate  : config
 }
