@@ -148,9 +148,15 @@ function deploy(userConfig){
             return;
         }
         
-        //Do not allow access to Dirs or restricted file types
+        //default
         if (
-            fs.statSync(filename).isDirectory() ||
+            fs.statSync(filename).isDirectory()
+        ){
+            filename+='/'+server.config.server.index;
+        }
+        
+        //Do not allow access to restricted file types
+        if (
             server.config.restrictedType[contentType]
         ){
             if(server.config.verbose)

@@ -5,6 +5,6 @@ console.log(server);
 server.deploy(
     {
         port:8000,
-        root:'~/myApp/'
+        root:'/home/brandon/myApp/'
     }
 );
