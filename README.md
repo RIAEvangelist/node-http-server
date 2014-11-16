@@ -15,19 +15,23 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
 ---
 #### currently modifiable via any interface, commandline, bash, node etc.
 
-    port    : 8080
-    root    : Current Working Directory (where you execute the command from)
-    domain  : 0.0.0.0
-    index   : index.html
-    verbose : false
-    noCache : true
-
+    port        : 8080
+    root        : Current Working Directory (where you execute the command from)
+    domain      : 0.0.0.0
+    index       : index.html
+    verbose     : false
+    noCache     : true
+    log         : false
+    logFunction : serverLogging
+    
 `` port `` the port on which the server should run  
 `` root `` the absolute location to the root dir for the public file system  
 `` domain `` the domain which this server applies to. You can add more servers via the node `` domains `` implementation described below than you can via bash or commandline. If you want to accept incoming requests for ***ANY Applicable Domain*** use `` 0.0.0.0 `` this will allow any request that is pointed at this machine on the specified port to use this server config.  
 `` index `` the default file to look for in a dir. if not found a **404** will be displayed   
 `` verbose `` should the server display detailed info about what it is doing
 `` noCache `` should the server prevent caching
+`` log `` full path to log file, if specified file is not present it will be created, however the dir must be there. ie. /tmp/server.log
+`` logFunction `` this defaults to log JSON data in the `` log `` file. However, you can overwrite this and do whatever you like with the JSON data if you so choose.
 
 ---
 #### currently modifiable via node
