@@ -10,7 +10,8 @@ var passedArgs  = process.argv.splice(2),
         port    : 8080,
         root    : process.cwd(),
         domain  : '0.0.0.0',
-        index   : 'index.html'
+        index   : 'index.html',
+        log     : false
     };
 
 for(var i=0; i<argCount; i++){
@@ -36,6 +37,9 @@ function config(userConfig){
         port        : args.port||defaults.port,
         root        : args.root||defaults.root,
         domain      : args.domain||defaults.domain,
+        log         : false,
+        //pass this as config for custom logging
+        logFunction : serverLogging,
         domains   : {
             /*******************\
              * domain  : /that/domains/root/dir
@@ -80,6 +84,22 @@ function config(userConfig){
         for(var k in userConfig){
             config[k]=userConfig[k];
         }
+    }
+    
+    function serverLogging(JSONData){
+        fs.exists(
+            config.log,
+            function(exists){
+                fs.writeFile(
+                    config.log, 
+                    ','+JSONData, 
+                    function (err) {
+                        if(err) 
+                            console.log(err);
+                    }
+                );
+            }
+        );
     }
     
     return config;
@@ -212,6 +232,22 @@ function deploy(userConfig){
     }
     
     function requestRecieved(request,response){
+        if(server.config.log){
+            var logData={
+                method  : request.method,
+                url     : request.url,
+                headers : request.headers
+            }
+            
+            server.config.logFunction(
+                JSON.stringify(
+                    logData
+                )
+            );
+    
+            if(server.config.verbose)
+                console.log(logData);
+        }
         var uri = url.parse(request.url);
         uri=uri.pathname;
         if (uri=='/')
