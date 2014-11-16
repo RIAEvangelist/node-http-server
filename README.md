@@ -5,7 +5,7 @@ Node http server
 Simple to use stand alone node HTTP Server you can spin up from node apps, bash scripts, the commandline, C or python apps etc.
 
     npm install node-http-server
-[![NPM](https://nodei.co/npm/node-http-server.png?downloads=true&downloadRank=true&stars=true)](https://npmjs.org/package/node-http-server)
+[![alt node-http-server npm stats](https://nodei.co/npm/node-http-server.png?downloads=true&downloadRank=true&stars=true)](https://npmjs.org/package/node-http-server)
 [![alt node-http-server npm downloads](https://nodei.co/npm-dl/node-http-server.png "number of times the node-http-server package has been downloaded from npm")](https://npmjs.org/package/node-http-server)
 
 ----
