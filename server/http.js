@@ -86,18 +86,25 @@ function config(userConfig){
         }
     }
     
-    function serverLogging(JSONData){
+    function serverLogging(data){
         fs.exists(
             config.log,
             function(exists){
-                fs.writeFile(
+                data.timestamp=new Date().getTime();
+                
+                var JSONData=JSON.stringify(data);
+                var method='appendFile';
+                if(!exists)
+                    method='writeFile'
+                    
+                fs[method](
                     config.log, 
-                    ','+JSONData, 
+                    JSONData, 
                     function (err) {
                         if(err) 
                             console.log(err);
                     }
-                );
+                );    
             }
         );
     }
@@ -246,9 +253,7 @@ function deploy(userConfig){
             }
             
             server.config.logFunction(
-                JSON.stringify(
-                    logData
-                )
+                logData
             );
     
             if(server.config.verbose)

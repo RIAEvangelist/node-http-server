@@ -33,7 +33,7 @@ This work is licenced via the [DBAD Public Licence](http://www.dbad-license.org/
 `` verbose `` should the server display detailed info about what it is doing
 `` noCache `` should the server prevent caching
 `` log `` full path to log file, if specified file is not present it will be created, however the dir must be there. ie. /tmp/server.log
-`` logFunction `` this defaults to log JSON data in the `` log `` file. However, you can overwrite this and do whatever you like with the JSON data if you so choose.
+`` logFunction `` this defaults to append timestamp to headers object and log as JSON in the `` log `` file. However, you can overwrite this and do whatever you like with the JSON data if you so choose. It accepts a javascript Object as the first argument for parsing. If you manually log to the default function. If you overwrite the function for custom logging, you must accept a javascript object as the first argument for the default log requests to function.
 
 ---
 #### currently modifiable via node
@@ -41,30 +41,30 @@ This work is licenced via the [DBAD Public Licence](http://www.dbad-license.org/
     domains     :   {}
     
     contentType :   {
-                        html    : 'text/html',
-                        css     : 'text/css',
-                        js      : 'text/javascript',
-                        json    : 'application/json',
-                        txt     : 'text/plain',
-                        jpeg    : 'image/jpeg',
-                        jpg     : 'image/jpeg',
-                        png     : 'image/png',
-                        gif     : 'image/gif',
-                        ico     : 'image/x-icon',
-                        appcache: 'text/cache-manifest'
-                    }
+        html    : 'text/html',
+        css     : 'text/css',
+        js      : 'text/javascript',
+        json    : 'application/json',
+        txt     : 'text/plain',
+        jpeg    : 'image/jpeg',
+        jpg     : 'image/jpeg',
+        png     : 'image/png',
+        gif     : 'image/gif',
+        ico     : 'image/x-icon',
+        appcache: 'text/cache-manifest'
+    }
     
     restrictedType: {}
     
     errors  :   {
-                    headers : {
-                        'Content-Type' : 'text/plain'
-                    },
-                    404: '404 MIA',
-                    415: '415 File type not supported',
-                    403: '403 Access Denied',
-                    500: '500 {{err}}'
-                }
+        headers : {
+            'Content-Type' : 'text/plain'
+        },
+        404: '404 MIA',
+        415: '415 File type not supported',
+        403: '403 Access Denied',
+        500: '500 {{err}}'
+    }
 
 `` domains `` this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.  
 `` contentType `` mapping of file extension to header content type.  
@@ -102,7 +102,7 @@ can be found in the examples folder
 #### basic
 this app could be launched as  
 `` node basicApp.js verbose=true  ``  
-to force verbose logging. This can be helpful if you have many servers in a single app and want them all to be verbose right now for debugging or testing purposes.
+to force verbose terminal output. This can be helpful if you have many servers in a single app and want them all to be verbose right now for debugging or testing purposes.
     
     var server=require('node-http-server');
 
