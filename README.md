@@ -32,7 +32,7 @@ This work is licenced via the [DBAD Public Licence](http://www.dbad-license.org/
 `` index `` the default file to look for in a dir. if not found a **404** will be displayed   
 `` verbose `` should the server display detailed info about what it is doing
 `` noCache `` should the server prevent caching
-`` log `` full path to log file, if specified file is not present it will be created, however the dir must be there. ie. /tmp/server.log It is recommended that you randomize this file name with a time stamp like : `` '~/serverLogs/domain-'+new Date().getTime()+'.log' `` this will create a new log file each time the server is started/restarted/reboot etc...
+`` log `` full path to log file, if specified file is not present it will be created, however the dir must be there. ie. /tmp/server.log It is recommended that you timestamp this file name with a time stamp like : `` '~/serverLogs/domain-'+new Date().getTime()+'.log' `` this will create a new log file each time the server is started/restarted/reboot etc...
 `` logFunction `` this defaults to append timestamp to headers object and log as JSON in the `` log `` file. However, you can overwrite this and do whatever you like with the JSON data if you so choose. It accepts a javascript Object as the first argument for parsing. If you manually log to the default function. If you overwrite the function for custom logging, you must accept a javascript object as the first argument for the default log requests to function.
 
 ---
