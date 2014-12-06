@@ -1,5 +1,6 @@
 Node http server
 ================
+v2.0.0 - stable
 ----
 
 Simple to use stand alone node HTTP Server you can spin up from node apps, bash scripts, the commandline, C or python apps etc.
@@ -25,15 +26,17 @@ This work is licenced via the [DBAD Public Licence](http://www.dbad-license.org/
     noCache     : true
     log         : false
     logFunction : serverLogging
-    
-`` port `` the port on which the server should run  
-`` root `` the absolute location to the root dir for the public file system  
-`` domain `` the domain which this server applies to. You can add more servers via the node `` domains `` implementation described below than you can via bash or commandline. If you want to accept incoming requests for ***ANY Applicable Domain*** use `` 0.0.0.0 `` this will allow any request that is pointed at this machine on the specified port to use this server config.  
-`` index `` the default file to look for in a dir. if not found a **404** will be displayed   
-`` verbose `` should the server display detailed info about what it is doing
-`` noCache `` should the server prevent caching
-`` log `` full path to log file, if specified file is not present it will be created, however the dir must be there. ie. /tmp/server.log It is recommended that you timestamp this file name with a time stamp like : `` '~/serverLogs/domain-'+new Date().getTime()+'.log' `` this will create a new log file each time the server is started/restarted/reboot etc...
-`` logFunction `` this defaults to append timestamp to headers object and log as JSON in the `` log `` file. However, you can overwrite this and do whatever you like with the JSON data if you so choose. It accepts a javascript Object as the first argument for parsing. If you manually log to the default function. If you overwrite the function for custom logging, you must accept a javascript object as the first argument for the default log requests to function.
+
+|key|description|
+|---|-----|
+|port| the port on which the server should run  |
+|root| the absolute location to the root dir for the public file system  |
+|domain| the domain which this server applies to. You can add more servers via the node `` domains ``  implementation described below than you can via bash or commandline. If you want to accept incoming requests for ***ANY Applicable Domain*** use `` 0.0.0.0 `` this will allow any request that is pointed at this machine on the specified port to use this server config.  |
+|index| the default file to look for in a dir. if not found a **404** will be displayed   |
+|verbose| should the server display detailed info about what it is doing  |
+|noCache| should the server prevent caching    |
+|log| full path to log file, if specified file is not present it will be created, however the dir must be there. ie. /tmp/server.log It is recommended that you timestamp this file name with a time stamp like : `` '~/serverLogs/domain-'+new Date().getTime()+'.log' `` this will create a new log file each time the server is started/restarted/reboot etc...  |
+|logFunction| this defaults to append timestamp to headers object and log as JSON in the `` log `` file. However, you can overwrite this and do whatever you like with the JSON data if you so choose. It accepts a javascript Object as the first argument for parsing. If you manually log to the default function. If you overwrite the function for custom logging, you must accept a javascript object as the first argument for the default log requests to function.  |
 
 ---
 #### currently modifiable via node
@@ -66,10 +69,12 @@ This work is licenced via the [DBAD Public Licence](http://www.dbad-license.org/
         500: '500 {{err}}'
     }
 
-`` domains `` this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.  
-`` contentType `` mapping of file extension to header content type.  
-`` restrictedType `` extensions to which external access will be denied.  
-`` errors `` error headers and error strings, these can be anything you like from html to text etc. just make sure they all can use the same headers. The **500** error will replace `` {{err}} `` in the specified value with the actual error message from the server.  
+|key|description|
+|---|-----------|
+|domains| this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.|
+|contentType| mapping of file extension to header content type.  |
+|restrictedType| extensions to which external access will be denied.  |
+|errors| error headers and error strings, these can be anything you like from html to text etc. just make sure| they all can use the same headers. The **500** error will replace `` {{err}} `` in the specified value with the actual error message from the server.  |
 
 ---
 
@@ -90,9 +95,10 @@ you can specify any of the variables frpom the ***currently modifiable via any i
 
 `` server `` has 2 methods, `` deploy `` and `` configTemplate ``
 
-`` server.configTemplate `` will generate a complete config file based off of the default values and arguments passed in when launching the app. **DO NOT USE launch=now** as an argument for a node app. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.
-
-`` server.deploy `` will accept any config params and merge them with a fresh configTemplate, so passing a modified config based off of `` server.configTemplate() `` will result in using only the values from the modified config passed when deploying as it will override all of the defaults. ***The passed config object only merges to one level deep*** so if you pass a multi level object like `` contentTypes `` it will overwrite the default config with what you sent for that object rather than merging your object with the default.
+|Server Method| description |
+|-------------|-------------|
+|server.configTemplate| will generate a complete config file based off of the default values and arguments passed in when launching the app. **DO NOT USE launch=now** as an argument for a node app. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.|
+|server.deploy|will accept any config params and merge them with a fresh configTemplate, so passing a modified config based off of `` server.configTemplate() `` will result in using only the values from the modified config passed when deploying as it will override all of the defaults. ***The passed config object only merges to one level deep*** so if you pass a multi level object like `` contentTypes `` it will overwrite the default config with what you sent for that object rather than merging your object with the default.|
 
 ---
 
