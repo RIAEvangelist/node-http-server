@@ -1,3 +1,6 @@
+/*jslint node: true */
+'use strict';
+
 var http    = require('http'),
     url     = require('url'),
     path    = require('path'),
@@ -32,7 +35,7 @@ if(args.launch=='now')
  * ************************************/
 
 function config(userConfig){
-    var config={
+    var configObj={
         verbose     : (args.verbose=='true')||false,
         port        : args.port||defaults.port,
         root        : args.root||defaults.root,
@@ -78,27 +81,27 @@ function config(userConfig){
             403: '403 Access Denied',
             500: '500 {{err}}'
         }
-    }
+    };
 
     if(userConfig){
         for(var k in userConfig){
-            config[k]=userConfig[k];
+            configObj[k]=userConfig[k];
         }
     }
 
     function serverLogging(data){
         fs.exists(
-            config.log,
+            configObj.log,
             function(exists){
                 data.timestamp=new Date().getTime();
 
                 var JSONData=JSON.stringify(data);
                 var method='appendFile';
                 if(!exists)
-                    method='writeFile'
+                    method='writeFile';
 
                 fs[method](
-                    config.log,
+                    configObj.log,
                     JSONData,
                     function (err) {
                         if(err)
@@ -109,10 +112,10 @@ function config(userConfig){
         );
     }
 
-    return config;
-};
+    return configObj;
+}
 
-function deploy(userConfig){
+function deploy(userConfig, readyCallback){
     var server=http.createServer(
         requestRecieved
     );
@@ -122,10 +125,13 @@ function deploy(userConfig){
     if(server.config.verbose)
         console.log(server.config.logID+' configured with ###\n\n',server.config);
 
-    server.listen(server.config.port);
-
-    if(server.config.verbose)
-        console.log(server.config.logID+' listening on port '+server.config.port+' ###\n\n');
+    server.listen(server.config.port, function() {
+        if(server.config.verbose)
+            console.log(server.config.logID+' listening on port '+server.config.port+' ###\n\n');       
+        if ( readyCallback ) {
+            readyCallback();
+        }
+    } );
 
     function serveFile(filename,exists,response) {
         if(!exists) {
@@ -195,7 +201,7 @@ function deploy(userConfig){
 
                 var headers = {
                     'Content-Type' : server.config.contentType[contentType]
-                }
+                };
 
                 if(server.config.server.noCache)
                     headers['Cache-Control']='no-cache, no-store, must-revalidate';
@@ -225,7 +231,7 @@ function deploy(userConfig){
         if(!headers){
             headers={
                 'Content-type':'text/plain'
-            }
+            };
 
             if(server.config.verbose)
                 console.log(server.config.logID+' headers not specified ###\n\nheaders set to:\n',headers,'\n\n');
@@ -250,7 +256,7 @@ function deploy(userConfig){
                 method  : request.method,
                 url     : request.url,
                 headers : request.headers
-            }
+            };
 
             server.config.logFunction(
                 logData
@@ -265,7 +271,7 @@ function deploy(userConfig){
             uri='/'+server.config.server.index;
 
          var hostname= [];
-        if (request.headers.host != undefined)
+        if (request.headers.host !== undefined)
             hostname = request.headers.host.split(':');
         var root    = server.config.root;
 
@@ -296,7 +302,7 @@ function deploy(userConfig){
         fs.exists(
             filename,
             function(exists){
-                serveFile(filename,exists,response)
+                serveFile(filename,exists,response);
             }
         );
     }
@@ -308,4 +314,4 @@ function deploy(userConfig){
 module.exports={
     deploy          : deploy,
     configTemplate  : config
-}
+};
