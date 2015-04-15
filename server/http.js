@@ -125,13 +125,15 @@ function deploy(userConfig, readyCallback){
     if(server.config.verbose)
         console.log(server.config.logID+' configured with ###\n\n',server.config);
 
-    server.listen(server.config.port, function() {
-        if(server.config.verbose)
-            console.log(server.config.logID+' listening on port '+server.config.port+' ###\n\n');       
-        if ( readyCallback ) {
-            readyCallback();
-        }
-    } );
+    server.listen(
+        server.config.port, 
+        function() {
+            if(server.config.verbose)
+                console.log(server.config.logID+' listening on port '+server.config.port+' ###\n\n');       
+            if (readyCallback)
+                readyCallback();
+        } 
+    );
 
     function serveFile(filename,exists,response) {
         if(!exists) {
@@ -270,7 +272,7 @@ function deploy(userConfig, readyCallback){
         if (uri=='/')
             uri='/'+server.config.server.index;
 
-         var hostname= [];
+        var hostname= [];
         if (request.headers.host !== undefined)
             hostname = request.headers.host.split(':');
         var root    = server.config.root;
@@ -284,11 +286,11 @@ function deploy(userConfig, readyCallback){
         }
 
         if(server.config.verbose){
-                console.log(server.config.logID+' REQUEST ###\n\n',
-                    request.headers,'\n',
-                    uri,'\n\n',
-                    hostname,'\n\n'
-                );
+            console.log(server.config.logID+' REQUEST ###\n\n',
+                request.headers,'\n',
+                uri,'\n\n',
+                hostname,'\n\n'
+            );
         }
 
         if(uri.slice(-1)=='/')
