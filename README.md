@@ -12,6 +12,8 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
 [![http server package quality](http://npm.packagequality.com/badge/node-http-server.png)](http://packagequality.com/#?package=node-http-server)  
 This work is licenced via the [DBAD Public Licence](http://www.dbad-license.org/). 
 
+[See node-http-server NPM stats](http://npm-stat.com/charts.html?package=node-http-server&author=&from=&to=)
+
 ----
 
 
