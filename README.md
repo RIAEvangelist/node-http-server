@@ -1,6 +1,6 @@
 Node http server
 ================
-v2.0.0 - stable
+v3.0.1 - stable
 ----
 
 Simple to use stand alone node HTTP Server you can spin up from node apps, bash scripts, the commandline, C or python apps etc.
