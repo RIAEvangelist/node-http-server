@@ -1,10 +1,13 @@
 {
   "name": "node-http-server",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "A very simple and fast http server for node, bash, and spawnable from C, Python etc. It is lightweight and great for embedded solutions as well as everyday development or public facing apps.",
   "main": "server/http.js",
   "directories": {
     "example": "example"
+  },
+  "engines": {
+    "node": ">=0.10.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
