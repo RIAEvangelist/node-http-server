@@ -7,12 +7,14 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
 
 ` npm install node-http-server `
 
-[![Package Quality](http://npm.packagequality.com/shield/node-http-server.svg)](http://packagequality.com/#?package=node-http-server)
+npm info :  [See npm trends and stats for node-http-server](http://npm-stat.com/charts.html?package=node-http-server&author=&from=&to=)  
+![node-http-server npm version](https://img.shields.io/npm/v/node-http-server.svg) ![supported node version for node-http-server](https://img.shields.io/node/v/node-http-server.svg) ![total npm downloads for node-http-server](https://img.shields.io/npm/dt/node-http-server.svg) ![monthly npm downloads for node-http-server](https://img.shields.io/npm/dm/node-http-server.svg) ![npm licence for node-http-server](https://img.shields.io/npm/l/node-http-server.svg)
 
-[![http server package quality](http://npm.packagequality.com/badge/node-http-server.png)](http://packagequality.com/#?package=node-http-server)  
-This work is licenced via the [DBAD Public Licence](http://www.dbad-license.org/). 
+GitHub info :  
+![node-http-server GitHub Release](https://img.shields.io/github/release/RIAEvangelist/node-http-server.svg) ![GitHub license node-http-server license](https://img.shields.io/github/license/RIAEvangelist/node-http-server.svg) ![open issues for node-http-server on GitHub](https://img.shields.io/github/issues/RIAEvangelist/node-http-server.svg)
 
-[See node-http-server NPM stats](http://npm-stat.com/charts.html?package=node-http-server&author=&from=&to=)
+Package Quality :  
+![node-http-server Package Quality](http://npm.packagequality.com/badge/node-http-server.png)
 
 ----
 
@@ -45,7 +47,7 @@ This work is licenced via the [DBAD Public Licence](http://www.dbad-license.org/
 #### currently modifiable via node
 
     domains     :   {}
-    
+
     contentType :   {
         html    : 'text/html',
         css     : 'text/css',
@@ -59,9 +61,9 @@ This work is licenced via the [DBAD Public Licence](http://www.dbad-license.org/
         ico     : 'image/x-icon',
         appcache: 'text/cache-manifest'
     }
-    
+
     restrictedType: {}
-    
+
     errors  :   {
         headers : {
             'Content-Type' : 'text/plain'
@@ -112,25 +114,25 @@ can be found in the examples folder
 this app could be launched as  
 `` node basicApp.js verbose=true  ``  
 to force verbose terminal output. This can be helpful if you have many servers in a single app and want them all to be verbose right now for debugging or testing purposes.
-    
+
     var server=require('node-http-server');
 
     console.log(server);
-    
+
     server.deploy(
         {
             port:8000,
             root:'~/myApp/'
         }
-    ); 
-    
+    );
+
 ---
 #### verbose
 
     var server=require('node-http-server');
 
     console.log(server);
-    
+
     server.deploy(
         {
             verbose:true,
@@ -138,21 +140,21 @@ to force verbose terminal output. This can be helpful if you have many servers i
             root:'~/myApp/'
         }
     );
-    
+
 ---
 #### advanced
-    
+
     var server=require('node-http-server');
 
     console.log(server);
-    
+
     var config=server.configTemplate();
     config.errors['404']    = 'These are not the files you are looking for...';
     config.contentType.mp4  = 'video/mp4';
     config.port             = 8005;
     config.verbose          = true;
     config.root             = '~/myApp/'
-    
+
     server.deploy(config);
 
 ---
@@ -161,7 +163,7 @@ to force verbose terminal output. This can be helpful if you have many servers i
     var server=require('node-http-server');
 
     console.log(server);
-    
+
     server.deploy(
         {
             verbose:true,
@@ -183,5 +185,5 @@ to force verbose terminal output. This can be helpful if you have many servers i
 *when starting the same server many times, **like every time the system boots** you will want to append to the same log file* so use `` -a ``. Without `` -a `` forever will throw an error stating that the log file for the `` --uid `` already exists.
 
     forever --uid nodeServer -a start ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
-    
+
 This can be set as a ``.profile`` command or a ``.bash_rc`` command as well if you want to launch the server every time the computer boots up.
