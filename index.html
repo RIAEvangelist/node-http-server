@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Node-http-server : Simple to use node HTTP Server">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Node-http-server</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/RIAEvangelist/node-http-server">View on GitHub</a>
+
+          <h1 id="project_title">Node-http-server</h1>
+          <h2 id="project_tagline">Simple to use node HTTP Server</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/RIAEvangelist/node-http-server/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/RIAEvangelist/node-http-server/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="node-http-server" class="anchor" href="#node-http-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node http server</h1>
+
+<hr>
+
+<p>Simple to use stand alone node HTTP Server you can spin up from node apps, bash scripts, the commandline, C or python apps etc.</p>
+
+<p><code>npm install node-http-server</code></p>
+
+<p>npm info :  <a href="http://npm-stat.com/charts.html?package=node-http-server&amp;author=&amp;from=&amp;to=">See npm trends and stats for node-http-server</a><br>
+<img src="https://img.shields.io/npm/v/node-http-server.svg" alt="node-http-server npm version"> <img src="https://img.shields.io/node/v/node-http-server.svg" alt="supported node version for node-http-server"> <img src="https://img.shields.io/npm/dt/node-http-server.svg" alt="total npm downloads for node-http-server"> <img src="https://img.shields.io/npm/dm/node-http-server.svg" alt="monthly npm downloads for node-http-server"> <img src="https://img.shields.io/npm/l/node-http-server.svg" alt="npm licence for node-http-server"></p>
+
+<p>GitHub info :<br>
+<img src="https://img.shields.io/github/release/RIAEvangelist/node-http-server.svg" alt="node-http-server GitHub Release"> <img src="https://img.shields.io/github/license/RIAEvangelist/node-http-server.svg" alt="GitHub license node-http-server license"> <img src="https://img.shields.io/github/issues/RIAEvangelist/node-http-server.svg" alt="open issues for node-http-server on GitHub"></p>
+
+<p>Package Quality :<br>
+<img src="http://npm.packagequality.com/badge/node-http-server.png" alt="node-http-server Package Quality"></p>
+
+<hr>
+
+<h2>
+<a id="defaults" class="anchor" href="#defaults" aria-hidden="true"><span class="octicon octicon-link"></span></a>Defaults</h2>
+
+<hr>
+
+<h4>
+<a id="currently-modifiable-via-any-interface-commandline-bash-node-etc" class="anchor" href="#currently-modifiable-via-any-interface-commandline-bash-node-etc" aria-hidden="true"><span class="octicon octicon-link"></span></a>currently modifiable via any interface, commandline, bash, node etc.</h4>
+
+<pre><code>port        : 8080
+root        : Current Working Directory (where you execute the command from)
+domain      : 0.0.0.0
+index       : index.html
+verbose     : false
+noCache     : true
+log         : false
+logFunction : serverLogging
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>key</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>port</td>
+<td>the port on which the server should run</td>
+</tr>
+<tr>
+<td>root</td>
+<td>the absolute location to the root dir for the public file system</td>
+</tr>
+<tr>
+<td>domain</td>
+<td>the domain which this server applies to. You can add more servers via the node <code>domains</code>  implementation described below than you can via bash or commandline. If you want to accept incoming requests for <strong><em>ANY Applicable Domain</em></strong> use <code>0.0.0.0</code> this will allow any request that is pointed at this machine on the specified port to use this server config.</td>
+</tr>
+<tr>
+<td>index</td>
+<td>the default file to look for in a dir. if not found a <strong>404</strong> will be displayed</td>
+</tr>
+<tr>
+<td>verbose</td>
+<td>should the server display detailed info about what it is doing</td>
+</tr>
+<tr>
+<td>noCache</td>
+<td>should the server prevent caching</td>
+</tr>
+<tr>
+<td>log</td>
+<td>full path to log file, if specified file is not present it will be created, however the dir must be there. ie. /tmp/server.log It is recommended that you timestamp this file name with a time stamp like : <code>'~/serverLogs/domain-'+new Date().getTime()+'.log'</code> this will create a new log file each time the server is started/restarted/reboot etc...</td>
+</tr>
+<tr>
+<td>logFunction</td>
+<td>this defaults to append timestamp to headers object and log as JSON in the <code>log</code> file. However, you can overwrite this and do whatever you like with the JSON data if you so choose. It accepts a javascript Object as the first argument for parsing. If you manually log to the default function. If you overwrite the function for custom logging, you must accept a javascript object as the first argument for the default log requests to function.</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h4>
+<a id="currently-modifiable-via-node" class="anchor" href="#currently-modifiable-via-node" aria-hidden="true"><span class="octicon octicon-link"></span></a>currently modifiable via node</h4>
+
+<pre><code>domains     :   {}
+
+contentType :   {
+    html    : 'text/html',
+    css     : 'text/css',
+    js      : 'text/javascript',
+    json    : 'application/json',
+    txt     : 'text/plain',
+    jpeg    : 'image/jpeg',
+    jpg     : 'image/jpeg',
+    png     : 'image/png',
+    gif     : 'image/gif',
+    ico     : 'image/x-icon',
+    appcache: 'text/cache-manifest'
+}
+
+restrictedType: {}
+
+errors  :   {
+    headers : {
+        'Content-Type' : 'text/plain'
+    },
+    404: '404 MIA',
+    415: '415 File type not supported',
+    403: '403 Access Denied',
+    500: '500 {{err}}'
+}
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>key</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>domains</td>
+<td>this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.</td>
+</tr>
+<tr>
+<td>contentType</td>
+<td>mapping of file extension to header content type.</td>
+</tr>
+<tr>
+<td>restrictedType</td>
+<td>extensions to which external access will be denied.</td>
+</tr>
+<tr>
+<td>errors</td>
+<td>error headers and error strings, these can be anything you like from html to text etc. just make sure</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>
+<a id="commandline--bash-use" class="anchor" href="#commandline--bash-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>Commandline / bash use</h2>
+
+<p><code>launch</code> is an argument that specifies to launch the server now with the provided arguments and defaults</p>
+
+<pre><code>node ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
+</code></pre>
+
+<p>you can specify any of the variables frpom the <strong><em>currently modifiable via any interface, commandline, bash, node etc.</em></strong> section above. The order does not matter.</p>
+
+<pre><code>node ~/git/node-http-server/server/http.js root=~/myApp/ port=8888 verbose=true launch=now
+</code></pre>
+
+<hr>
+
+<h2>
+<a id="node-app-use" class="anchor" href="#node-app-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>node app use</h2>
+
+<pre><code>var server=require('node-http-server');
+</code></pre>
+
+<p><code>server</code> has 2 methods, <code>deploy</code> and <code>configTemplate</code></p>
+
+<table>
+<thead>
+<tr>
+<th>Server Method</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>server.configTemplate</td>
+<td>will generate a complete config file based off of the default values and arguments passed in when launching the app. <strong>DO NOT USE launch=now</strong> as an argument for a node app. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.</td>
+</tr>
+<tr>
+<td>server.deploy</td>
+<td>will accept any config params and merge them with a fresh configTemplate, so passing a modified config based off of <code>server.configTemplate()</code> will result in using only the values from the modified config passed when deploying as it will override all of the defaults. <strong><em>The passed config object only merges to one level deep</em></strong> so if you pass a multi level object like <code>contentTypes</code> it will overwrite the default config with what you sent for that object rather than merging your object with the default.</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h4>
+<a id="node-examples" class="anchor" href="#node-examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>node examples</h4>
+
+<p>can be found in the examples folder</p>
+
+<h4>
+<a id="basic" class="anchor" href="#basic" aria-hidden="true"><span class="octicon octicon-link"></span></a>basic</h4>
+
+<p>this app could be launched as<br>
+<code>node basicApp.js verbose=true</code><br>
+to force verbose terminal output. This can be helpful if you have many servers in a single app and want them all to be verbose right now for debugging or testing purposes.</p>
+
+<pre><code>var server=require('node-http-server');
+
+console.log(server);
+
+server.deploy(
+    {
+        port:8000,
+        root:'~/myApp/'
+    }
+);
+</code></pre>
+
+<hr>
+
+<h4>
+<a id="verbose" class="anchor" href="#verbose" aria-hidden="true"><span class="octicon octicon-link"></span></a>verbose</h4>
+
+<pre><code>var server=require('node-http-server');
+
+console.log(server);
+
+server.deploy(
+    {
+        verbose:true,
+        port:8001,
+        root:'~/myApp/'
+    }
+);
+</code></pre>
+
+<hr>
+
+<h4>
+<a id="advanced" class="anchor" href="#advanced" aria-hidden="true"><span class="octicon octicon-link"></span></a>advanced</h4>
+
+<pre><code>var server=require('node-http-server');
+
+console.log(server);
+
+var config=server.configTemplate();
+config.errors['404']    = 'These are not the files you are looking for...';
+config.contentType.mp4  = 'video/mp4';
+config.port             = 8005;
+config.verbose          = true;
+config.root             = '~/myApp/'
+
+server.deploy(config);
+</code></pre>
+
+<hr>
+
+<h4>
+<a id="multiple-domains-or-subdomains" class="anchor" href="#multiple-domains-or-subdomains" aria-hidden="true"><span class="octicon octicon-link"></span></a>multiple domains or subdomains</h4>
+
+<pre><code>var server=require('node-http-server');
+
+console.log(server);
+
+server.deploy(
+    {
+        verbose:true,
+        port:8010,
+        root:process.env.HOME+'/myApp/',
+        domain:'myapp',
+        domains:{
+            'a.myapp':process.env.HOME+'/myApp/mySubdomain/',
+            'yourapp.com':process.env.HOME+'/www/yourApp/'
+        }
+    }
+);    
+</code></pre>
+
+<hr>
+
+<h2>
+<a id="starting-with-forever" class="anchor" href="#starting-with-forever" aria-hidden="true"><span class="octicon octicon-link"></span></a>Starting with forever</h2>
+
+<p><em>It is helpful especially when running multiple servers to label them</em>  with <code>--uid</code> for easy to remember process names</p>
+
+<p><em>when starting the same server many times, *</em>like every time the system boots** you will want to append to the same log file* so use <code>-a</code>. Without <code>-a</code> forever will throw an error stating that the log file for the <code>--uid</code> already exists.</p>
+
+<pre><code>forever --uid nodeServer -a start ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
+</code></pre>
+
+<p>This can be set as a <code>.profile</code> command or a <code>.bash_rc</code> command as well if you want to launch the server every time the computer boots up.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Node-http-server maintained by <a href="https://github.com/RIAEvangelist">RIAEvangelist</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
