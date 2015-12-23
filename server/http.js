@@ -253,6 +253,9 @@ function deploy(userConfig, readyCallback){
     }
 
     function requestRecieved(request,response){
+        if(response.finished){
+            return
+        }
         if(server.config.log){
             var logData={
                 method  : request.method,
