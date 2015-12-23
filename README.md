@@ -112,9 +112,10 @@ In the main directory enter
 
 `npm start`
 
-to see a basic app and see the example folder to edit and create an awesome app of your own! 
+to see a basic app and see the example folder to edit and create an awesome app of your own!
 
 ---
+
 #### node examples
 can be found in the examples folder
 
