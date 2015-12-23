@@ -106,6 +106,15 @@ you can specify any of the variables frpom the ***currently modifiable via any i
 
 ---
 
+## basic app example
+
+In the main directory enter
+
+`npm start`
+
+to see a basic app and see the example folder to edit and create an awesome app of your own! 
+
+---
 #### node examples
 can be found in the examples folder
 

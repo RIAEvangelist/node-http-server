@@ -1,0 +1,13 @@
+body{
+    height: 100%;
+    width: 100%;
+    background-color: rgb(191, 191, 191);
+}
+
+.helloDiv{
+    position: absolute;
+    top: 40%;
+    left: 30%;
+    font-size: 100px;
+    font-family: impact;
+}
