@@ -84,7 +84,6 @@ var defaultConfigs={
 };
 
 function deploy(userConfig, readyCallback){
-    console.log('deploying');
     Object.defineProperty(
         this,
         'server',
@@ -96,7 +95,6 @@ function deploy(userConfig, readyCallback){
             enumerable:true
         }
     );
-
     this.config=new this.Config(userConfig);
     this.config.logID='### '+this.config.domain+' server';
 
@@ -211,7 +209,7 @@ function serveFile(filename,exists,response) {
             }
 
             return;
-        }
+        }.bind(this)
     );
 }
 
@@ -343,8 +341,10 @@ function serverLogging(data){
  * ************************************/
 
 function Config(userConfig){
+    //for backwards compatibility
+    var config = {};
     Object.defineProperties(
-        this,
+        config,
         {
             verbose     : {
                 value:defaultConfigs.verbose,
@@ -407,12 +407,12 @@ function Config(userConfig){
 
     if(userConfig){
         for(var k in userConfig){
-            this[k]=userConfig[k];
+            config[k]=userConfig[k];
         }
     }
 
     //this is to allow backwards compatibility with configTemplate
-    return this;
+    return config;
 }
 
 /*********************
