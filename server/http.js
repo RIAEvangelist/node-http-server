@@ -54,7 +54,7 @@ var defaultConfigs={
     },
     server      : {
         index   : args.index||defaults.index,
-        noCache : (args.noCache=='false')||true
+        noCache : args.noCache=='false' ? false : true
     },
     contentType : {
         html    : 'text/html',
