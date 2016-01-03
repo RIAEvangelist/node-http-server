@@ -40,6 +40,7 @@ function deploy(userConfig, readyCallback){
         console.log(this.config.logID+' configured with ###\n\n',this.config);
     }
 
+    this.server.timeout=this.config.server.timeout;
     this.server.listen(
         this.config.port,
         function() {
@@ -266,18 +267,24 @@ function Server(){
             },
             serveFile:{
                 value:serveFile,
-                writable:true,
+                writable:false,
                 enumerable:false
+            },
+            //executed just before response sent allowing user to modify if needed
+            beforeServe:{
+                value:function(){},
+                writable:true,
+                enumerable:true
             },
             serve:{
                 value:serve,
-                writable:true,
+                writable:false,
                 enumerable:false
             },
             //kept for backwards compatibility
             configTemplate  :{
                 value:Config,
-                writable:true,
+                writable:false,
                 //not visible because this is just for backwards compatibility
                 enumerable:false
             },
