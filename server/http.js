@@ -58,12 +58,15 @@ function deploy(userConfig, readyCallback){
 
 function serveFile(filename,exists,response) {
     if(!exists) {
-        if(this.config.verbose)
+        if(this.config.verbose){
             console.log(this.config.logID+' 404 ###\n\n');
+        }
+
+        response.statusCode=404;
+
         this.serve(
             response,
             this.config.errors['404'],
-            404,
             this.config.errors.headers
         );
         return;
@@ -77,10 +80,11 @@ function serveFile(filename,exists,response) {
             console.log(this.config.logID+' 415 ###\n\n');
         }
 
+        response.statusCode=415;
+
         this.serve(
             response,
             this.config.errors['415'],
-            415,
             this.config.errors.headers
         );
         return;
@@ -101,10 +105,11 @@ function serveFile(filename,exists,response) {
             console.log(this.config.logID+' 403 ###\n\n');
         }
 
+        response.statusCode=403;
+
         this.serve(
             response,
             this.config.errors['403'],
-            403,
             this.config.errors.headers
         );
         return;
@@ -118,10 +123,12 @@ function serveFile(filename,exists,response) {
                 if(this.config.verbose){
                     console.log(this.config.logID+' 500 ###\n\n',err,'\n\n');
                 }
+
+                response.statusCode=500;
+
                 this.serve(
                     response,
                     this.config.errors['500'].replace(/\{\{err\}\}/g,err),
-                    500,
                     this.config.errors.headers
                 );
                 return;
@@ -135,10 +142,11 @@ function serveFile(filename,exists,response) {
                 headers['Cache-Control']='no-cache, no-store, must-revalidate';
             }
 
+            response.statusCode=200;
+
             this.serve(
                 response,
                 file,
-                200,
                 headers,
                 'binary'
             );
@@ -152,10 +160,10 @@ function serveFile(filename,exists,response) {
     );
 }
 
-function serve(response,body,status,headers,encoding){
+function serve(response,body,headers,encoding){
     //defaults to 200
-    if(!status){
-        status=200;
+    if(!response.statusCode){
+        response.statusCode=200;
     }
 
     //defaults to text/plain
@@ -178,12 +186,18 @@ function serve(response,body,status,headers,encoding){
         }
     }
 
+    this.beforeServe(response,body,headers,encoding);
+
+    if(response.finished){
+        this.afterServe();
+        return;
+    }
+
     response.writeHead(
-        status,
+        response.statusCode,
         headers
     );
-    response.write(body,encoding);
-    response.end();
+    response.end(body,encoding,this.afterServe);
     return;
 }
 
@@ -272,6 +286,12 @@ function Server(){
             },
             //executed just before response sent allowing user to modify if needed
             beforeServe:{
+                value:function(){},
+                writable:true,
+                enumerable:true
+            },
+            //executed after each full response completely sent
+            afterServe:{
                 value:function(){},
                 writable:true,
                 enumerable:true
