@@ -1,0 +1,29 @@
+body{
+    height: 100%;
+    width: 100%;
+    background-color: rgb({{bgr}}, {{bgg}}, {{bgb}});
+}
+
+.helloDiv{
+    position: absolute;
+    color: rgb({{tr}}, {{tg}}, {{tb}});
+    font-family: impact;
+    top: 20%;
+    width:100%;
+    text-align:center;
+    font-size: 8em;
+}
+
+.networkinfo{
+    font-family: ubuntu, helvetica, arial;
+    font-size:.25em;
+    width:50%;
+    margin:0 25%;
+    text-align: left;
+    list-style: none;
+}
+
+.networkinfo > li{
+    margin:1em 0;
+    line-height:1.2em;
+}
