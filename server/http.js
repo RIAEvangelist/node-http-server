@@ -56,6 +56,16 @@ function deploy(userConfig, readyCallback){
     );
 }
 
+function setHeaders(response,headers){
+    var keys=Object.keys(headers);
+    for(var i in keys){
+        response.setHeader(
+            keys[i],
+            headers[keys[i]]
+        )
+    }
+}
+
 function serveFile(filename,exists,response) {
     if(!exists) {
         if(this.config.verbose){
@@ -63,11 +73,11 @@ function serveFile(filename,exists,response) {
         }
 
         response.statusCode=404;
+        setHeaders(response, this.config.errors.headers);
 
         this.serve(
             response,
-            this.config.errors['404'],
-            this.config.errors.headers
+            this.config.errors['404']
         );
         return;
     }
@@ -81,11 +91,11 @@ function serveFile(filename,exists,response) {
         }
 
         response.statusCode=415;
+        setHeaders(response, this.config.errors.headers);
 
         this.serve(
             response,
-            this.config.errors['415'],
-            this.config.errors.headers
+            this.config.errors['415']
         );
         return;
     }
@@ -106,11 +116,11 @@ function serveFile(filename,exists,response) {
         }
 
         response.statusCode=403;
+        setHeaders(response, this.config.errors.headers);
 
         this.serve(
             response,
-            this.config.errors['403'],
-            this.config.errors.headers
+            this.config.errors['403']
         );
         return;
     }
@@ -125,21 +135,25 @@ function serveFile(filename,exists,response) {
                 }
 
                 response.statusCode=500;
+                setHeaders(response, this.config.errors.headers);
 
                 this.serve(
                     response,
-                    this.config.errors['500'].replace(/\{\{err\}\}/g,err),
-                    this.config.errors.headers
+                    this.config.errors['500'].replace(/\{\{err\}\}/g,err)
                 );
                 return;
             }
 
-            var headers = {
-                'Content-Type' : this.config.contentType[contentType]
-            };
+            response.setHeader(
+                'Content-Type',
+                this.config.contentType[contentType]
+            );
 
             if(this.config.server.noCache){
-                headers['Cache-Control']='no-cache, no-store, must-revalidate';
+                response.setHeader(
+                    'Cache-Control',
+                    'no-cache, no-store, must-revalidate'
+                );
             }
 
             response.statusCode=200;
@@ -147,12 +161,11 @@ function serveFile(filename,exists,response) {
             this.serve(
                 response,
                 file,
-                headers,
                 'binary'
             );
 
             if(this.config.verbose){
-                console.log(this.config.logID+' 200 ###\n\n',headers,'\n\n');
+                console.log(this.config.logID+' 200 ###\n\n');
             }
 
             return;
@@ -160,43 +173,40 @@ function serveFile(filename,exists,response) {
     );
 }
 
-function serve(response,body,headers,encoding){
+function serve(response,body,encoding){
     //defaults to 200
     if(!response.statusCode){
         response.statusCode=200;
     }
 
     //defaults to text/plain
-    if(!headers){
-        headers={
-            'Content-type':'text/plain'
-        };
+    if(!response.getHeader('Content-Type')){
+        response.setHeader(
+            'Content-Type',
+            'text/plain'
+        );
 
         if(this.config.verbose){
-            console.log(this.config.logID+' headers not specified ###\n\nheaders set to:\n',headers,'\n\n');
+            console.log(this.config.logID+' response content-type header not specified ###\n\nContent-Type set to: text/plain\n\n');
         }
     }
 
-   //defaults to utf8
+    //defaults to utf8
     if(!encoding){
         encoding='utf8';
 
         if(this.config.verbose){
-            console.log(this.config.logID+' encoding not specified ###\n\encoding set to:\n',encoding,'\n\n');
+            console.log(this.config.logID+' encoding not specified ###\nencoding set to:\n',encoding,'\n\n');
         }
     }
 
-    this.beforeServe(response,body,headers,encoding);
+    this.beforeServe(response,body,encoding);
 
     if(response.finished){
         this.afterServe();
         return;
     }
 
-    response.writeHead(
-        response.statusCode,
-        headers
-    );
     response.end(body,encoding,this.afterServe);
     return;
 }

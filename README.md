@@ -45,33 +45,58 @@ Package Quality :
 ---
 #### currently modifiable via node
 
-    domains     :   {}
+```javascript```
 
-    contentType :   {
-        html    : 'text/html',
-        css     : 'text/css',
-        js      : 'text/javascript',
-        json    : 'application/json',
-        txt     : 'text/plain',
-        jpeg    : 'image/jpeg',
-        jpg     : 'image/jpeg',
-        png     : 'image/png',
-        gif     : 'image/gif',
-        ico     : 'image/x-icon',
-        appcache: 'text/cache-manifest'
-    }
-
-    restrictedType: {}
-
-    errors  :   {
-        headers : {
-            'Content-Type' : 'text/plain'
+    {
+        verbose     : (args.verbose=='true')||false,
+        port        : args.port||defaults.port,
+        root        : args.root||defaults.root,
+        domain      : args.domain||defaults.domain,
+        log         : false,
+        //pass this as config for custom logging
+        logFunction : serverLogging,
+        domains   : {
+            /*******************\
+             * domain  : /that/domains/root/dir
+             *
+             * for sub domains, specify the whole host i.e. "my.sub.domain"
+             * you may need to edit your hosts file, cnames or iptable
+             * domain or my.domain etc. goes to 127.0.0.1 for local development
+             * *****************/
         },
-        404: '404 MIA',
-        415: '415 File type not supported',
-        403: '403 Access Denied',
-        500: '500 {{err}}'
-    }
+        server      : {
+            index   : args.index||defaults.index,
+            noCache : args.noCache=='false' ? false : true,
+            timeout : 30000 //30 second timeout
+        },
+        contentType : {
+            html    : 'text/html',
+            css     : 'text/css',
+            js      : 'text/javascript',
+            json    : 'application/json',
+            txt     : 'text/plain',
+            jpeg    : 'image/jpeg',
+            jpg     : 'image/jpeg',
+            png     : 'image/png',
+            gif     : 'image/gif',
+            ico     : 'image/x-icon',
+            appcache: 'text/cache-manifest'
+        },
+        restrictedType: {
+
+        },
+        errors:{
+            headers : {
+                'Content-Type' : 'text/plain'
+            },
+            404: '404 MIA',
+            415: '415 File type not supported',
+            403: '403 Access Denied',
+            500: '500 {{err}}'
+        }
+    };
+
+```
 
 |key|description|
 |---|-----------|
