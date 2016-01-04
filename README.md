@@ -19,7 +19,7 @@ Package Quality :
 
 ## writing a node http server
 
-** DO NOT USE launch=now ** as a commandline argument for a node server. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.
+**DO NOT USE launch=now** as a commandline argument for a node server. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.
 
 The below table shows all of the methods available on the server when you require this module.
 
@@ -49,11 +49,11 @@ If you want to create a custom Server or extend the Server Class you can require
 
 ---
 
-## basic app example
+## Examples
 
-To see the server in action run `npm start` from the root of this repo and then visit [localhost:8080](http://localhost:8080).
+To see the server in action run ` npm start ` from the root of this repo and then visit [localhost:8000](http://localhost:8000).
 
-Detailed examples can be found in the [example folder](https://github.com/RIAEvangelist/node-http-server/tree/master/example)
+Detailed examples can be found in the [example folder](https://github.com/RIAEvangelist/node-http-server/tree/master/example) The basic example directory is static file servers and the advanced directory has dynamic server side rendering examples including a benchmark example.
 
 ```javascript
 
@@ -70,13 +70,13 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
 
 ---
 
-#### Custom configuration
+## Custom configuration
 
 ```javascript
 
     var server=require('node-http-server');
 
-    var config=server.Config();
+    var config=new server.Config;
     config.errors['404']    = 'These are not the files you are looking for...';
     config.contentType.mp4  = 'video/mp4';
     config.port             = 8005;
@@ -89,7 +89,7 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
 
 ---
 
-#### multiple domains or subdomains
+## multiple domains or subdomains
 
 ```javascript
 
@@ -106,6 +106,34 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
     }
 
     server.deploy(config);    
+
+```
+
+## basic template filling
+
+```javascript
+
+    var server=require('../../server/http.js');
+
+    server.beforeServe=beforeServe;
+
+    function beforeServe(request,response,body,encoding){
+        //only parsing html files for this example
+        if(response.getHeader('Content-Type')!=server.config.contentType.html){
+            return;
+        }
+
+        var someVariable='this is some variable value';
+
+        body.value=body.value.replace('{{someVariable}}',someVariable);
+    }
+
+    server.deploy(
+        {
+            port:8000,
+            root:__dirname+'/appRoot/'
+        }
+    );
 
 ```
 
@@ -226,7 +254,7 @@ You can add the below example to your hosts file to run some of the examples fro
 
     var config={
         port:8000,
-        root:__dirname+'/appRoot/',
+        root:__dirna\me+'/appRoot/',
         domain:'myapp',
         domains:{
              //subdomain
