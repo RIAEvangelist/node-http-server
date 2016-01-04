@@ -279,9 +279,9 @@ If you wish to make a reusable Server Class of your own to share or for some int
     var os=require('os');
     var Server=require('node-http-server').Server;
 
-   //MyAwesomeQueue inherits from Queue
+   //MyAwesomeServer inherits from Server
    MyAwesomeServer.prototype = new Server;
-   //Constructor will extend Queue
+   //Constructor will extend Server
    MyAwesomeServer.constructor = MyAwesomeServer;
 
    function MyAwesomeServer(){
@@ -299,7 +299,7 @@ If you wish to make a reusable Server Class of your own to share or for some int
             }
         );
 
-        //enforce Object.assign for extending by locking down Class structure
+        //locking down Class structure
         //no willy nilly cowboy coding
         Object.seal(this);
 
