@@ -89,7 +89,7 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
 
 ---
 
-## multiple domains or subdomains
+## Multiple domains or subdomains
 
 ```javascript
 
@@ -109,7 +109,7 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
 
 ```
 
-## basic template filling
+## Template filling
 
 ```javascript
 
