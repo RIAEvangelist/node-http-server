@@ -292,9 +292,13 @@ function requestRecieved(request,response){
     request.url=uri;
     request.serverRoot=root;
 
+    this.onRequest(
+        request
+    );
+
     var filename = path.join(
-        root,
-        uri
+        request.serverRoot,
+        request.url
     );
 
     fs.exists(
@@ -322,6 +326,12 @@ function Server(){
                 value:serveFile,
                 writable:false,
                 enumerable:false
+            },
+            //executed just after request recieved allowing user to modify if needed
+            onRequest:{
+                value:function(request){},
+                writable:true,
+                enumerable:true
             },
             //executed just before response sent allowing user to modify if needed
             beforeServe:{
