@@ -33,7 +33,7 @@ If you want to create a custom Server or extend the Server Class you can require
 
 ```javascript
 
-    var server=require('node-http-server').Server;
+    var Server=require('node-http-server').Server;
 
 ```
 
@@ -265,5 +265,69 @@ You can add the below example to your hosts file to run some of the examples fro
     }
 
     server.deploy(config);
+
+```
+
+---
+
+## Extending the Server
+
+If you wish to make a reusable Server Class of your own to share or for some internal use you can always extend the server class and make your own module too.
+
+```javascript
+
+    var os=require('os');
+    var Server=require('node-http-server').Server;
+
+   //MyAwesomeQueue inherits from Queue
+   MyAwesomeServer.prototype = new Server;
+   //Constructor will extend Queue
+   MyAwesomeServer.constructor = MyAwesomeServer;
+
+   function MyAwesomeServer(){
+        //extend with some stuff your app needs,
+        //maybe npm publish your extention with node-http-server as a dependancy?
+        Object.defineProperties(
+            this,
+            {
+                IP:{
+                    enumerable:true,
+                    get:getIP,
+                    //not settable so just return the IP
+                    set:getIP
+                }
+            }
+        );
+
+        //enforce Object.assign for extending by locking down Class structure
+        //no willy nilly cowboy coding
+        Object.seal(this);
+
+        function getIP(){
+            var networkInterfaces = os.networkInterfaces();
+            var serverIPs={};
+            var interfaceKeys=Object.keys(networkInterfaces);
+            for(var i in interfaceKeys){
+                serverIPs[
+                    interfaceKeys[i]
+                ]={};
+
+                var interface=networkInterfaces[
+                    interfaceKeys[i]
+                ];
+
+                for(var j in interface){
+                    serverIPs[
+                        interfaceKeys[i]
+                    ][
+                        interface[j].family
+                    ]=interface[j].address;
+                }
+            }
+
+            body.value=body.value.replace('{{some-content}}',serverIPs);
+            return IPs;
+        }
+    }
 
 ```
