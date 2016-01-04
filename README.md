@@ -325,9 +325,28 @@ If you wish to make a reusable Server Class of your own to share or for some int
                 }
             }
 
-            body.value=body.value.replace('{{some-content}}',serverIPs);
             return IPs;
         }
     }
+
+    module.exports=MyAwesomeServer;
+
+```
+
+
+```javascript
+
+    var AwesomeServer=require('MyAwesomeServer');
+
+    var server=new AwesomeServer;
+
+    server.deploy(
+        {
+            port:8000,
+            root:'~/myAwesomeApp'
+        }
+    );
+
+    console.log(server.IP);
 
 ```
