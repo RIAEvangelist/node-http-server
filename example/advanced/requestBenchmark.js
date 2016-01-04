@@ -13,7 +13,7 @@ server.afterServe=stopTimer;
 
 var benchmarks=[];
 
-function startTimer(request){
+function startTimer(request,response){
     var index=benchmarks.length;
     benchmarks[index]={
         startTime:new Date().getMilliseconds(),

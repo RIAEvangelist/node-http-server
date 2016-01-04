@@ -298,7 +298,8 @@ function requestRecieved(request,response){
     request.serverRoot=root;
 
     this.onRequest(
-        request
+        request,
+        response
     );
 
     var filename = path.join(
@@ -334,7 +335,7 @@ function Server(){
             },
             //executed just after request recieved allowing user to modify if needed
             onRequest:{
-                value:function(request){},
+                value:function(request,response){},
                 writable:true,
                 enumerable:true
             },
@@ -346,7 +347,7 @@ function Server(){
             },
             //executed after each full response completely sent
             afterServe:{
-                value:function(){},
+                value:function(request){},
                 writable:true,
                 enumerable:true
             },

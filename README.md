@@ -150,16 +150,60 @@ you can specify any of the variables from the config example above which use arg
 
 ---
 
-## node app use
+## writing a node http server
 
-    var server=require('node-http-server');
+** DO NOT USE launch=now ** as an argument for a node app. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.
 
-` server ` has 2 methods, ` deploy ` and ` configTemplate `
+```javascript
 
-|Server Method| description |
-|-------------|-------------|
-|server.configTemplate| will generate a complete config file based off of the default values and arguments passed in when launching the app. **DO NOT USE launch=now** as an argument for a node app. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.|
-|server.deploy|will accept any config params and merge them with a fresh configTemplate, so passing a modified config based off of ` server.configTemplate() ` will result in using only the values from the modified config passed when deploying as it will override all of the defaults. ***The passed config object only merges to one level deep*** so if you pass a multi level object like ` contentTypes ` it will overwrite the default config with what you sent for that object rather than merging your object with the default.|
+    Server={
+        deploy:{
+            value:deploy,
+            writable:false,
+            enumerable:true
+        },
+        //executed just after request recieved allowing user to modify if needed
+        onRequest:{
+            value:function(request){},
+            writable:true,
+            enumerable:true
+        },
+        //executed just before response sent allowing user to modify if needed
+        beforeServe:{
+            value:function(request,response,body,encoding){},
+            writable:true,
+            enumerable:true
+        },
+        //executed after each full response completely sent
+        afterServe:{
+            value:function(){},
+            writable:true,
+            enumerable:true
+        },
+        //Config Class
+        Config:{
+            value:Config,
+            writable:false,
+            enumerable:true
+        },
+        //Server Class use to extend the node server
+        Server:{
+            value:Server,
+            writable:false,
+            enumerable:true
+        }
+    }
+
+```
+
+|Server Method| params | description |
+|-------------|--------|-------------|
+|deploy| config obj (optional) | starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class|
+|onRequest| request obj | called when request recieved |
+|beforeServe|request obj, response obj, body obj, encoding obj| called just before data is served to the client |
+|afterServe|request obj| called once data has been fully sent to client |
+|Config| config object (optional) | This is a refrence to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values ig config object passed.|
+|Server| none | This is a refrence to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
 
 ---
 
@@ -178,7 +222,7 @@ can be found in the examples folder
 
 #### basic
 this app could be launched as  
-`` node basicApp.js verbose=true  `  
+` node basicApp.js verbose=true  `  
 to force verbose terminal output. This can be helpful if you have many servers in a single app and want them all to be verbose right now for debugging or testing purposes.
 
     var server=require('node-http-server');
@@ -193,6 +237,7 @@ to force verbose terminal output. This can be helpful if you have many servers i
     );
 
 ---
+
 #### verbose
 
     var server=require('node-http-server');
@@ -248,8 +293,8 @@ to force verbose terminal output. This can be helpful if you have many servers i
 ## Starting with forever
 *It is helpful especially when running multiple servers to label them*  with ` --uid ` for easy to remember process names
 
-*when starting the same server many times, **like every time the system boots** you will want to append to the same log file* so use ` -a ``. Without ` -a ` forever will throw an error stating that the log file for the ` --uid ` already exists.
+*when starting the same server many times, **like every time the system boots** you will want to append to the same log file* so use ` -a `. Without ` -a ` forever will throw an error stating that the log file for the ` --uid ` already exists.
 
     forever --uid nodeServer -a start ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
 
-This can be set as a ``.profile`` command or a ``.bash_rc`` command as well if you want to launch the server every time the computer boots up.
+This can be set as a ` .profile ` command or a ` .bash_rc ` command as well if you want to launch the server every time the computer boots up.
