@@ -73,8 +73,6 @@ Package Quality :
 ```
 
 
-#### Basics, config.*
-
 |key|description|
 |---|-----|
 |verbose| display detailed info about what server is doing via terminal. |
@@ -128,14 +126,27 @@ You can add the below example to your hosts file to run some of the examples fro
 
 ---
 
+
 ## Commandline / bash use
-`` launch ` is an argument that specifies to launch the server now with the provided arguments and defaults
+
+` launch ` is an argument that specifies to launch the server now with the provided arguments and defaults
 
     node ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
 
-you can specify any of the variables frpom the ***currently modifiable via any interface, commandline, bash, node etc.*** section above. The order does not matter.
+you can specify any of the variables from the config example above which use args. The order does not matter.
 
     node ~/git/node-http-server/server/http.js root=~/myApp/ port=8888 verbose=true launch=now
+
+
+
+|arg|default|vaild values|
+|---|-------|------------|
+|verbose|false|true or false|
+|port|defaults.port|any valid port on the machine|
+|root|defaults.root|any valid path on the machine|
+|domain|localhost|any domain which route to the machines ip. This can be done publicly or locally, as in the hosts file. ` 0.0.0.0 ` will accept requests from *** ANY *** domain pointed at the machine.|
+|index|index.html|any file name|
+|noCache|true|true or false|
 
 ---
 
@@ -143,7 +154,7 @@ you can specify any of the variables frpom the ***currently modifiable via any i
 
     var server=require('node-http-server');
 
-`` server ` has 2 methods, ` deploy ` and ` configTemplate ``
+` server ` has 2 methods, ` deploy ` and ` configTemplate `
 
 |Server Method| description |
 |-------------|-------------|
