@@ -1,9 +1,15 @@
 var os = require( 'os' );
 var server=require('../../server/http.js');
+var config=new server.Config;
 
-console.log(server);
+config.verbose=true;
+config.port=8000;
+config.root=__dirname+'/appRoot/';
 
-server.beforeServe=function(request,response,body,encoding){
+
+server.beforeServe=beforeServe;
+
+function beforeServe(request,response,body,encoding){
     //only parse the /index.html request
     if(request.url!='/index.html'){
         return;
@@ -29,15 +35,7 @@ server.beforeServe=function(request,response,body,encoding){
     }
 
 
-    body.value=body.value.replace('{{server-ips}}',serverIPs);
-
-
+    body.value=body.value.replace('{{some-content}}',serverIPs);
 }
 
-server.deploy(
-    {
-        verbose: true,
-        port: 8000,
-        root:__dirname+'/appRoot/'
-    }
-);
+server.deploy(config);

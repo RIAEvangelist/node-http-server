@@ -214,11 +214,16 @@ function serve(request,response,body,encoding){
     this.beforeServe(request,response,refBody,refEncoding);
 
     if(response.finished){
-        this.afterServe();
+        this.afterServe(request);
         return;
     }
 
-    response.end(refBody.value,refEncoding.value,this.afterServe);
+    response.end(
+        refBody.value,
+        refEncoding.value,
+        this.afterServe.bind(this,request)
+    );
+
     return;
 }
 
