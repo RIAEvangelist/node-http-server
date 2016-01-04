@@ -126,13 +126,13 @@ function deploy(userConfig, readyCallback){
         console.log(server.config.logID+' configured with ###\n\n',server.config);
 
     server.listen(
-        server.config.port, 
+        server.config.port,
         function() {
             if(server.config.verbose)
-                console.log(server.config.logID+' listening on port '+server.config.port+' ###\n\n');       
+                console.log(server.config.logID+' listening on port '+server.config.port+' ###\n\n');
             if (readyCallback)
                 readyCallback();
-        } 
+        }
     );
 
     function serveFile(filename,exists,response) {
