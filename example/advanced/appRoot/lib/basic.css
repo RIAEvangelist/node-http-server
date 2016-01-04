@@ -1,0 +1,15 @@
+body{
+    height: 100%;
+    width: 100%;
+    background-color: rgb(80, 80, 80);
+}
+
+.helloDiv{
+    position: absolute;
+    color: rgb(180, 180, 180);
+    font-family: impact;
+    top: 42%;
+    width:100%;
+    text-align:center;
+    font-size: 100px;
+}

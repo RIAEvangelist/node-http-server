@@ -66,7 +66,7 @@ function setHeaders(response,headers){
     }
 }
 
-function serveFile(filename,exists,response) {
+function serveFile(filename,exists,request,response) {
     if(!exists) {
         if(this.config.verbose){
             console.log(this.config.logID+' 404 ###\n\n');
@@ -76,6 +76,7 @@ function serveFile(filename,exists,response) {
         setHeaders(response, this.config.errors.headers);
 
         this.serve(
+            request,
             response,
             this.config.errors['404']
         );
@@ -94,6 +95,7 @@ function serveFile(filename,exists,response) {
         setHeaders(response, this.config.errors.headers);
 
         this.serve(
+            request,
             response,
             this.config.errors['415']
         );
@@ -119,6 +121,7 @@ function serveFile(filename,exists,response) {
         setHeaders(response, this.config.errors.headers);
 
         this.serve(
+            request,
             response,
             this.config.errors['403']
         );
@@ -138,6 +141,7 @@ function serveFile(filename,exists,response) {
                 setHeaders(response, this.config.errors.headers);
 
                 this.serve(
+                    request,
                     response,
                     this.config.errors['500'].replace(/\{\{err\}\}/g,err)
                 );
@@ -159,6 +163,7 @@ function serveFile(filename,exists,response) {
             response.statusCode=200;
 
             this.serve(
+                request,
                 response,
                 file,
                 'binary'
@@ -173,7 +178,7 @@ function serveFile(filename,exists,response) {
     );
 }
 
-function serve(response,body,encoding){
+function serve(request,response,body,encoding){
     //defaults to 200
     if(!response.statusCode){
         response.statusCode=200;
@@ -200,15 +205,34 @@ function serve(response,body,encoding){
         }
     }
 
-    this.beforeServe(response,body,encoding);
+    var refBody=new RefString;
+    var refEncoding=new RefString;
+
+    refBody.value=body;
+    refEncoding.value=encoding;
+
+    this.beforeServe(request,response,refBody,refEncoding);
 
     if(response.finished){
         this.afterServe();
         return;
     }
 
-    response.end(body,encoding,this.afterServe);
+    response.end(refBody.value,refEncoding.value,this.afterServe);
     return;
+}
+
+function RefString(){
+    Object.defineProperties(
+        this,
+        {
+            value:{
+                value:'',
+                enumerable:true,
+                writable:true
+            }
+        }
+    );
 }
 
 function requestRecieved(request,response){
@@ -256,12 +280,17 @@ function requestRecieved(request,response){
         root=this.config.domains[hostname[0]];
     }
 
+
     if(this.config.verbose){
         console.log(this.config.logID+' USING ROOT : '+root+'###\n\n');
     }
 
-    if(uri.slice(-1)=='/')
+    if(uri.slice(-1)=='/'){
         uri+=this.config.server.index;
+    }
+
+    request.url=uri;
+    request.serverRoot=root;
 
     var filename = path.join(
         root,
@@ -271,7 +300,7 @@ function requestRecieved(request,response){
     fs.exists(
         filename,
         function(exists){
-            this.serveFile(filename,exists,response);
+            this.serveFile(filename,exists,request,response);
         }.bind(this)
     );
 }
@@ -296,7 +325,7 @@ function Server(){
             },
             //executed just before response sent allowing user to modify if needed
             beforeServe:{
-                value:function(){},
+                value:function(request,response,body,encoding){},
                 writable:true,
                 enumerable:true
             },
