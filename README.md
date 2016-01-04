@@ -17,7 +17,123 @@ GitHub info :
 Package Quality :  
 ![node-http-server Package Quality](http://npm.packagequality.com/badge/node-http-server.png)
 
+## writing a node http server
+
+** DO NOT USE launch=now ** as a commandline argument for a node server. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.
+
+The below table shows all of the methods available on the server when you require this module.
+
+```javascript
+
+    var server=require('node-http-server');
+
+```
+
+If you want to create a custom Server or extend the Server Class you can require just the server class.
+
+```javascript
+
+    var server=require('node-http-server').Server;
+
+```
+
+|Server Method| params | description |
+|-------------|--------|-------------|
+|deploy| config obj (optional) | starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class|
+|onRequest| request obj | called when request recieved |
+|beforeServe|request obj, response obj, body obj, encoding obj| called just before data is served to the client |
+|afterServe|request obj| called once data has been fully sent to client |
+|Config| config object (optional) | This is a refrence to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values ig config object passed.|
+|Server| none | This is a refrence to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
+
+
 ---
+
+## basic app example
+
+To see the server in action run `npm start` from the root of this repo and then visit [localhost:8080](http://localhost:8080).
+
+Detailed examples can be found in the [example folder](https://github.com/RIAEvangelist/node-http-server/tree/master/example)
+
+```javascript
+
+    var server=require('node-http-server');
+
+    server.deploy(
+        {
+            port:8000,
+            root:'~/myApp/'
+        }
+    );
+
+```
+
+---
+
+#### Custom configuration
+
+```javascript
+
+    var server=require('node-http-server');
+
+    var config=server.Config();
+    config.errors['404']    = 'These are not the files you are looking for...';
+    config.contentType.mp4  = 'video/mp4';
+    config.port             = 8005;
+    config.verbose          = true;
+    config.root             = '~/myApp/'
+
+    server.deploy(config);
+
+```
+
+---
+
+#### multiple domains or subdomains
+
+```javascript
+
+    var server=require('node-http-server');
+
+    var config={
+        port:8010,
+        root:__dirname + '/www/myApp/',
+        domain:'myapp.com',
+        domains:{
+            'a.myapp.com':__dirname+'/www/a-myApp/',
+            'yourapp.com':__dirname+'/someFolder/yourApp/'
+        }
+    }
+
+    server.deploy(config);    
+
+```
+
+## Commandline / terminal / bash / script use
+
+` launch ` is an argument that specifies to launch the server now with the provided arguments and defaults
+
+    node ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
+
+you can specify any of the variables from the config example above which use args. The order does not matter.
+
+    node ~/git/node-http-server/server/http.js root=~/myApp/ port=8888 verbose=true launch=now
+
+commandline arguments will also work when starting a node server
+
+    node myServer.js verbose=true
+
+|arg|default|vaild values|
+|---|-------|------------|
+|verbose|false|true or false|
+|port|defaults.port|any valid port on the machine|
+|root|defaults.root|any valid path on the machine|
+|domain|localhost|any domain which route to the machines ip. This can be done publicly or locally, as in the hosts file. ` 0.0.0.0 ` will accept requests from *** ANY *** domain pointed at the machine.|
+|index|index.html|any file name|
+|noCache|true|true or false|
+
+---
+
 ## Default Node HTTP Server Configuration
 
 ```javascript
@@ -123,178 +239,3 @@ You can add the below example to your hosts file to run some of the examples fro
     server.deploy(config);
 
 ```
-
----
-
-
-## Commandline / bash use
-
-` launch ` is an argument that specifies to launch the server now with the provided arguments and defaults
-
-    node ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
-
-you can specify any of the variables from the config example above which use args. The order does not matter.
-
-    node ~/git/node-http-server/server/http.js root=~/myApp/ port=8888 verbose=true launch=now
-
-
-
-|arg|default|vaild values|
-|---|-------|------------|
-|verbose|false|true or false|
-|port|defaults.port|any valid port on the machine|
-|root|defaults.root|any valid path on the machine|
-|domain|localhost|any domain which route to the machines ip. This can be done publicly or locally, as in the hosts file. ` 0.0.0.0 ` will accept requests from *** ANY *** domain pointed at the machine.|
-|index|index.html|any file name|
-|noCache|true|true or false|
-
----
-
-## writing a node http server
-
-** DO NOT USE launch=now ** as an argument for a node app. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.
-
-```javascript
-
-    Server={
-        deploy:{
-            value:deploy,
-            writable:false,
-            enumerable:true
-        },
-        //executed just after request recieved allowing user to modify if needed
-        onRequest:{
-            value:function(request){},
-            writable:true,
-            enumerable:true
-        },
-        //executed just before response sent allowing user to modify if needed
-        beforeServe:{
-            value:function(request,response,body,encoding){},
-            writable:true,
-            enumerable:true
-        },
-        //executed after each full response completely sent
-        afterServe:{
-            value:function(){},
-            writable:true,
-            enumerable:true
-        },
-        //Config Class
-        Config:{
-            value:Config,
-            writable:false,
-            enumerable:true
-        },
-        //Server Class use to extend the node server
-        Server:{
-            value:Server,
-            writable:false,
-            enumerable:true
-        }
-    }
-
-```
-
-|Server Method| params | description |
-|-------------|--------|-------------|
-|deploy| config obj (optional) | starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class|
-|onRequest| request obj | called when request recieved |
-|beforeServe|request obj, response obj, body obj, encoding obj| called just before data is served to the client |
-|afterServe|request obj| called once data has been fully sent to client |
-|Config| config object (optional) | This is a refrence to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values ig config object passed.|
-|Server| none | This is a refrence to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
-
----
-
-## basic app example
-
-In the main directory enter
-
-`npm start`
-
-to see a basic app and see the example folder to edit and create an awesome app of your own!
-
----
-
-#### node examples
-can be found in the examples folder
-
-#### basic
-this app could be launched as  
-` node basicApp.js verbose=true  `  
-to force verbose terminal output. This can be helpful if you have many servers in a single app and want them all to be verbose right now for debugging or testing purposes.
-
-    var server=require('node-http-server');
-
-    console.log(server);
-
-    server.deploy(
-        {
-            port:8000,
-            root:'~/myApp/'
-        }
-    );
-
----
-
-#### verbose
-
-    var server=require('node-http-server');
-
-    console.log(server);
-
-    server.deploy(
-        {
-            verbose:true,
-            port:8001,
-            root:'~/myApp/'
-        }
-    );
-
----
-#### advanced
-
-    var server=require('node-http-server');
-
-    console.log(server);
-
-    var config=server.configTemplate();
-    config.errors['404']    = 'These are not the files you are looking for...';
-    config.contentType.mp4  = 'video/mp4';
-    config.port             = 8005;
-    config.verbose          = true;
-    config.root             = '~/myApp/'
-
-    server.deploy(config);
-
----
-#### multiple domains or subdomains
-
-    var server=require('node-http-server');
-
-    console.log(server);
-
-    server.deploy(
-        {
-            verbose:true,
-            port:8010,
-            root:process.env.HOME+'/myApp/',
-            domain:'myapp',
-            domains:{
-                'a.myapp':process.env.HOME+'/myApp/mySubdomain/',
-                'yourapp.com':process.env.HOME+'/www/yourApp/'
-            }
-        }
-    );    
-
----
-
-## Starting with forever
-*It is helpful especially when running multiple servers to label them*  with ` --uid ` for easy to remember process names
-
-*when starting the same server many times, **like every time the system boots** you will want to append to the same log file* so use ` -a `. Without ` -a ` forever will throw an error stating that the log file for the ` --uid ` already exists.
-
-    forever --uid nodeServer -a start ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
-
-This can be set as a ` .profile ` command or a ` .bash_rc ` command as well if you want to launch the server every time the computer boots up.
