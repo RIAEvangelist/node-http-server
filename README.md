@@ -6,6 +6,8 @@ Simple to use stand alone node HTTP Server you can spin up from node apps, bash 
 
 ` npm install node-http-server `
 
+[![node-http-server stats](https://nodei.co/npm/node-http-server.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/node-http-server)  
+
 npm info :  [See npm trends and stats for node-http-server](http://npm-stat.com/charts.html?package=node-http-server&author=&from=&to=)  
 ![node-http-server npm version](https://img.shields.io/npm/v/node-http-server.svg) ![supported node version for node-http-server](https://img.shields.io/node/v/node-http-server.svg) ![total npm downloads for node-http-server](https://img.shields.io/npm/dt/node-http-server.svg) ![monthly npm downloads for node-http-server](https://img.shields.io/npm/dm/node-http-server.svg) ![npm licence for node-http-server](https://img.shields.io/npm/l/node-http-server.svg)
 
@@ -15,37 +17,10 @@ GitHub info :
 Package Quality :  
 ![node-http-server Package Quality](http://npm.packagequality.com/badge/node-http-server.png)
 
-----
-
-
-## Defaults
 ---
-#### currently modifiable via any interface, commandline, bash, node etc.
+## Default Node HTTP Server Configuration
 
-    port        : 8080
-    root        : Current Working Directory (where you execute the command from)
-    domain      : 0.0.0.0
-    index       : index.html
-    verbose     : false
-    noCache     : true
-    log         : false
-    logFunction : serverLogging
-
-|key|description|
-|---|-----|
-|port| the port on which the server should run  |
-|root| the absolute location to the root dir for the public file system  |
-|domain| the domain which this server applies to. You can add more servers via the node `` domains ``  implementation described below than you can via bash or commandline. If you want to accept incoming requests for ***ANY Applicable Domain*** use `` 0.0.0.0 `` this will allow any request that is pointed at this machine on the specified port to use this server config.  |
-|index| the default file to look for in a dir. if not found a **404** will be displayed   |
-|verbose| should the server display detailed info about what it is doing  |
-|noCache| should the server prevent caching    |
-|log| full path to log file, if specified file is not present it will be created, however the dir must be there. ie. /tmp/server.log It is recommended that you timestamp this file name with a time stamp like : `` '~/serverLogs/domain-'+new Date().getTime()+'.log' `` this will create a new log file each time the server is started/restarted/reboot etc...  |
-|logFunction| this defaults to append timestamp to headers object and log as JSON in the `` log `` file. However, you can overwrite this and do whatever you like with the JSON data if you so choose. It accepts a javascript Object as the first argument for parsing. If you manually log to the default function. If you overwrite the function for custom logging, you must accept a javascript object as the first argument for the default log requests to function.  |
-
----
-#### currently modifiable via node
-
-```javascript```
+```javascript
 
     {
         verbose     : (args.verbose=='true')||false,
@@ -53,7 +28,6 @@ Package Quality :
         root        : args.root||defaults.root,
         domain      : args.domain||defaults.domain,
         log         : false,
-        //pass this as config for custom logging
         logFunction : serverLogging,
         domains   : {
             /*******************\
@@ -98,17 +72,64 @@ Package Quality :
 
 ```
 
+
+#### Basics, config.*
+
 |key|description|
-|---|-----------|
-|domains| this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.|
-|contentType| mapping of file extension to header content type.  |
-|restrictedType| extensions to which external access will be denied.  |
-|errors| error headers and error strings, these can be anything you like from html to text etc. just make sure| they all can use the same headers. The **500** error will replace `` {{err}} `` in the specified value with the actual error message from the server.  |
+|---|-----|
+|verbose| display detailed info about what server is doing via terminal. |
+|port| the port on which the server should run  |
+|root| the absolute path to the root dir for the domain |
+|domain| the server domain. To accept incoming requests for ***ANY Applicable Domain*** use ` 0.0.0.0 ` this will allow any request that is pointed at this machine on the specified port to use this server config.  |
+|log| full path to log file, if specified and the file is not present, it will be created, however the dir must be there. Example path : ` /tmp/server.log ` It is recommended that you timestamp this file name with a time stamp like : ` '~/serverLogs/domain-'+new Date().getTime()+'.log' ` this will create a new log file each time the server is started/restarted/reboot etc...  |
+|logFunction| the default function appends timestamps to the headers object and logs as JSON in the ` log ` file. You can assign your own function here as well. It should accepts a javascript Object as the first argument. |
+|domains.*| this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.|
+|server.index| the default file to look for in a dir. if not found a **404** will be displayed   |
+|server.noCache| should the server prevent caching    |
+|server.timeout| the amount of time allowed for no activity on a connection before it is closed. |
+|contentType.*| mapping of file extension to header Content-Type value.  |
+|restrictedType.*| extensions to which access will be denied. |
+|errors.headers| these are the headers that will automatically be applied to all error responses. You can add custom headers per error in the ` beforeServe ` function |
+|errors.*| error headers and error strings, these can be anything you like from html to text etc. The **500** error will replace ` {{err}} ` in the specified value with the actual error message from the server.  |
+
+
+#### config.domains.*
+
+Use this object for sub domains, or hosting multiple domains on the same port. Specify the whole host i.e. "my.sub.domain.com" or "amazing-domain.com".
+
+You may need to edit your hosts file, cnames, iptable to get this to work on your server or development environment.
+
+You can add the below example to your hosts file to run some of the examples from the ` /example/basic ` directory which use multiple domains on occasion.
+
+    #node-http-server examples
+    127.0.0.1 myapp
+    127.0.0.1 a.myapp
+    127.0.0.1 yourapp.com
+
+ ```javascript
+
+    var server=require('node-http-server');
+
+    var config={
+        port:8000,
+        root:__dirname+'/appRoot/',
+        domain:'myapp',
+        domains:{
+             //subdomain
+             'a.myapp':__dirname+'/appSubDomainRoot/',
+             //totally different domain, but also on port 8000
+             'yourapp.com':__dirname+'/appOtherDomainRoot/'
+        }
+    }
+
+    server.deploy(config);
+
+```
 
 ---
 
 ## Commandline / bash use
-`` launch `` is an argument that specifies to launch the server now with the provided arguments and defaults
+`` launch ` is an argument that specifies to launch the server now with the provided arguments and defaults
 
     node ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
 
@@ -122,12 +143,12 @@ you can specify any of the variables frpom the ***currently modifiable via any i
 
     var server=require('node-http-server');
 
-`` server `` has 2 methods, `` deploy `` and `` configTemplate ``
+`` server ` has 2 methods, ` deploy ` and ` configTemplate ``
 
 |Server Method| description |
 |-------------|-------------|
 |server.configTemplate| will generate a complete config file based off of the default values and arguments passed in when launching the app. **DO NOT USE launch=now** as an argument for a node app. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.|
-|server.deploy|will accept any config params and merge them with a fresh configTemplate, so passing a modified config based off of `` server.configTemplate() `` will result in using only the values from the modified config passed when deploying as it will override all of the defaults. ***The passed config object only merges to one level deep*** so if you pass a multi level object like `` contentTypes `` it will overwrite the default config with what you sent for that object rather than merging your object with the default.|
+|server.deploy|will accept any config params and merge them with a fresh configTemplate, so passing a modified config based off of ` server.configTemplate() ` will result in using only the values from the modified config passed when deploying as it will override all of the defaults. ***The passed config object only merges to one level deep*** so if you pass a multi level object like ` contentTypes ` it will overwrite the default config with what you sent for that object rather than merging your object with the default.|
 
 ---
 
@@ -146,7 +167,7 @@ can be found in the examples folder
 
 #### basic
 this app could be launched as  
-`` node basicApp.js verbose=true  ``  
+`` node basicApp.js verbose=true  `  
 to force verbose terminal output. This can be helpful if you have many servers in a single app and want them all to be verbose right now for debugging or testing purposes.
 
     var server=require('node-http-server');
@@ -214,9 +235,9 @@ to force verbose terminal output. This can be helpful if you have many servers i
 ---
 
 ## Starting with forever
-*It is helpful especially when running multiple servers to label them*  with `` --uid `` for easy to remember process names
+*It is helpful especially when running multiple servers to label them*  with ` --uid ` for easy to remember process names
 
-*when starting the same server many times, **like every time the system boots** you will want to append to the same log file* so use `` -a ``. Without `` -a `` forever will throw an error stating that the log file for the `` --uid `` already exists.
+*when starting the same server many times, **like every time the system boots** you will want to append to the same log file* so use ` -a ``. Without ` -a ` forever will throw an error stating that the log file for the ` --uid ` already exists.
 
     forever --uid nodeServer -a start ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
 

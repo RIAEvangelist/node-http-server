@@ -86,15 +86,16 @@ function serverLogging(data){
 
             var JSONData=JSON.stringify(data);
             var method='appendFile';
-            if(!exists)
+            if(!exists){
                 method='writeFile';
-
+            }
             fs[method](
                 this.log,
                 JSONData,
                 function (err) {
-                    if(err)
+                    if(err){
                         console.log(err);
+                    }
                 }
             );
         }.bind(this)
