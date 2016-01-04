@@ -14,7 +14,7 @@ server.beforeServe=function(request,response,body,encoding){
     var serverIPs='';
     var interfaceKeys=Object.keys(networkInterfaces);
     for(var i in interfaceKeys){
-        serverIPs+='<li><strong>'+interfaceKeys[i]+' : </strong>';
+        serverIPs+='<li><strong>'+interfaceKeys[i]+' : </strong><br>';
 
         var interface=networkInterfaces[
             interfaceKeys[i]
@@ -23,7 +23,7 @@ server.beforeServe=function(request,response,body,encoding){
         for(var j in interface){
             var fam=interface[j].family;
             var address=interface[j].address;
-            serverIPs+=fam+' '+address+'<br>';
+            serverIPs+=fam+' -> '+address+'<br>';
         }
         serverIPs+='</li>';
     }
