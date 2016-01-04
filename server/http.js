@@ -18,7 +18,7 @@ for(var i=0; i<argCount; i++){
 
 if(args.launch=='now'){
     var server=new Server;
-    deploy();
+    server.deploy();
 }
 
 function deploy(userConfig, readyCallback){
