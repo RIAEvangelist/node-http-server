@@ -16,10 +16,6 @@ for(var i=0; i<argCount; i++){
     args[data[0]]=data[1];
 }
 
-if(args.launch=='now'){
-    deploy();
-}
-
 /**************************************\
  *
  *    These are the valid basic configs
