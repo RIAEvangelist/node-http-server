@@ -363,7 +363,7 @@ class Server{
                 },
                 //kept for backwards compatibility
                 configTemplate  :{
-                    value:Config,
+                    value:new Config,
                     writable:false,
                     //not visible because this is just for backwards compatibility
                     enumerable:false
