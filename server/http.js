@@ -72,6 +72,10 @@ function serveFile(filename,exists,request,response) {
             console.log(`${this.config.logID} 404 ###\n\n`);
         }
 
+        if(!response){
+            return false;
+        }
+
         response.statusCode=404;
         setHeaders(response, this.config.errors.headers);
 
