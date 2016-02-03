@@ -363,7 +363,9 @@ class Server{
                 },
                 //kept for backwards compatibility
                 configTemplate  :{
-                    value:new Config,
+                    value:function configTemplate(config){
+                        return new Config(config);
+                    },
                     writable:false,
                     //not visible because this is just for backwards compatibility
                     enumerable:false
