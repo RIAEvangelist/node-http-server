@@ -1,9 +1,11 @@
-var fs=require('fs');
+'use strict';
 
-var passedArgs  = process.argv.splice(2),
-    argCount    = passedArgs.length,
-    args        = {},
-    defaults    = {
+const fs=require('fs');
+
+const passedArgs = process.argv.splice(2),
+    argCount = passedArgs.length,
+    args = {},
+    defaults = {
         port    : 8080,
         root    : process.cwd(),
         domain  : '0.0.0.0',
@@ -11,8 +13,8 @@ var passedArgs  = process.argv.splice(2),
         log     : false
     };
 
-for(var i=0; i<argCount; i++){
-    var data=passedArgs[i].split('=');
+for(let i=0; i<argCount; i++){
+    const data=passedArgs[i].split('=');
     args[data[0]]=data[1];
 }
 
@@ -25,7 +27,7 @@ for(var i=0; i<argCount; i++){
  *
  * ************************************/
 
-var defaultConfigs={
+const defaultConfigs={
     verbose     : (args.verbose=='true')||false,
     port        : args.port||defaults.port,
     root        : args.root||defaults.root,
@@ -77,18 +79,18 @@ var defaultConfigs={
 function serverLogging(data){
     fs.exists(
         this.log,
-        function(exists){
+        function serverLogExsits(exists){
             data.timestamp=new Date().getTime();
 
-            var JSONData=JSON.stringify(data);
-            var method='appendFile';
+            const JSONData=JSON.stringify(data);
+            let method='appendFile';
             if(!exists){
                 method='writeFile';
             }
             fs[method](
                 this.log,
                 JSONData,
-                function (err) {
+                function fsMethod(err) {
                     if(err){
                         console.log(err);
                     }
@@ -103,79 +105,81 @@ function serverLogging(data){
  *    Config Class.
  * ************************************/
 
-function Config(userConfig){
-    //for backwards compatibility
-    var config = {};
-    Object.defineProperties(
-        config,
-        {
-            verbose     : {
-                value:defaultConfigs.verbose,
-                enumerable:true,
-                writable:true
-            },
-            port        : {
-                value:defaultConfigs.port,
-                enumerable:true,
-                writable:true
-            },
-            root        : {
-                value:defaultConfigs.root,
-                enumerable:true,
-                writable:true
-            },
-            domain      : {
-                value:defaultConfigs.domain,
-                enumerable:true,
-                writable:true
-            },
-            log         : {
-                value:defaultConfigs.log,
-                enumerable:true,
-                writable:true
-            },
-            //pass this as config for custom logging
-            logFunction : {
-                value:defaultConfigs.logFunction,
-                enumerable:true,
-                writable:true
-            },
-            domains     : {
-                value:defaultConfigs.domains,
-                enumerable:true,
-                writable:true
-            },
-            server      : {
-                value:defaultConfigs.server,
-                enumerable:true,
-                writable:true
-            },
-            contentType : {
-                value:defaultConfigs.contentType,
-                enumerable:true,
-                writable:true
-            },
-            restrictedType: {
-                value:defaultConfigs.restrictedType,
-                enumerable:true,
-                writable:true
-            },
-            errors      : {
-                value:defaultConfigs.errors,
-                enumerable:true,
-                writable:true
+class Config{
+    constructor(userConfig){
+        //for backwards compatibility
+        const config = {};
+        Object.defineProperties(
+            config,
+            {
+                verbose     : {
+                    value:defaultConfigs.verbose,
+                    enumerable:true,
+                    writable:true
+                },
+                port        : {
+                    value:defaultConfigs.port,
+                    enumerable:true,
+                    writable:true
+                },
+                root        : {
+                    value:defaultConfigs.root,
+                    enumerable:true,
+                    writable:true
+                },
+                domain      : {
+                    value:defaultConfigs.domain,
+                    enumerable:true,
+                    writable:true
+                },
+                log         : {
+                    value:defaultConfigs.log,
+                    enumerable:true,
+                    writable:true
+                },
+                //pass this as config for custom logging
+                logFunction : {
+                    value:defaultConfigs.logFunction,
+                    enumerable:true,
+                    writable:true
+                },
+                domains     : {
+                    value:defaultConfigs.domains,
+                    enumerable:true,
+                    writable:true
+                },
+                server      : {
+                    value:defaultConfigs.server,
+                    enumerable:true,
+                    writable:true
+                },
+                contentType : {
+                    value:defaultConfigs.contentType,
+                    enumerable:true,
+                    writable:true
+                },
+                restrictedType: {
+                    value:defaultConfigs.restrictedType,
+                    enumerable:true,
+                    writable:true
+                },
+                errors      : {
+                    value:defaultConfigs.errors,
+                    enumerable:true,
+                    writable:true
+                }
+            }
+        );
+
+        if(userConfig){
+            for(const k in userConfig){
+                config[k]=userConfig[k];
             }
         }
-    )
 
-    if(userConfig){
-        for(var k in userConfig){
-            config[k]=userConfig[k];
-        }
+        //this is to allow backwards compatibility with configTemplate
+        return config;
     }
-
-    //this is to allow backwards compatibility with configTemplate
-    return config;
 }
 
 module.exports=Config;

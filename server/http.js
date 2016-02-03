@@ -1,22 +1,22 @@
 'use strict';
 
-var http    = require('http'),
-    url     = require('url'),
-    path    = require('path'),
-    fs      = require('fs'),
-    Config  = require(__dirname+'/Config.js');
+const http = require('http'),
+    url = require('url'),
+    path = require('path'),
+    fs = require('fs'),
+    Config = require(`${__dirname}/Config.js`);
 
-var passedArgs  = process.argv.splice(2),
-    argCount    = passedArgs.length,
-    args        = {};
+const passedArgs = process.argv.splice(2),
+    argCount = passedArgs.length,
+    args = {};
 
-for(var i=0; i<argCount; i++){
-    var data=passedArgs[i].split('=');
+for(let i=0; i<argCount; i++){
+    const data=passedArgs[i].split('=');
     args[data[0]]=data[1];
 }
 
 if(args.launch=='now'){
-    var server=new Server;
+    const server=new Server;
     server.deploy();
 }
 
@@ -33,10 +33,11 @@ function deploy(userConfig, readyCallback){
         }
     );
     this.config=new this.Config(userConfig);
-    this.config.logID='### '+this.config.domain+' server';
+    this.config.logID=`### ${this.config.domain} server`;
 
     if(this.config.verbose){
-        console.log(this.config.logID+' configured with ###\n\n',this.config);
+        console.log(
+            `${this.config.logID} configured with ###\n\n`,this.config);
     }
 
     this.server.timeout=this.config.server.timeout;
@@ -44,7 +45,7 @@ function deploy(userConfig, readyCallback){
         this.config.port,
         function() {
             if(this.config.verbose){
-                console.log(this.config.logID+' listening on port '+this.config.port+' ###\n\n');
+                console.log(`${this.config.logID} listening on port ${this.config.port} ###\n\n`);
             }
             if (readyCallback){
                 //passes the current Server class instance for refrence.
@@ -56,19 +57,19 @@ function deploy(userConfig, readyCallback){
 }
 
 function setHeaders(response,headers){
-    var keys=Object.keys(headers);
-    for(var i in keys){
+    const keys=Object.keys(headers);
+    for(const i in keys){
         response.setHeader(
             keys[i],
             headers[keys[i]]
-        )
+        );
     }
 }
 
 function serveFile(filename,exists,request,response) {
     if(!exists) {
         if(this.config.verbose){
-            console.log(this.config.logID+' 404 ###\n\n');
+            console.log(`${this.config.logID} 404 ###\n\n`);
         }
 
         response.statusCode=404;
@@ -82,12 +83,12 @@ function serveFile(filename,exists,request,response) {
         return;
     }
 
-    var contentType = path.extname(filename).slice(1);
+    const contentType = path.extname(filename).slice(1);
 
     //Only serve specified file types
     if(!this.config.contentType){
         if(this.config.verbose){
-            console.log(this.config.logID+' 415 ###\n\n');
+            console.log(`${this.config.logID} 415 ###\n\n`);
         }
 
         response.statusCode=415;
@@ -105,7 +106,7 @@ function serveFile(filename,exists,request,response) {
     if (
         fs.statSync(filename).isDirectory()
     ){
-        filename+='/'+this.config.server.index;
+        filename+=`/${this.config.server.index}`;
     }
 
     //Do not allow access to restricted file types
@@ -113,7 +114,7 @@ function serveFile(filename,exists,request,response) {
         this.config.restrictedType[contentType]
     ){
         if(this.config.verbose){
-            console.log(this.config.logID+' 403 ###\n\n');
+            console.log(`${this.config.logID} 403 ###\n\n`);
         }
 
         response.statusCode=403;
@@ -133,7 +134,7 @@ function serveFile(filename,exists,request,response) {
         function(err, file) {
             if(err) {
                 if(this.config.verbose){
-                    console.log(this.config.logID+' 500 ###\n\n',err,'\n\n');
+                    console.log(`${this.config.logID} 500 ###\n\n`,err,'\n\n');
                 }
 
                 response.statusCode=500;
@@ -169,7 +170,7 @@ function serveFile(filename,exists,request,response) {
             );
 
             if(this.config.verbose){
-                console.log(this.config.logID+' 200 ###\n\n');
+                console.log(`${this.config.logID} 200 ###\n\n`);
             }
 
             return;
@@ -191,7 +192,7 @@ function serve(request,response,body,encoding){
         );
 
         if(this.config.verbose){
-            console.log(this.config.logID+' response content-type header not specified ###\n\nContent-Type set to: text/plain\n\n');
+            console.log(`${this.config.logID} response content-type header not specified ###\n\nContent-Type set to: text/plain\n\n`);
         }
     }
 
@@ -200,12 +201,12 @@ function serve(request,response,body,encoding){
         encoding='utf8';
 
         if(this.config.verbose){
-            console.log(this.config.logID+' encoding not specified ###\nencoding set to:\n',encoding,'\n\n');
+            console.log(`${this.config.logID} encoding not specified ###\nencoding set to:\n`,encoding,'\n\n');
         }
     }
 
-    var refBody=new RefString;
-    var refEncoding=new RefString;
+    const refBody=new RefString;
+    const refEncoding=new RefString;
 
     refBody.value=body;
     refEncoding.value=encoding;
@@ -241,7 +242,7 @@ function RefString(){
 
 function requestRecieved(request,response){
     if(this.config.log){
-        var logData={
+        const logData={
             method  : request.method,
             url     : request.url,
             headers : request.headers
@@ -251,22 +252,22 @@ function requestRecieved(request,response){
             logData
         );
     }
-    var uri = url.parse(request.url);
+    let uri = url.parse(request.url);
     uri=uri.pathname;
     if (uri=='/'){
-        uri='/'+this.config.server.index;
+        uri=`/${this.config.server.index}`;
     }
 
-    var hostname= [];
+    let hostname= [];
 
     if (request.headers.host !== undefined){
         hostname = request.headers.host.split(':');
     }
 
-    var root    = this.config.root;
+    let root = this.config.root;
 
     if(this.config.verbose){
-        console.log(this.config.logID+' REQUEST ###\n\n',
+        console.log(`${this.config.logID} REQUEST ###\n\n`,
             request.headers,'\n',
             uri,'\n\n',
             hostname,'\n\n'
@@ -276,7 +277,7 @@ function requestRecieved(request,response){
     if(this.config.domain!='0.0.0.0' && hostname.length > 0 && hostname[0]!=this.config.domain){
         if(!this.config.domains[hostname[0]]){
             if(this.config.verbose){
-                console.log(this.config.logID+' INVALID HOST ###\n\n');
+                console.log(`${this.config.logID} INVALID HOST ###\n\n`);
             }
             this.serveFile(hostname[0],false,response);
             return;
@@ -286,7 +287,7 @@ function requestRecieved(request,response){
 
 
     if(this.config.verbose){
-        console.log(this.config.logID+' USING ROOT : '+root+'###\n\n');
+        console.log(`${this.config.logID} USING ROOT : ${root}###\n\n`);
     }
 
     if(uri.slice(-1)=='/'){
@@ -301,14 +302,14 @@ function requestRecieved(request,response){
         response
     );
 
-    var filename = path.join(
+    const filename = path.join(
         request.serverRoot,
         request.url
     );
 
     fs.exists(
         filename,
-        function(exists){
+        function fileExists(exists){
             this.serveFile(filename,exists,request,response);
         }.bind(this)
     );
@@ -318,62 +319,64 @@ function requestRecieved(request,response){
 /*********************
 *  SERVER CLASS
 *********************/
-function Server(){
-    Object.defineProperties(
-        this,
-        {
-            deploy:{
-                value:deploy,
-                writable:false,
-                enumerable:true
-            },
-            serveFile:{
-                value:serveFile,
-                writable:false,
-                enumerable:false
-            },
-            //executed just after request recieved allowing user to modify if needed
-            onRequest:{
-                value:function(request,response){},
-                writable:true,
-                enumerable:true
-            },
-            //executed just before response sent allowing user to modify if needed
-            beforeServe:{
-                value:function(request,response,body,encoding){},
-                writable:true,
-                enumerable:true
-            },
-            //executed after each full response completely sent
-            afterServe:{
-                value:function(request){},
-                writable:true,
-                enumerable:true
-            },
-            serve:{
-                value:serve,
-                writable:false,
-                enumerable:false
-            },
-            //kept for backwards compatibility
-            configTemplate  :{
-                value:Config,
-                writable:false,
-                //not visible because this is just for backwards compatibility
-                enumerable:false
-            },
-            Config:{
-                value:Config,
-                writable:false,
-                enumerable:true
-            },
-            Server:{
-                value:Server,
-                writable:false,
-                enumerable:true
+class Server{
+    constructor(){
+        Object.defineProperties(
+            this,
+            {
+                deploy:{
+                    value:deploy,
+                    writable:false,
+                    enumerable:true
+                },
+                serveFile:{
+                    value:serveFile,
+                    writable:false,
+                    enumerable:false
+                },
+                //executed just after request recieved allowing user to modify if needed
+                onRequest:{
+                    value:function(request,response){},
+                    writable:true,
+                    enumerable:true
+                },
+                //executed just before response sent allowing user to modify if needed
+                beforeServe:{
+                    value:function beforeServe(request,response,body,encoding){},
+                    writable:true,
+                    enumerable:true
+                },
+                //executed after each full response completely sent
+                afterServe:{
+                    value:function afterServe(request){},
+                    writable:true,
+                    enumerable:true
+                },
+                serve:{
+                    value:serve,
+                    writable:false,
+                    enumerable:false
+                },
+                //kept for backwards compatibility
+                configTemplate  :{
+                    value:Config,
+                    writable:false,
+                    //not visible because this is just for backwards compatibility
+                    enumerable:false
+                },
+                Config:{
+                    value:Config,
+                    writable:false,
+                    enumerable:true
+                },
+                Server:{
+                    value:Server,
+                    writable:false,
+                    enumerable:true
+                }
             }
-        }
-    )
+        );
+    }
 }
 
 module.exports=new Server;
