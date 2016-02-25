@@ -90,7 +90,7 @@ function serveFile(filename,exists,request,response) {
     const contentType = path.extname(filename).slice(1);
 
     //Only serve specified file types
-    if(!this.config.contentType){
+    if(!this.config.contentType[contentType]){
         if(this.config.verbose){
             console.log(`${this.config.logID} 415 ###\n\n`);
         }
