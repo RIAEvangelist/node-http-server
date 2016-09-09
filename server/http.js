@@ -4,6 +4,7 @@ const http = require('http'),
     url = require('url'),
     path = require('path'),
     fs = require('fs'),
+    querystring = require('querystring'),
     Config = require(`${__dirname}/Config.js`);
 
 const passedArgs = process.argv.splice(2),
@@ -257,6 +258,8 @@ function requestRecieved(request,response){
         );
     }
     let uri = url.parse(request.url);
+    let query = querystring.parse(uri.query);
+
     uri=uri.pathname;
     if (uri=='/'){
         uri=`/${this.config.server.index}`;
@@ -299,6 +302,7 @@ function requestRecieved(request,response){
     }
 
     request.url=uri;
+    request.query=query;
     request.serverRoot=root;
 
     this.onRequest(
