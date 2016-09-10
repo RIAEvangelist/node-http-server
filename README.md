@@ -1,8 +1,8 @@
-Node http server
+Node http server with https support
 ================
 ----
 
-Simple to use stand alone node HTTP Server you can spin up from node apps, bash scripts, the commandline, C or python apps etc.
+Simple to use stand alone node HTTP and HTTPS Server you can spin up in seconds.
 
 ` npm install node-http-server `
 
@@ -17,9 +17,7 @@ GitHub info :
 Package Quality :  
 ![node-http-server Package Quality](http://npm.packagequality.com/badge/node-http-server.png)
 
-## writing a node http server
-
-**DO NOT USE launch=now** as a commandline argument for a node server. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.
+## writing a node http or https server
 
 The below table shows all of the methods available on the server when you require this module.
 
@@ -51,9 +49,15 @@ If you want to create a custom Server or extend the Server Class you can require
 
 ## Examples
 
-To see the server in action run ` npm start ` from the root of this repo and then visit [localhost:8000](http://localhost:8000).
+To see the node http server in action run ` npm start ` from the root of this repo and then visit [localhost:8000](http://localhost:8000).
 
-Detailed examples can be found in the [example folder](https://github.com/RIAEvangelist/node-http-server/tree/master/example) The basic example directory is static file servers and the advanced directory has dynamic server side rendering examples including a benchmark example.
+To start only an https example server ` npm run https ` from the root of this repo and then visit [localhost:4433](http://localhost:4433).
+
+To spin up both an http and an https server ` npm run both ` from the root of this repo and then visit [localhost:4433](http://localhost:4433) or [localhost:8000](http://localhost:8000).
+
+Detailed examples can be found in the [example folder](https://github.com/RIAEvangelist/node-http-server/tree/master/example) The basic example directory is static http and https file servers and the advanced directory has dynamic server side rendering http and https examples including a benchmark example.
+
+# Basic http server example
 
 ```javascript
 
@@ -68,9 +72,52 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
 
 ```
 
+# Basic https only server example
+
+```javascript
+
+    var server=require('node-http-server');
+
+    server.deploy(
+        {
+            port:8000,
+            root:'~/myApp/',
+            https:{
+                privateKey:`/path/to/your/certs/private/server.key`,
+                certificate:`/path/to/your/certs/server.pub`,
+                port:4433,
+                only:true
+            }
+        }
+    );
+
+```
+
+# Basic server running both http and https
+
+```javascript
+
+    var server=require('node-http-server');
+
+    server.deploy(
+        {
+            port:8000,
+            root:'~/myApp/',
+            https:{
+                privateKey:`/path/to/your/certs/private/server.key`,
+                certificate:`/path/to/your/certs/server.pub`,
+                port:4433
+            }
+        }
+    );
+
+```
+
 ---
 
 ## Custom configuration
+
+for http :
 
 ```javascript
 
@@ -86,6 +133,28 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
     server.deploy(config);
 
 ```
+
+for https :
+
+```javascript
+
+    var server=require('node-http-server');
+
+    var config=new server.Config;
+    config.errors['404']    = 'These are not the files you are looking for...';
+    config.contentType.mp4  = 'video/mp4';
+    config.port             = 8005;
+    config.verbose          = true;
+    config.root             = '~/myApp/'
+    config.https.privateKey = `/path/to/your/certs/private/server.key`;
+    config.https.certificate= `/path/to/your/certs/server.pub`;
+    config.https.port       = 4433;
+    config.https.only       = true;
+
+    server.deploy(config);
+
+```
+
 
 ---
 
@@ -137,31 +206,6 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
 
 ```
 
-## Commandline / terminal / bash / script use
-
-` launch ` is an argument that specifies to launch the server now with the provided arguments and defaults
-
-    node ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
-
-you can specify any of the variables from the config example above which use args. The order does not matter.
-
-    node ~/git/node-http-server/server/http.js root=~/myApp/ port=8888 verbose=true launch=now
-
-commandline arguments will also work when starting a node server
-
-    node myServer.js verbose=true
-
-|arg|default|vaild values|
-|---|-------|------------|
-|verbose|false|true or false|
-|port|defaults.port|any valid port on the machine|
-|root|defaults.root|any valid path on the machine|
-|domain|localhost|any domain which route to the machines ip. This can be done publicly or locally, as in the hosts file. ` 0.0.0.0 ` will accept requests from *** ANY *** domain pointed at the machine.|
-|index|index.html|any file name|
-|noCache|true|true or false|
-
----
-
 ## Default Node HTTP Server Configuration
 
 ```javascript
@@ -171,6 +215,12 @@ commandline arguments will also work when starting a node server
         port        : args.port||defaults.port,
         root        : args.root||defaults.root,
         domain      : args.domain||defaults.domain,
+        https       :{
+            privateKey:'',
+            certificate:'',
+            port:443,
+            only:false
+        },
         log         : false,
         logFunction : serverLogging,
         domains   : {
@@ -223,6 +273,7 @@ commandline arguments will also work when starting a node server
 |port| the port on which the server should run  |
 |root| the absolute path to the root dir for the domain |
 |domain| the server domain. To accept incoming requests for ***ANY Applicable Domain*** use ` 0.0.0.0 ` this will allow any request that is pointed at this machine on the specified port to use this server config.  |
+|https|settings for https, these wil only take effect if both a `privateKey` and a `certificate` are specified. Setting ` only ` to be true means the instance will only serve over https|
 |log| full path to log file, if specified and the file is not present, it will be created, however the dir must be there. Example path : ` /tmp/server.log ` It is recommended that you timestamp this file name with a time stamp like : ` '~/serverLogs/domain-'+new Date().getTime()+'.log' ` this will create a new log file each time the server is started/restarted/reboot etc...  |
 |logFunction| the default function appends timestamps to the headers object and logs as JSON in the ` log ` file. You can assign your own function here as well. It should accepts a javascript Object as the first argument. |
 |domains.*| this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.|

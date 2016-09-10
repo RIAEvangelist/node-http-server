@@ -1,6 +1,7 @@
 'use strict';
 
 const http = require('http'),
+    https = require('https'),
     url = require('url'),
     path = require('path'),
     fs = require('fs'),
@@ -33,6 +34,34 @@ function deploy(userConfig, readyCallback){
         }
     );
     this.config=new this.Config(userConfig);
+
+    if(this.config.https && this.config.https.privateKey && this.config.https.certificate){
+        if(!this.config.https.port){
+            this.config.https.port=443;
+        }
+        this.config.httpsOptions = {
+            key: fs.readFileSync(this.config.https.privateKey),
+            cert: fs.readFileSync(this.config.https.certificate)
+        };
+
+        Object.defineProperty(
+            this,
+            'secureServer',
+            {
+                value:https.createServer(
+                    this.config.httpsOptions,
+                    requestRecieved.bind(this)
+                ),
+                writable:false,
+                enumerable:true
+            }
+        );
+    }else{
+        this.config.https={
+            only:false
+        };
+    }
+
     this.config.logID=`### ${this.config.domain} server`;
 
     if(this.config.verbose){
@@ -41,19 +70,38 @@ function deploy(userConfig, readyCallback){
     }
 
     this.server.timeout=this.config.server.timeout;
-    this.server.listen(
-        this.config.port,
-        function() {
-            if(this.config.verbose){
-                console.log(`${this.config.logID} listening on port ${this.config.port} ###\n\n`);
-            }
-            if (readyCallback){
-                //passes the current Server class instance for refrence.
-                //this allows multiple servers to use the same ready callback if desired
-                readyCallback(this);
-            }
-        }.bind(this)
-    );
+
+    if(!this.config.https.only){
+        this.server.listen(
+            this.config.port,
+            function() {
+                if(this.config.verbose){
+                    console.log(`${this.config.logID} listening on port ${this.config.port} ###\n\n`);
+                }
+                if (readyCallback){
+                    //passes the current Server class instance for refrence.
+                    //this allows multiple servers to use the same ready callback if desired
+                    readyCallback(this);
+                }
+            }.bind(this)
+        );
+    }
+
+    if(this.config.httpsOptions){
+        this.secureServer.listen(
+            this.config.https.port,
+            function() {
+                if(this.config.verbose){
+                    console.log(`HTTPS: ${this.config.logID} listening on port ${this.config.https.port} ###\n\n`);
+                }
+                if (readyCallback){
+                    //passes the current Server class instance for refrence.
+                    //this allows multiple servers to use the same ready callback if desired
+                    readyCallback(this);
+                }
+            }.bind(this)
+        );
+    }
 }
 
 function setHeaders(response,headers){

@@ -1,6 +1,6 @@
 {
   "name": "node-http-server",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "description": "A very simple and fast http server for node, bash, and spawnable from C, Python etc. It is lightweight and great for embedded solutions as well as everyday development or public facing apps.",
   "main": "server/http.js",
   "directories": {
@@ -11,7 +11,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./example/basic/basicApp.js"
+    "start": "node ./example/basic/basicApp.js",
+    "https": "node ./example/basic/https-ONLY-basicApp.js",
+    "both": "node ./example/basic/https-basicApp.js"
   },
   "repository": {
     "type": "git",

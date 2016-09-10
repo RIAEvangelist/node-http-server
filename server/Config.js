@@ -49,6 +49,12 @@ const defaultConfigs={
         noCache : args.noCache=='false' ? false : true,
         timeout : 30000 //30 second timeout
     },
+    https:{
+        privateKey:'',
+        certificate:'',
+        port:443,
+        only:false
+    },
     contentType : {
         html    : 'text/html',
         css     : 'text/css',
@@ -129,6 +135,11 @@ class Config{
                 },
                 domain      : {
                     value:defaultConfigs.domain,
+                    enumerable:true,
+                    writable:true
+                },
+                https       : {
+                    value:defaultConfigs.https,
                     enumerable:true,
                     writable:true
                 },
