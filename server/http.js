@@ -5,6 +5,7 @@ const http = require('http'),
     url = require('url'),
     path = require('path'),
     fs = require('fs'),
+    querystring=require('querystring'),
     Config = require(`${__dirname}/Config.js`);
 
 const passedArgs = process.argv.splice(2),
@@ -263,7 +264,32 @@ function serve(request,response,body,encoding){
     refBody.value=body;
     refEncoding.value=encoding;
 
-    this.beforeServe(request,response,refBody,refEncoding);
+    //return any value to force delayed serving
+    if(
+        this.beforeServe(
+            request,
+            response,
+            refBody,
+            refEncoding,
+            completeServing.bind(this)
+        )
+    ){
+        return;
+    };
+
+    completeServing.bind(this)(request,response,refBody,encoding);
+
+    return;
+}
+
+function completeServing(request,response,refBody,refEncoding){
+    if(!(refBody instanceof RefString)){
+        refBody=new RefString(refBody);
+    }
+
+    if(!(refEncoding instanceof RefString)){
+        refEncoding=new RefString(refEncoding||'binary');
+    }
 
     if(response.finished){
         this.afterServe(request);
@@ -275,16 +301,14 @@ function serve(request,response,body,encoding){
         refEncoding.value,
         this.afterServe.bind(this,request)
     );
-
-    return;
 }
 
-function RefString(){
+function RefString(value){
     Object.defineProperties(
         this,
         {
             value:{
-                value:'',
+                value:value||'',
                 enumerable:true,
                 writable:true
             }
@@ -304,8 +328,52 @@ function requestRecieved(request,response){
             logData
         );
     }
+
     let uri = url.parse(request.url);
+    uri.protocol='http';
+    uri.host=uri.hostname=request.headers.host;
+    uri.port=80;
+    uri.query=querystring.parse(uri.query);
+
+    if(request.connection.encrypted){
+        uri.protocol='https';
+        uri.port=443;
+    }
+
+    (
+        function(){
+            const host=uri.host.split(':');
+
+            if(!host[1]){
+                return;
+            }
+            uri.host=uri.hostname=host[0];
+            uri.port=host[1];
+        }
+    )();
+
+    for(let key in uri){
+        if(uri[key]!==null){
+            continue;
+        }
+        uri[key]='';
+    }
+
+    request.uri=uri;
+
+    //return any value to force delayed serving
+    if(
+        this.onRawRequest(
+            request,
+            response,
+            completeServing.bind(this)
+        )
+    ){
+        return;
+    };
+
     uri=uri.pathname;
+
     if (uri=='/'){
         uri=`/${this.config.server.index}`;
     }
@@ -349,10 +417,16 @@ function requestRecieved(request,response){
     request.url=uri;
     request.serverRoot=root;
 
-    this.onRequest(
-        request,
-        response
-    );
+    //return any value to force delayed serving
+    if(
+        this.onRequest(
+            request,
+            response,
+            completeServing.bind(this)
+        )
+    ){
+        return;
+    };
 
     const filename = path.join(
         request.serverRoot,
@@ -386,15 +460,21 @@ class Server{
                     writable:false,
                     enumerable:false
                 },
-                //executed just after request recieved allowing user to modify if needed
-                onRequest:{
-                    value:function(request,response){},
+                //executed before any processing of request. If returns true response serving will be delayed.
+                onRawRequest:{
+                    value:function(request,response,serve){},
                     writable:true,
                     enumerable:true
                 },
-                //executed just before response sent allowing user to modify if needed
+                //executed just after request recieved allowing user to modify if needed. If returns true response serving will be delayed.
+                onRequest:{
+                    value:function(request,response,serve){},
+                    writable:true,
+                    enumerable:true
+                },
+                //executed just before response sent allowing user to modify if needed. If returns true response serving will be delayed.
                 beforeServe:{
-                    value:function beforeServe(request,response,body,encoding){},
+                    value:function beforeServe(request,response,body,encoding,serve){},
                     writable:true,
                     enumerable:true
                 },

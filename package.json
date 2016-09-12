@@ -36,5 +36,8 @@
   "bugs": {
     "url": "https://github.com/RIAEvangelist/node-http-server/issues"
   },
-  "homepage": "https://github.com/RIAEvangelist/node-http-server"
+  "homepage": "https://github.com/RIAEvangelist/node-http-server",
+  "devDependencies": {
+    "request": "^2.74.0"
+  }
 }
