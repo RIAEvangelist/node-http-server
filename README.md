@@ -1,8 +1,10 @@
-Node http server with https support
+Node http server with https and proxy support
 ================
 ----
 
 Simple to use stand alone node HTTP and HTTPS Server you can spin up in seconds.
+
+Support for building proxy servers has been added. Documentation coming in next release. [For now see the node-http-server proxy examples](https://github.com/RIAEvangelist/node-http-server/tree/master/example/proxy).
 
 ` npm install node-http-server `
 
