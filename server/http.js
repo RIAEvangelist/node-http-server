@@ -342,6 +342,9 @@ function requestRecieved(request,response){
 
     (
         function(){
+            if(!uri.host){
+                return;
+            }
             const host=uri.host.split(':');
 
             if(!host[1]){
