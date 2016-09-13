@@ -32,13 +32,17 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h1>
-<a id="node-http-server" class="anchor" href="#node-http-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node http server</h1>
+<a id="node-http-server-with-https-and-proxy-support" class="anchor" href="#node-http-server-with-https-and-proxy-support" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Node http server with https and proxy support</h1>
 
 <hr>
 
-<p>Simple to use stand alone node HTTP Server you can spin up from node apps, bash scripts, the commandline, C or python apps etc.</p>
+<p>Simple to use stand alone node HTTP and HTTPS Server you can spin up in seconds.</p>
+
+<p>Support for building proxy servers has been added. Documentation coming in next release. <a href="https://github.com/RIAEvangelist/node-http-server/tree/master/example/proxy">For now see the node-http-server proxy examples</a>.</p>
 
 <p><code>npm install node-http-server</code></p>
+
+<p><a href="https://www.npmjs.com/package/node-http-server"><img src="https://nodei.co/npm/node-http-server.png?downloads=true&amp;downloadRank=true&amp;stars=true" alt="node-http-server stats"></a>  </p>
 
 <p>npm info :  <a href="http://npm-stat.com/charts.html?package=node-http-server&amp;author=&amp;from=&amp;to=">See npm trends and stats for node-http-server</a><br>
 <img src="https://img.shields.io/npm/v/node-http-server.svg" alt="node-http-server npm version"> <img src="https://img.shields.io/node/v/node-http-server.svg" alt="supported node version for node-http-server"> <img src="https://img.shields.io/npm/dt/node-http-server.svg" alt="total npm downloads for node-http-server"> <img src="https://img.shields.io/npm/dm/node-http-server.svg" alt="monthly npm downloads for node-http-server"> <img src="https://img.shields.io/npm/l/node-http-server.svg" alt="npm licence for node-http-server"></p>
@@ -49,25 +53,274 @@
 <p>Package Quality :<br>
 <img src="http://npm.packagequality.com/badge/node-http-server.png" alt="node-http-server Package Quality"></p>
 
+<h2>
+<a id="writing-a-node-http-or-https-server" class="anchor" href="#writing-a-node-http-or-https-server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>writing a node http or https server</h2>
+
+<p>The below table shows all of the methods available on the server when you require this module.</p>
+
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> server<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-http-server<span class="pl-pds">'</span></span>);
+</pre></div>
+
+<p>If you want to create a custom Server or extend the Server Class you can require just the server class.</p>
+
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> Server<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-http-server<span class="pl-pds">'</span></span>).<span class="pl-smi">Server</span>;
+</pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Server Method</th>
+<th>params</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>deploy</td>
+<td>config obj (optional)</td>
+<td>starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class</td>
+</tr>
+<tr>
+<td>onRequest</td>
+<td>request obj</td>
+<td>called when request recieved</td>
+</tr>
+<tr>
+<td>beforeServe</td>
+<td>request obj, response obj, body obj, encoding obj</td>
+<td>called just before data is served to the client</td>
+</tr>
+<tr>
+<td>afterServe</td>
+<td>request obj</td>
+<td>called once data has been fully sent to client</td>
+</tr>
+<tr>
+<td>Config</td>
+<td>config object (optional)</td>
+<td>This is a refrence to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values ig config object passed.</td>
+</tr>
+<tr>
+<td>Server</td>
+<td>none</td>
+<td>This is a refrence to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.</td>
+</tr>
+</tbody>
+</table>
+
 <hr>
 
 <h2>
-<a id="defaults" class="anchor" href="#defaults" aria-hidden="true"><span class="octicon octicon-link"></span></a>Defaults</h2>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples</h2>
+
+<p>To see the node http server in action run <code>npm start</code> from the root of this repo and then visit <a href="http://localhost:8000">localhost:8000</a>.</p>
+
+<p>To start only an https example server <code>npm run https</code> from the root of this repo and then visit <a href="http://localhost:4433">localhost:4433</a>.</p>
+
+<p>To spin up both an http and an https server <code>npm run both</code> from the root of this repo and then visit <a href="http://localhost:4433">localhost:4433</a> or <a href="http://localhost:8000">localhost:8000</a>.</p>
+
+<p>Detailed examples can be found in the <a href="https://github.com/RIAEvangelist/node-http-server/tree/master/example">example folder</a> The basic example directory is static http and https file servers and the advanced directory has dynamic server side rendering http and https examples including a benchmark example.</p>
+
+<h1>
+<a id="basic-http-server-example" class="anchor" href="#basic-http-server-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Basic http server example</h1>
+
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> server<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-http-server<span class="pl-pds">'</span></span>);
+
+    <span class="pl-smi">server</span>.<span class="pl-en">deploy</span>(
+        {
+            port<span class="pl-k">:</span><span class="pl-c1">8000</span>,
+            root<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>~/myApp/<span class="pl-pds">'</span></span>
+        }
+    );
+</pre></div>
+
+<h1>
+<a id="basic-https-only-server-example" class="anchor" href="#basic-https-only-server-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Basic https only server example</h1>
+
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> server<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-http-server<span class="pl-pds">'</span></span>);
+
+    <span class="pl-smi">server</span>.<span class="pl-en">deploy</span>(
+        {
+            port<span class="pl-k">:</span><span class="pl-c1">8000</span>,
+            root<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>~/myApp/<span class="pl-pds">'</span></span>,
+            https<span class="pl-k">:</span>{
+                privateKey<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">`</span>/path/to/your/certs/private/server.key<span class="pl-pds">`</span></span>,
+                certificate<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">`</span>/path/to/your/certs/server.pub<span class="pl-pds">`</span></span>,
+                port<span class="pl-k">:</span><span class="pl-c1">4433</span>,
+                only<span class="pl-k">:</span><span class="pl-c1">true</span>
+            }
+        }
+    );
+</pre></div>
+
+<h1>
+<a id="basic-server-running-both-http-and-https" class="anchor" href="#basic-server-running-both-http-and-https" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Basic server running both http and https</h1>
+
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> server<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-http-server<span class="pl-pds">'</span></span>);
+
+    <span class="pl-smi">server</span>.<span class="pl-en">deploy</span>(
+        {
+            port<span class="pl-k">:</span><span class="pl-c1">8000</span>,
+            root<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>~/myApp/<span class="pl-pds">'</span></span>,
+            https<span class="pl-k">:</span>{
+                privateKey<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">`</span>/path/to/your/certs/private/server.key<span class="pl-pds">`</span></span>,
+                certificate<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">`</span>/path/to/your/certs/server.pub<span class="pl-pds">`</span></span>,
+                port<span class="pl-k">:</span><span class="pl-c1">4433</span>
+            }
+        }
+    );
+</pre></div>
 
 <hr>
 
-<h4>
-<a id="currently-modifiable-via-any-interface-commandline-bash-node-etc" class="anchor" href="#currently-modifiable-via-any-interface-commandline-bash-node-etc" aria-hidden="true"><span class="octicon octicon-link"></span></a>currently modifiable via any interface, commandline, bash, node etc.</h4>
+<h2>
+<a id="custom-configuration" class="anchor" href="#custom-configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Custom configuration</h2>
 
-<pre><code>port        : 8080
-root        : Current Working Directory (where you execute the command from)
-domain      : 0.0.0.0
-index       : index.html
-verbose     : false
-noCache     : true
-log         : false
-logFunction : serverLogging
-</code></pre>
+<p>for http :</p>
+
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> server<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-http-server<span class="pl-pds">'</span></span>);
+
+    <span class="pl-k">var</span> config<span class="pl-k">=</span><span class="pl-k">new</span> <span class="pl-en">server.Config</span>;
+    <span class="pl-smi">config</span>.<span class="pl-smi">errors</span>[<span class="pl-s"><span class="pl-pds">'</span>404<span class="pl-pds">'</span></span>]    <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>These are not the files you are looking for...<span class="pl-pds">'</span></span>;
+    <span class="pl-smi">config</span>.<span class="pl-smi">contentType</span>.<span class="pl-smi">mp4</span>  <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>video/mp4<span class="pl-pds">'</span></span>;
+    <span class="pl-smi">config</span>.<span class="pl-c1">port</span>             <span class="pl-k">=</span> <span class="pl-c1">8005</span>;
+    <span class="pl-smi">config</span>.<span class="pl-smi">verbose</span>          <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+    <span class="pl-smi">config</span>.<span class="pl-smi">root</span>             <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>~/myApp/<span class="pl-pds">'</span></span>
+
+    <span class="pl-smi">server</span>.<span class="pl-en">deploy</span>(config);
+</pre></div>
+
+<p>for https :</p>
+
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> server<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-http-server<span class="pl-pds">'</span></span>);
+
+    <span class="pl-k">var</span> config<span class="pl-k">=</span><span class="pl-k">new</span> <span class="pl-en">server.Config</span>;
+    <span class="pl-smi">config</span>.<span class="pl-smi">errors</span>[<span class="pl-s"><span class="pl-pds">'</span>404<span class="pl-pds">'</span></span>]    <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>These are not the files you are looking for...<span class="pl-pds">'</span></span>;
+    <span class="pl-smi">config</span>.<span class="pl-smi">contentType</span>.<span class="pl-smi">mp4</span>  <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>video/mp4<span class="pl-pds">'</span></span>;
+    <span class="pl-smi">config</span>.<span class="pl-c1">port</span>             <span class="pl-k">=</span> <span class="pl-c1">8005</span>;
+    <span class="pl-smi">config</span>.<span class="pl-smi">verbose</span>          <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+    <span class="pl-smi">config</span>.<span class="pl-smi">root</span>             <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>~/myApp/<span class="pl-pds">'</span></span>
+    <span class="pl-smi">config</span>.<span class="pl-smi">https</span>.<span class="pl-smi">privateKey</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">`</span>/path/to/your/certs/private/server.key<span class="pl-pds">`</span></span>;
+    <span class="pl-smi">config</span>.<span class="pl-smi">https</span>.<span class="pl-smi">certificate</span><span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">`</span>/path/to/your/certs/server.pub<span class="pl-pds">`</span></span>;
+    <span class="pl-smi">config</span>.<span class="pl-smi">https</span>.<span class="pl-c1">port</span>       <span class="pl-k">=</span> <span class="pl-c1">4433</span>;
+    <span class="pl-smi">config</span>.<span class="pl-smi">https</span>.<span class="pl-smi">only</span>       <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+
+    <span class="pl-smi">server</span>.<span class="pl-en">deploy</span>(config);
+</pre></div>
+
+<hr>
+
+<h2>
+<a id="multiple-domains-or-subdomains" class="anchor" href="#multiple-domains-or-subdomains" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Multiple domains or subdomains</h2>
+
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> server<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-http-server<span class="pl-pds">'</span></span>);
+
+    <span class="pl-k">var</span> config<span class="pl-k">=</span>{
+        port<span class="pl-k">:</span><span class="pl-c1">8010</span>,
+        root<span class="pl-k">:</span><span class="pl-c1">__dirname</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>/www/myApp/<span class="pl-pds">'</span></span>,
+        domain<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>myapp.com<span class="pl-pds">'</span></span>,
+        domains<span class="pl-k">:</span>{
+            <span class="pl-s"><span class="pl-pds">'</span>a.myapp.com<span class="pl-pds">'</span></span><span class="pl-k">:</span><span class="pl-c1">__dirname</span><span class="pl-k">+</span><span class="pl-s"><span class="pl-pds">'</span>/www/a-myApp/<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>yourapp.com<span class="pl-pds">'</span></span><span class="pl-k">:</span><span class="pl-c1">__dirname</span><span class="pl-k">+</span><span class="pl-s"><span class="pl-pds">'</span>/someFolder/yourApp/<span class="pl-pds">'</span></span>
+        }
+    }
+
+    <span class="pl-smi">server</span>.<span class="pl-en">deploy</span>(config);    
+</pre></div>
+
+<h2>
+<a id="template-filling" class="anchor" href="#template-filling" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Template filling</h2>
+
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> server<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>../../server/http.js<span class="pl-pds">'</span></span>);
+
+    <span class="pl-smi">server</span>.<span class="pl-smi">beforeServe</span><span class="pl-k">=</span>beforeServe;
+
+    <span class="pl-k">function</span> <span class="pl-en">beforeServe</span>(<span class="pl-smi">request</span>,<span class="pl-smi">response</span>,<span class="pl-smi">body</span>,<span class="pl-smi">encoding</span>){
+        <span class="pl-c">//only parsing html files for this example</span>
+        <span class="pl-k">if</span>(<span class="pl-smi">response</span>.<span class="pl-en">getHeader</span>(<span class="pl-s"><span class="pl-pds">'</span>Content-Type<span class="pl-pds">'</span></span>)<span class="pl-k">!=</span><span class="pl-smi">server</span>.<span class="pl-smi">config</span>.<span class="pl-smi">contentType</span>.<span class="pl-smi">html</span>){
+            <span class="pl-k">return</span>;
+        }
+
+        <span class="pl-k">var</span> someVariable<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>this is some variable value<span class="pl-pds">'</span></span>;
+
+        <span class="pl-smi">body</span>.<span class="pl-c1">value</span><span class="pl-k">=</span><span class="pl-smi">body</span>.<span class="pl-c1">value</span>.<span class="pl-c1">replace</span>(<span class="pl-s"><span class="pl-pds">'</span>{{someVariable}}<span class="pl-pds">'</span></span>,someVariable);
+    }
+
+    <span class="pl-smi">server</span>.<span class="pl-en">deploy</span>(
+        {
+            port<span class="pl-k">:</span><span class="pl-c1">8000</span>,
+            root<span class="pl-k">:</span><span class="pl-c1">__dirname</span><span class="pl-k">+</span><span class="pl-s"><span class="pl-pds">'</span>/appRoot/<span class="pl-pds">'</span></span>
+        }
+    );
+</pre></div>
+
+<h2>
+<a id="default-node-http-server-configuration" class="anchor" href="#default-node-http-server-configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Default Node HTTP Server Configuration</h2>
+
+<div class="highlight highlight-source-js"><pre>
+    {
+        verbose     <span class="pl-k">:</span> (<span class="pl-smi">args</span>.<span class="pl-smi">verbose</span><span class="pl-k">==</span><span class="pl-s"><span class="pl-pds">'</span>true<span class="pl-pds">'</span></span>)<span class="pl-k">||</span><span class="pl-c1">false</span>,
+        port        <span class="pl-k">:</span> <span class="pl-smi">args</span>.<span class="pl-c1">port</span><span class="pl-k">||</span><span class="pl-smi">defaults</span>.<span class="pl-c1">port</span>,
+        root        <span class="pl-k">:</span> <span class="pl-smi">args</span>.<span class="pl-smi">root</span><span class="pl-k">||</span><span class="pl-smi">defaults</span>.<span class="pl-smi">root</span>,
+        domain      <span class="pl-k">:</span> <span class="pl-smi">args</span>.<span class="pl-smi">domain</span><span class="pl-k">||</span><span class="pl-smi">defaults</span>.<span class="pl-smi">domain</span>,
+        https       <span class="pl-k">:</span>{
+            privateKey<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+            certificate<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+            port<span class="pl-k">:</span><span class="pl-c1">443</span>,
+            only<span class="pl-k">:</span><span class="pl-c1">false</span>
+        },
+        log         <span class="pl-k">:</span> <span class="pl-c1">false</span>,
+        logFunction <span class="pl-k">:</span> serverLogging,
+        domains   <span class="pl-k">:</span> {
+            <span class="pl-c">/*******************\</span>
+<span class="pl-c">             * domain  : /that/domains/root/dir</span>
+<span class="pl-c">             *</span>
+<span class="pl-c">             * for sub domains, specify the whole host i.e. "my.sub.domain"</span>
+<span class="pl-c">             * you may need to edit your hosts file, cnames or iptable</span>
+<span class="pl-c">             * domain or my.domain etc. goes to 127.0.0.1 for local development</span>
+<span class="pl-c">             * *****************/</span>
+        },
+        server      <span class="pl-k">:</span> {
+            index   <span class="pl-k">:</span> <span class="pl-smi">args</span>.<span class="pl-c1">index</span><span class="pl-k">||</span><span class="pl-smi">defaults</span>.<span class="pl-c1">index</span>,
+            noCache <span class="pl-k">:</span> <span class="pl-smi">args</span>.<span class="pl-smi">noCache</span><span class="pl-k">==</span><span class="pl-s"><span class="pl-pds">'</span>false<span class="pl-pds">'</span></span> <span class="pl-k">?</span> <span class="pl-c1">false</span> <span class="pl-k">:</span> <span class="pl-c1">true</span>,
+            timeout <span class="pl-k">:</span> <span class="pl-c1">30000</span> <span class="pl-c">//30 second timeout</span>
+        },
+        contentType <span class="pl-k">:</span> {
+            html    <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>text/html<span class="pl-pds">'</span></span>,
+            css     <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>text/css<span class="pl-pds">'</span></span>,
+            js      <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>text/javascript<span class="pl-pds">'</span></span>,
+            json    <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>application/json<span class="pl-pds">'</span></span>,
+            txt     <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>text/plain<span class="pl-pds">'</span></span>,
+            jpeg    <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>image/jpeg<span class="pl-pds">'</span></span>,
+            jpg     <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>image/jpeg<span class="pl-pds">'</span></span>,
+            png     <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>image/png<span class="pl-pds">'</span></span>,
+            gif     <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>image/gif<span class="pl-pds">'</span></span>,
+            ico     <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>image/x-icon<span class="pl-pds">'</span></span>,
+            appcache<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>text/cache-manifest<span class="pl-pds">'</span></span>
+        },
+        restrictedType<span class="pl-k">:</span> {
+
+        },
+        errors<span class="pl-k">:</span>{
+            headers <span class="pl-k">:</span> {
+                <span class="pl-s"><span class="pl-pds">'</span>Content-Type<span class="pl-pds">'</span></span> <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>text/plain<span class="pl-pds">'</span></span>
+            },
+            <span class="pl-c1">404</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>404 MIA<span class="pl-pds">'</span></span>,
+            <span class="pl-c1">415</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>415 File type not supported<span class="pl-pds">'</span></span>,
+            <span class="pl-c1">403</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>403 Access Denied<span class="pl-pds">'</span></span>,
+            <span class="pl-c1">500</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>500 {{err}}<span class="pl-pds">'</span></span>
+        }
+    };
+</pre></div>
 
 <table>
 <thead>
@@ -77,245 +330,180 @@ logFunction : serverLogging
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>verbose</td>
+<td>display detailed info about what server is doing via terminal.</td>
+</tr>
 <tr>
 <td>port</td>
 <td>the port on which the server should run</td>
 </tr>
 <tr>
 <td>root</td>
-<td>the absolute location to the root dir for the public file system</td>
+<td>the absolute path to the root dir for the domain</td>
 </tr>
 <tr>
 <td>domain</td>
-<td>the domain which this server applies to. You can add more servers via the node <code>domains</code>  implementation described below than you can via bash or commandline. If you want to accept incoming requests for <strong><em>ANY Applicable Domain</em></strong> use <code>0.0.0.0</code> this will allow any request that is pointed at this machine on the specified port to use this server config.</td>
+<td>the server domain. To accept incoming requests for <strong><em>ANY Applicable Domain</em></strong> use <code>0.0.0.0</code> this will allow any request that is pointed at this machine on the specified port to use this server config.</td>
 </tr>
 <tr>
-<td>index</td>
-<td>the default file to look for in a dir. if not found a <strong>404</strong> will be displayed</td>
-</tr>
-<tr>
-<td>verbose</td>
-<td>should the server display detailed info about what it is doing</td>
-</tr>
-<tr>
-<td>noCache</td>
-<td>should the server prevent caching</td>
+<td>https</td>
+<td>settings for https, these wil only take effect if both a <code>privateKey</code> and a <code>certificate</code> are specified. Setting <code>only</code> to be true means the instance will only serve over https</td>
 </tr>
 <tr>
 <td>log</td>
-<td>full path to log file, if specified file is not present it will be created, however the dir must be there. ie. /tmp/server.log It is recommended that you timestamp this file name with a time stamp like : <code>'~/serverLogs/domain-'+new Date().getTime()+'.log'</code> this will create a new log file each time the server is started/restarted/reboot etc...</td>
+<td>full path to log file, if specified and the file is not present, it will be created, however the dir must be there. Example path : <code>/tmp/server.log</code> It is recommended that you timestamp this file name with a time stamp like : <code>'~/serverLogs/domain-'+new Date().getTime()+'.log'</code> this will create a new log file each time the server is started/restarted/reboot etc...</td>
 </tr>
 <tr>
 <td>logFunction</td>
-<td>this defaults to append timestamp to headers object and log as JSON in the <code>log</code> file. However, you can overwrite this and do whatever you like with the JSON data if you so choose. It accepts a javascript Object as the first argument for parsing. If you manually log to the default function. If you overwrite the function for custom logging, you must accept a javascript object as the first argument for the default log requests to function.</td>
+<td>the default function appends timestamps to the headers object and logs as JSON in the <code>log</code> file. You can assign your own function here as well. It should accepts a javascript Object as the first argument.</td>
 </tr>
-</tbody>
-</table>
-
-<hr>
-
-<h4>
-<a id="currently-modifiable-via-node" class="anchor" href="#currently-modifiable-via-node" aria-hidden="true"><span class="octicon octicon-link"></span></a>currently modifiable via node</h4>
-
-<pre><code>domains     :   {}
-
-contentType :   {
-    html    : 'text/html',
-    css     : 'text/css',
-    js      : 'text/javascript',
-    json    : 'application/json',
-    txt     : 'text/plain',
-    jpeg    : 'image/jpeg',
-    jpg     : 'image/jpeg',
-    png     : 'image/png',
-    gif     : 'image/gif',
-    ico     : 'image/x-icon',
-    appcache: 'text/cache-manifest'
-}
-
-restrictedType: {}
-
-errors  :   {
-    headers : {
-        'Content-Type' : 'text/plain'
-    },
-    404: '404 MIA',
-    415: '415 File type not supported',
-    403: '403 Access Denied',
-    500: '500 {{err}}'
-}
-</code></pre>
-
-<table>
-<thead>
 <tr>
-<th>key</th>
-<th>description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>domains</td>
+<td>domains.*</td>
 <td>this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.</td>
 </tr>
 <tr>
-<td>contentType</td>
-<td>mapping of file extension to header content type.</td>
+<td>server.index</td>
+<td>the default file to look for in a dir. if not found a <strong>404</strong> will be displayed</td>
 </tr>
 <tr>
-<td>restrictedType</td>
-<td>extensions to which external access will be denied.</td>
+<td>server.noCache</td>
+<td>should the server prevent caching</td>
 </tr>
 <tr>
-<td>errors</td>
-<td>error headers and error strings, these can be anything you like from html to text etc. just make sure</td>
+<td>server.timeout</td>
+<td>the amount of time allowed for no activity on a connection before it is closed.</td>
+</tr>
+<tr>
+<td>contentType.*</td>
+<td>mapping of file extension to header Content-Type value.</td>
+</tr>
+<tr>
+<td>restrictedType.*</td>
+<td>extensions to which access will be denied.</td>
+</tr>
+<tr>
+<td>errors.headers</td>
+<td>these are the headers that will automatically be applied to all error responses. You can add custom headers per error in the <code>beforeServe</code> function</td>
+</tr>
+<tr>
+<td>errors.*</td>
+<td>error headers and error strings, these can be anything you like from html to text etc. The <strong>500</strong> error will replace <code>{{err}}</code> in the specified value with the actual error message from the server.</td>
 </tr>
 </tbody>
 </table>
 
-<hr>
-
-<h2>
-<a id="commandline--bash-use" class="anchor" href="#commandline--bash-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>Commandline / bash use</h2>
-
-<p><code>launch</code> is an argument that specifies to launch the server now with the provided arguments and defaults</p>
-
-<pre><code>node ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
-</code></pre>
-
-<p>you can specify any of the variables frpom the <strong><em>currently modifiable via any interface, commandline, bash, node etc.</em></strong> section above. The order does not matter.</p>
-
-<pre><code>node ~/git/node-http-server/server/http.js root=~/myApp/ port=8888 verbose=true launch=now
-</code></pre>
-
-<hr>
-
-<h2>
-<a id="node-app-use" class="anchor" href="#node-app-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>node app use</h2>
-
-<pre><code>var server=require('node-http-server');
-</code></pre>
-
-<p><code>server</code> has 2 methods, <code>deploy</code> and <code>configTemplate</code></p>
-
-<table>
-<thead>
-<tr>
-<th>Server Method</th>
-<th>description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>server.configTemplate</td>
-<td>will generate a complete config file based off of the default values and arguments passed in when launching the app. <strong>DO NOT USE launch=now</strong> as an argument for a node app. This will result in launching 2 servers, the one you specify with the arguments passed and then the one the node app launches too.</td>
-</tr>
-<tr>
-<td>server.deploy</td>
-<td>will accept any config params and merge them with a fresh configTemplate, so passing a modified config based off of <code>server.configTemplate()</code> will result in using only the values from the modified config passed when deploying as it will override all of the defaults. <strong><em>The passed config object only merges to one level deep</em></strong> so if you pass a multi level object like <code>contentTypes</code> it will overwrite the default config with what you sent for that object rather than merging your object with the default.</td>
-</tr>
-</tbody>
-</table>
-
-<hr>
-
 <h4>
-<a id="node-examples" class="anchor" href="#node-examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>node examples</h4>
+<a id="configdomains" class="anchor" href="#configdomains" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>config.domains.*</h4>
 
-<p>can be found in the examples folder</p>
+<p>Use this object for sub domains, or hosting multiple domains on the same port. Specify the whole host i.e. "my.sub.domain.com" or "amazing-domain.com".</p>
 
-<h4>
-<a id="basic" class="anchor" href="#basic" aria-hidden="true"><span class="octicon octicon-link"></span></a>basic</h4>
+<p>You may need to edit your hosts file, cnames, iptable to get this to work on your server or development environment.</p>
 
-<p>this app could be launched as<br>
-<code>node basicApp.js verbose=true</code><br>
-to force verbose terminal output. This can be helpful if you have many servers in a single app and want them all to be verbose right now for debugging or testing purposes.</p>
+<p>You can add the below example to your hosts file to run some of the examples from the <code>/example/basic</code> directory which use multiple domains on occasion.</p>
 
-<pre><code>var server=require('node-http-server');
-
-console.log(server);
-
-server.deploy(
-    {
-        port:8000,
-        root:'~/myApp/'
-    }
-);
+<pre><code>#node-http-server examples
+127.0.0.1 myapp
+127.0.0.1 a.myapp
+127.0.0.1 yourapp.com
 </code></pre>
 
-<hr>
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> server<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-http-server<span class="pl-pds">'</span></span>);
 
-<h4>
-<a id="verbose" class="anchor" href="#verbose" aria-hidden="true"><span class="octicon octicon-link"></span></a>verbose</h4>
-
-<pre><code>var server=require('node-http-server');
-
-console.log(server);
-
-server.deploy(
-    {
-        verbose:true,
-        port:8001,
-        root:'~/myApp/'
-    }
-);
-</code></pre>
-
-<hr>
-
-<h4>
-<a id="advanced" class="anchor" href="#advanced" aria-hidden="true"><span class="octicon octicon-link"></span></a>advanced</h4>
-
-<pre><code>var server=require('node-http-server');
-
-console.log(server);
-
-var config=server.configTemplate();
-config.errors['404']    = 'These are not the files you are looking for...';
-config.contentType.mp4  = 'video/mp4';
-config.port             = 8005;
-config.verbose          = true;
-config.root             = '~/myApp/'
-
-server.deploy(config);
-</code></pre>
-
-<hr>
-
-<h4>
-<a id="multiple-domains-or-subdomains" class="anchor" href="#multiple-domains-or-subdomains" aria-hidden="true"><span class="octicon octicon-link"></span></a>multiple domains or subdomains</h4>
-
-<pre><code>var server=require('node-http-server');
-
-console.log(server);
-
-server.deploy(
-    {
-        verbose:true,
-        port:8010,
-        root:process.env.HOME+'/myApp/',
-        domain:'myapp',
-        domains:{
-            'a.myapp':process.env.HOME+'/myApp/mySubdomain/',
-            'yourapp.com':process.env.HOME+'/www/yourApp/'
+    <span class="pl-k">var</span> config<span class="pl-k">=</span>{
+        port<span class="pl-k">:</span><span class="pl-c1">8000</span>,
+        root<span class="pl-k">:</span>__dirna\me<span class="pl-k">+</span><span class="pl-s"><span class="pl-pds">'</span>/appRoot/<span class="pl-pds">'</span></span>,
+        domain<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>myapp<span class="pl-pds">'</span></span>,
+        domains<span class="pl-k">:</span>{
+             <span class="pl-c">//subdomain</span>
+             <span class="pl-s"><span class="pl-pds">'</span>a.myapp<span class="pl-pds">'</span></span><span class="pl-k">:</span><span class="pl-c1">__dirname</span><span class="pl-k">+</span><span class="pl-s"><span class="pl-pds">'</span>/appSubDomainRoot/<span class="pl-pds">'</span></span>,
+             <span class="pl-c">//totally different domain, but also on port 8000</span>
+             <span class="pl-s"><span class="pl-pds">'</span>yourapp.com<span class="pl-pds">'</span></span><span class="pl-k">:</span><span class="pl-c1">__dirname</span><span class="pl-k">+</span><span class="pl-s"><span class="pl-pds">'</span>/appOtherDomainRoot/<span class="pl-pds">'</span></span>
         }
     }
-);    
-</code></pre>
+
+    <span class="pl-smi">server</span>.<span class="pl-en">deploy</span>(config);
+</pre></div>
 
 <hr>
 
 <h2>
-<a id="starting-with-forever" class="anchor" href="#starting-with-forever" aria-hidden="true"><span class="octicon octicon-link"></span></a>Starting with forever</h2>
+<a id="extending-the-server" class="anchor" href="#extending-the-server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Extending the Server</h2>
 
-<p><em>It is helpful especially when running multiple servers to label them</em>  with <code>--uid</code> for easy to remember process names</p>
+<p>If you wish to make a reusable Server Class of your own to share or for some internal use you can always extend the server class and make your own module too.</p>
 
-<p><em>when starting the same server many times, *</em>like every time the system boots** you will want to append to the same log file* so use <code>-a</code>. Without <code>-a</code> forever will throw an error stating that the log file for the <code>--uid</code> already exists.</p>
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> os<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>os<span class="pl-pds">'</span></span>);
+    <span class="pl-k">var</span> Server<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-http-server<span class="pl-pds">'</span></span>).<span class="pl-smi">Server</span>;
 
-<pre><code>forever --uid nodeServer -a start ~/git/node-http-server/server/http.js root=~/myApp/ port=9999 launch=now
-</code></pre>
+   <span class="pl-c">//MyAwesomeServer inherits from Server</span>
+   <span class="pl-smi">MyAwesomeServer</span>.<span class="pl-c1">prototype</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Server</span>;
+   <span class="pl-c">//Constructor will extend Server</span>
+   <span class="pl-smi">MyAwesomeServer</span>.<span class="pl-c1">constructor</span> <span class="pl-k">=</span> MyAwesomeServer;
 
-<p>This can be set as a <code>.profile</code> command or a <code>.bash_rc</code> command as well if you want to launch the server every time the computer boots up.</p>
+   <span class="pl-k">function</span> <span class="pl-en">MyAwesomeServer</span>(){
+        <span class="pl-c">//extend with some stuff your app needs,</span>
+        <span class="pl-c">//maybe npm publish your extention with node-http-server as a dependancy?</span>
+        <span class="pl-c1">Object</span>.<span class="pl-en">defineProperties</span>(
+            <span class="pl-v">this</span>,
+            {
+                IP<span class="pl-k">:</span>{
+                    enumerable<span class="pl-k">:</span><span class="pl-c1">true</span>,
+                    get<span class="pl-k">:</span>getIP,
+                    <span class="pl-c">//not settable so just return the IP</span>
+                    set<span class="pl-k">:</span>getIP
+                }
+            }
+        );
+
+        <span class="pl-c">//locking down Class structure</span>
+        <span class="pl-c">//no willy nilly cowboy coding</span>
+        <span class="pl-c1">Object</span>.<span class="pl-en">seal</span>(<span class="pl-v">this</span>);
+
+        <span class="pl-k">function</span> <span class="pl-en">getIP</span>(){
+            <span class="pl-k">var</span> networkInterfaces <span class="pl-k">=</span> <span class="pl-smi">os</span>.<span class="pl-en">networkInterfaces</span>();
+            <span class="pl-k">var</span> serverIPs<span class="pl-k">=</span>{};
+            <span class="pl-k">var</span> interfaceKeys<span class="pl-k">=</span><span class="pl-c1">Object</span>.<span class="pl-c1">keys</span>(networkInterfaces);
+            <span class="pl-k">for</span>(<span class="pl-k">var</span> i <span class="pl-k">in</span> interfaceKeys){
+                serverIPs[
+                    interfaceKeys[i]
+                ]<span class="pl-k">=</span>{};
+
+                <span class="pl-k">var</span> <span class="pl-k">interface</span><span class="pl-k">=</span>networkInterfaces[
+                    interfaceKeys[i]
+                ];
+
+                <span class="pl-k">for</span>(<span class="pl-k">var</span> j <span class="pl-k">in</span> <span class="pl-k">interface</span>){
+                    serverIPs[
+                        interfaceKeys[i]
+                    ][
+                        <span class="pl-k">interface</span>[j].<span class="pl-smi">family</span>
+                    ]<span class="pl-k">=</span><span class="pl-k">interface</span>[j].<span class="pl-smi">address</span>;
+                }
+            }
+
+            <span class="pl-k">return</span> IPs;
+        }
+    }
+
+    <span class="pl-c1">module</span>.<span class="pl-smi">exports</span><span class="pl-k">=</span>MyAwesomeServer;
+</pre></div>
+
+<div class="highlight highlight-source-js"><pre>
+    <span class="pl-k">var</span> AwesomeServer<span class="pl-k">=</span><span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>MyAwesomeServer<span class="pl-pds">'</span></span>);
+
+    <span class="pl-k">var</span> server<span class="pl-k">=</span><span class="pl-k">new</span> <span class="pl-en">AwesomeServer</span>;
+
+    <span class="pl-smi">server</span>.<span class="pl-en">deploy</span>(
+        {
+            port<span class="pl-k">:</span><span class="pl-c1">8000</span>,
+            root<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>~/myAwesomeApp<span class="pl-pds">'</span></span>
+        }
+    );
+
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-smi">server</span>.<span class="pl-c1">IP</span>);
+</pre></div>
       </section>
     </div>
 
