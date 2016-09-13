@@ -32,6 +32,14 @@ function gotRequest(request,response,serve){
                 return;
             }
 
+            if(!proxiedResponse.headers['content-type']&&proxiedResponse.headers['Content-Type']){
+                proxiedResponse.headers['content-type']=proxiedResponse.headers['Content-Type'];
+            }
+
+            if(!proxiedResponse.headers['content-type']){
+                proxiedResponse.headers['content-type']='';
+            }
+
             if(proxiedResponse.headers['content-type'].indexOf('text/html')>-1){
                 const position=proxiedBody.match(/<body([^>]*)>/i);
 
