@@ -50,6 +50,7 @@ const defaultConfigs={
         timeout : 30000 //30 second timeout
     },
     https:{
+        ca:'',
         privateKey:'',
         certificate:'',
         port:443,

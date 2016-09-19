@@ -218,6 +218,7 @@ for https :
         root        : args.root||defaults.root,
         domain      : args.domain||defaults.domain,
         https       :{
+            ca:'',
             privateKey:'',
             certificate:'',
             port:443,
@@ -276,6 +277,9 @@ for https :
 |root| the absolute path to the root dir for the domain |
 |domain| the server domain. To accept incoming requests for ***ANY Applicable Domain*** use ` 0.0.0.0 ` this will allow any request that is pointed at this machine on the specified port to use this server config.  |
 |https|settings for https, these wil only take effect if both a `privateKey` and a `certificate` are specified. Setting ` only ` to be true means the instance will only serve over https|
+|https.privateKey|path to your servers private key like ./local-certs/private/server.key or similar|
+|https.certificate|path to your servers public cert like ./local-certs/client.pub or similar|
+|https.ca|path to your officially signed CA's certificate authority file servers public cert like ./local-certs/ca-bundle.crt or similar. This is often needed for officially signed and generated certs, but not for self signed certs so it is optional.|
 |log| full path to log file, if specified and the file is not present, it will be created, however the dir must be there. Example path : ` /tmp/server.log ` It is recommended that you timestamp this file name with a time stamp like : ` '~/serverLogs/domain-'+new Date().getTime()+'.log' ` this will create a new log file each time the server is started/restarted/reboot etc...  |
 |logFunction| the default function appends timestamps to the headers object and logs as JSON in the ` log ` file. You can assign your own function here as well. It should accepts a javascript Object as the first argument. |
 |domains.*| this is a mapping of hostname to path. It can be used for multiple different domains, or for subdomains.|

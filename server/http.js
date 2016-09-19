@@ -45,6 +45,10 @@ function deploy(userConfig, readyCallback){
             cert: fs.readFileSync(this.config.https.certificate)
         };
 
+        if(this.config.https.ca){
+            this.config.httpsOptions.ca=fs.readFileSync(this.config.https.ca);
+        }
+
         Object.defineProperty(
             this,
             'secureServer',
