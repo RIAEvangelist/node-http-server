@@ -7,7 +7,9 @@ const config=new server.Config;
 config.verbose=true;
 config.port=8000;
 config.https.privateKey = `${__dirname}/../../local-certs/private/server.key`;
-config.https.certificate= `${__dirname}/../../local-certs/server.pub`;
+config.https.certificate= `${__dirname}/../../local-certs/client.crt`;
+config.https.ca= `${__dirname}/../../local-certs/private/rootCA.pem`;
+
 config.https.port       = 4433;
 
 //lets ignore ssl issues and make a giant security hole since we are proxying https too...
