@@ -6,7 +6,7 @@ Simple to use stand alone node HTTP and HTTPS Server you can spin up in seconds.
 
 Support for building proxy servers has been added. Documentation coming in next release. [For now see the node-http-server proxy examples](https://github.com/RIAEvangelist/node-http-server/tree/master/example/proxy).
 
-` npm install node-http-server `
+` npm i node-http-server `
 
 [![node-http-server stats](https://nodei.co/npm/node-http-server.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/node-http-server)  
 
@@ -19,13 +19,38 @@ GitHub info :
 Package Quality :  
 ![node-http-server Package Quality](http://npm.packagequality.com/badge/node-http-server.png)
 
+## cli use if you just want to test
+
+Now you can also use the nodeserver cli if you just want to spin up a basic file server to test something out quickly or share on the local network.
+
+```sh
+
+$ sudo npm i -g node-http-server
+
+//start a nodeserver from the current directory on the default port 8080
+$ nodeserver
+
+```
+
+You can modify any of the config keys by passing their key value pairs as args.
+
+```sh
+
+//start a verbose nodeserver from the current directory on port 1942
+$ nodeserver port=1942 verbose=true
+
+```
+
+
 ## writing a node http or https server
 
 The below table shows all of the methods available on the server when you require this module.
 
 ```javascript
 
-    var server=require('node-http-server');
+    const server=require('node-http-server');
+
+    server.deploy();
 
 ```
 
@@ -33,19 +58,30 @@ If you want to create a custom Server or extend the Server Class you can require
 
 ```javascript
 
-    var Server=require('node-http-server').Server;
+    const Server=require('node-http-server').Server;
+
+    class MyCustomServer extends Server{
+      constructor(){
+        super();
+      }
+    }
+
+    const server=new MyCustomServer;
+    server.deploy();
 
 ```
 
 |Server Method| params | description |
 |-------------|--------|-------------|
-|deploy| config obj (optional) | starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class|
-|onRequest| request obj | called when request recieved |
-|beforeServe|request obj, response obj, body obj, encoding obj| called just before data is served to the client |
-|afterServe|request obj| called once data has been fully sent to client |
-|Config| config object (optional) | This is a refrence to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values ig config object passed.|
-|Server| none | This is a refrence to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
+|deploy       | config obj (optional), readyCallback fn (optional)        | Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class. |
+|onRequest    | request obj, response obj, serve fn                       | Called when request received. If this function manually serves or requires manual async serving, it should return true and use the ` serve ` argument to manually serve the response. |
+|beforeServe  |request obj, response obj, body obj, encoding obj, serve fn| Called just before data is served to the client. If this function manually serves or requires manual async serving, it should return true and use the ` serve ` argument to manually serve the response.  |
+|afterServe   |request obj                                                | Called once data has been fully sent to client. |
+|Config       | config object (optional)                                  | This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.|
+|Server       | none                                                      | This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
 
+|function | parameters | description |
+|serve    | request obj, response obj, body str, encoding str | serves the response with the specified body and encoding for the given request |
 
 ---
 
@@ -63,7 +99,7 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
 
 ```javascript
 
-    var server=require('node-http-server');
+    const server=require('node-http-server');
 
     server.deploy(
         {
@@ -78,7 +114,7 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
 
 ```javascript
 
-    var server=require('node-http-server');
+    const server=require('node-http-server');
 
     server.deploy(
         {
@@ -99,7 +135,7 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
 
 ```javascript
 
-    var server=require('node-http-server');
+    const server=require('node-http-server');
 
     server.deploy(
         {
@@ -123,9 +159,9 @@ for http :
 
 ```javascript
 
-    var server=require('node-http-server');
+    const server=require('node-http-server');
 
-    var config=new server.Config;
+    const config=new server.Config;
     config.errors['404']    = 'These are not the files you are looking for...';
     config.contentType.mp4  = 'video/mp4';
     config.port             = 8005;
@@ -140,9 +176,9 @@ for https :
 
 ```javascript
 
-    var server=require('node-http-server');
+    const server=require('node-http-server');
 
-    var config=new server.Config;
+    const config=new server.Config;
     config.errors['404']    = 'These are not the files you are looking for...';
     config.contentType.mp4  = 'video/mp4';
     config.port             = 8005;
@@ -164,9 +200,9 @@ for https :
 
 ```javascript
 
-    var server=require('node-http-server');
+    const server=require('node-http-server');
 
-    var config={
+    const config={
         port:8010,
         root:__dirname + '/www/myApp/',
         domain:'myapp.com',
@@ -184,7 +220,7 @@ for https :
 
 ```javascript
 
-    var server=require('../../server/http.js');
+    const server=require('../../server/http.js');
 
     server.beforeServe=beforeServe;
 
@@ -194,7 +230,7 @@ for https :
             return;
         }
 
-        var someVariable='this is some variable value';
+        const someVariable='this is some variable value';
 
         body.value=body.value.replace('{{someVariable}}',someVariable);
     }
@@ -202,7 +238,7 @@ for https :
     server.deploy(
         {
             port:8000,
-            root:__dirname+'/appRoot/'
+            root:`${__dirname}/appRoot/`
         }
     );
 
@@ -307,17 +343,17 @@ You can add the below example to your hosts file to run some of the examples fro
 
  ```javascript
 
-    var server=require('node-http-server');
+    const server=require('node-http-server');
 
-    var config={
+    const config={
         port:8000,
         root:__dirna\me+'/appRoot/',
         domain:'myapp',
         domains:{
              //subdomain
-             'a.myapp':__dirname+'/appSubDomainRoot/',
+             'a.myapp':`${__dirname}/appSubDomainRoot/`,
              //totally different domain, but also on port 8000
-             'yourapp.com':__dirname+'/appOtherDomainRoot/'
+             'yourapp.com':`${__dirname}/appOtherDomainRoot/`
         }
     }
 
@@ -333,47 +369,28 @@ If you wish to make a reusable Server Class of your own to share or for some int
 
 ```javascript
 
-    var os=require('os');
-    var Server=require('node-http-server').Server;
+    const os=require('os');
+    const Server=require('node-http-server').Server;
 
-   //MyAwesomeServer inherits from Server
-   MyAwesomeServer.prototype = new Server;
-   //Constructor will extend Server
-   MyAwesomeServer.constructor = MyAwesomeServer;
+    class MyAwesomeServer extends Server(){
+        constructor(){
+            super();
+        }
 
-   function MyAwesomeServer(){
-        //extend with some stuff your app needs,
-        //maybe npm publish your extention with node-http-server as a dependancy?
-        Object.defineProperties(
-            this,
-            {
-                IP:{
-                    enumerable:true,
-                    get:getIP,
-                    //not settable so just return the IP
-                    set:getIP
-                }
-            }
-        );
-
-        //locking down Class structure
-        //no willy nilly cowboy coding
-        Object.seal(this);
-
-        function getIP(){
-            var networkInterfaces = os.networkInterfaces();
-            var serverIPs={};
-            var interfaceKeys=Object.keys(networkInterfaces);
-            for(var i in interfaceKeys){
+        IP(){
+            const networkInterfaces = os.networkInterfaces();
+            const serverIPs={};
+            const interfaceKeys=Object.keys(networkInterfaces);
+            for(let i in interfaceKeys){
                 serverIPs[
                     interfaceKeys[i]
                 ]={};
 
-                var interface=networkInterfaces[
+                const interface=networkInterfaces[
                     interfaceKeys[i]
                 ];
 
-                for(var j in interface){
+                for(let j in interface){
                     serverIPs[
                         interfaceKeys[i]
                     ][
@@ -382,7 +399,7 @@ If you wish to make a reusable Server Class of your own to share or for some int
                 }
             }
 
-            return IPs;
+            return serverIPs;
         }
     }
 
@@ -393,9 +410,9 @@ If you wish to make a reusable Server Class of your own to share or for some int
 
 ```javascript
 
-    var AwesomeServer=require('MyAwesomeServer');
+    const AwesomeServer=require('MyAwesomeServer');
 
-    var server=new AwesomeServer;
+    const server=new AwesomeServer;
 
     server.deploy(
         {

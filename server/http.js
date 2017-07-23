@@ -8,18 +8,92 @@ const http = require('http'),
     querystring=require('querystring'),
     Config = require(`${__dirname}/Config.js`);
 
-const passedArgs = process.argv.splice(2),
-    argCount = passedArgs.length,
-    args = {};
+//
+// # SERVER CLASS
+// ---------------
+//
+class Server{
+    constructor(userConfig){
+      // ` server.config ` is where the servers configuration will reside.
+      // It is a new instance of the [Config class](./Config.html) which will be shallow merged with
+      // the passed ` userConfig ` if one is passed upon construction of the Server class, or to the ` server.deploy ` method.
+      //
+      // [Detailed info on the server.config or userConfig](https://github.com/RIAEvangelist/node-http-server#custom-configuration)
+      //
+      this.config=new this.Config(userConfig);
+    }
 
-for(let i=0; i<argCount; i++){
-    const data=passedArgs[i].split('=');
-    args[data[0]]=data[1];
-}
+    // ` server.deploy ` starts the server.
+    // if a ` userConfig ` object is passed it will shallow merge/decorate it with a clean instantion of the [Config class](./Config.html)
+    // once the server is up and running it will call the ` readyCallback `
+    //
+    // ```javascript
+    //
+    // const server=require('node-http-server');
+    //
+    // server.deploy(
+    //     {
+    //         port:8000,
+    //         root:'~/myApp/'
+    //     },
+    //     serverReady
+    // );
+    //
+    // server.deploy(
+    //     {
+    //         port:8888,
+    //         root:'~/myOtherApp/'
+    //     },
+    //     serverReady
+    // );
+    //
+    // function serverReady(server){
+    //    console.log( `Server on port ${server.config.port} is now up`);
+    // }
+    //
+    // ```
+    //
+    // [More Examples for deploying a node server](https://github.com/RIAEvangelist/node-http-server#examples)
+    //
+    get deploy(){
+      return deploy;
+    }
 
-if(args.launch=='now'){
-    const server=new Server;
-    server.deploy();
+    //executed before any processing of request. If returns true response serving will be delayed.
+    onRawRequest(request,response,serve){
+
+    }
+
+    //executed just after request recieved allowing user to modify if needed. If returns true response serving will be delayed.
+    onRequest(request,response,serve){
+
+    }
+
+    //executed just before response sent allowing user to modify if needed. If returns true response serving will be delayed.
+    beforeServe(request,response,body,encoding,serve){
+
+    }
+
+    //executed after each full response completely sent
+    afterServe(request){
+
+    }
+
+    get serve(){
+      return serve;
+    }
+
+    get serveFile(){
+      return serveFile;
+    }
+
+    get Config(){
+      return Config
+    }
+
+    get Server(){
+      return Server
+    }
 }
 
 function deploy(userConfig, readyCallback){
@@ -34,7 +108,10 @@ function deploy(userConfig, readyCallback){
             enumerable:true
         }
     );
-    this.config=new this.Config(userConfig);
+
+    if(userConfig){
+      Object.assign(this.config,userConfig);
+    }
 
     if(this.config.https && this.config.https.privateKey && this.config.https.certificate){
         if(!this.config.https.port){
@@ -42,7 +119,8 @@ function deploy(userConfig, readyCallback){
         }
         this.config.httpsOptions = {
             key: fs.readFileSync(this.config.https.privateKey),
-            cert: fs.readFileSync(this.config.https.certificate)
+            cert: fs.readFileSync(this.config.https.certificate),
+            passphrase: this.config.https.passphrase
         };
 
         if(this.config.https.ca){
@@ -84,8 +162,11 @@ function deploy(userConfig, readyCallback){
                     console.log(`${this.config.logID} listening on port ${this.config.port} ###\n\n`);
                 }
                 if (readyCallback){
-                    //passes the current Server class instance for refrence.
-                    //this allows multiple servers to use the same ready callback if desired
+                    //The ` readyCallback ` is passed the full server instance
+                    // so that you may use the same callback to handle multiple
+                    // server instances in the same code instead of writing an inline
+                    // callback... think about it ;)
+                    //
                     readyCallback(this);
                 }
             }.bind(this)
@@ -100,8 +181,9 @@ function deploy(userConfig, readyCallback){
                     console.log(`HTTPS: ${this.config.logID} listening on port ${this.config.https.port} ###\n\n`);
                 }
                 if (readyCallback){
-                    //passes the current Server class instance for refrence.
-                    //this allows multiple servers to use the same ready callback if desired
+                    // for example the same ready callback could handle both the
+                    // https and http servers with a simple test for the servers port
+                    //
                     readyCallback(this);
                 }
             }.bind(this)
@@ -142,7 +224,6 @@ function serveFile(filename,exists,request,response) {
 
     const contentType = path.extname(filename).slice(1);
 
-    //Only serve specified file types
     if(!this.config.contentType[contentType]){
         if(this.config.verbose){
             console.log(`${this.config.logID} 415 ###\n\n`);
@@ -159,14 +240,12 @@ function serveFile(filename,exists,request,response) {
         return;
     }
 
-    //default
     if (
         fs.statSync(filename).isDirectory()
     ){
         filename+=`/${this.config.server.index}`;
     }
 
-    //Do not allow access to restricted file types
     if (
         this.config.restrictedType[contentType]
     ){
@@ -236,12 +315,10 @@ function serveFile(filename,exists,request,response) {
 }
 
 function serve(request,response,body,encoding){
-    //defaults to 200
     if(!response.statusCode){
         response.statusCode=200;
     }
 
-    //defaults to text/plain
     if(!response.getHeader('Content-Type')){
         response.setHeader(
             'Content-Type',
@@ -253,7 +330,6 @@ function serve(request,response,body,encoding){
         }
     }
 
-    //defaults to utf8
     if(!encoding){
         encoding='utf8';
 
@@ -268,7 +344,7 @@ function serve(request,response,body,encoding){
     refBody.value=body;
     refEncoding.value=encoding;
 
-    //return any value to force delayed serving
+    //return any value to force or specify delayed or manual serving
     if(
         this.beforeServe(
             request,
@@ -424,7 +500,7 @@ function requestRecieved(request,response){
     request.url=uri;
     request.serverRoot=root;
 
-    //return any value to force delayed serving
+    //return any value to force or specify delayed or manual serving
     if(
         this.onRequest(
             request,
@@ -446,78 +522,6 @@ function requestRecieved(request,response){
             this.serveFile(filename,exists,request,response);
         }.bind(this)
     );
-}
-
-
-/*********************
-*  SERVER CLASS
-*********************/
-class Server{
-    constructor(){
-        Object.defineProperties(
-            this,
-            {
-                deploy:{
-                    value:deploy,
-                    writable:false,
-                    enumerable:true
-                },
-                serveFile:{
-                    value:serveFile,
-                    writable:false,
-                    enumerable:false
-                },
-                //executed before any processing of request. If returns true response serving will be delayed.
-                onRawRequest:{
-                    value:function(request,response,serve){},
-                    writable:true,
-                    enumerable:true
-                },
-                //executed just after request recieved allowing user to modify if needed. If returns true response serving will be delayed.
-                onRequest:{
-                    value:function(request,response,serve){},
-                    writable:true,
-                    enumerable:true
-                },
-                //executed just before response sent allowing user to modify if needed. If returns true response serving will be delayed.
-                beforeServe:{
-                    value:function beforeServe(request,response,body,encoding,serve){},
-                    writable:true,
-                    enumerable:true
-                },
-                //executed after each full response completely sent
-                afterServe:{
-                    value:function afterServe(request){},
-                    writable:true,
-                    enumerable:true
-                },
-                serve:{
-                    value:serve,
-                    writable:false,
-                    enumerable:false
-                },
-                //kept for backwards compatibility
-                configTemplate  :{
-                    value:function configTemplate(config){
-                        return new Config(config);
-                    },
-                    writable:false,
-                    //not visible because this is just for backwards compatibility
-                    enumerable:false
-                },
-                Config:{
-                    value:Config,
-                    writable:false,
-                    enumerable:true
-                },
-                Server:{
-                    value:Server,
-                    writable:false,
-                    enumerable:true
-                }
-            }
-        );
-    }
 }
 
 module.exports=new Server;

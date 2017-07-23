@@ -53,6 +53,7 @@ const defaultConfigs={
         ca:'',
         privateKey:'',
         certificate:'',
+        passphrase:false,
         port:443,
         only:false
     },
@@ -114,11 +115,12 @@ function serverLogging(data){
 
 class Config{
     constructor(userConfig){
-        //for backwards compatibility
-        const config = {};
         Object.defineProperties(
-            config,
+            this,
             {
+                // setting the ` config.verbose ` option will give you a lot of useful information
+                // this is good for testing and debugging, but might be a bit much for production.
+                //
                 verbose     : {
                     value:defaultConfigs.verbose,
                     enumerable:true,
@@ -139,6 +141,31 @@ class Config{
                     enumerable:true,
                     writable:true
                 },
+
+                // To have a properly secured ` https ` server you should set the ` https.privateKey `
+                // and ` https.certificate ` values in the user config. ***If*** you also need a
+                // passphrase for your certificate you can set that in the ` https.passphrase `
+                // You do not have to set the privateKey and certificate files for testing, but in production
+                // you really should.
+                //
+                // ```javascript
+                //
+                // const server=require('../../server/http.js');
+                // server.deploy(
+                //     {
+                //         verbose: true,
+                //         port: 8000,
+                //         root:__dirname+'/appRoot/',
+                //         https:{
+                //             privateKey:`${__dirname}/../../local-certs/private/server.key`,
+                //             certificate:`${__dirname}/../../local-certs/server.pub`,
+                //             port:4433
+                //         }
+                //     }
+                // );
+                //
+                // ```
+                //
                 https       : {
                     value:defaultConfigs.https,
                     enumerable:true,
@@ -188,9 +215,6 @@ class Config{
                 config[k]=userConfig[k];
             }
         }
-
-        //this is to allow backwards compatibility with configTemplate
-        return config;
     }
 }
 
