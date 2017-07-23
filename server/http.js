@@ -52,10 +52,12 @@ class Server{
     // ` server.deploy(userConfig,readyCallback) `
     //
     // |method  | returns |
+    // |--------|---------|
     // | deploy | void    |
     //
     // | parameter     | required | description |
-    // | userConfig    | no | if a ` userConfig ` object is passed it will shallow merge/decorate it with a clean instantion of the [Config class](http://riaevangelist.github.io/node-http-server/server/Config.js.html) |
+    // |---------------|----------|-------------|
+    // | userConfig    | no | if a ` userConfig ` object is passed it will shallow merge/decorate it with a clean instantion of the [Config class](http://riaevangelist.github.io/node-http-server/Config.js.html) |
     // | readyCallback | no | called once the server is started |
     //
     // ```javascript

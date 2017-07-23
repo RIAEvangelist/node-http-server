@@ -137,11 +137,41 @@
                 <h4 id="deploy">deploy</h4>
 <p> <code>server.deploy</code> starts the server.</p>
 <p> <code>server.deploy(userConfig,readyCallback)</code></p>
-<p> |method  | returns |
- | deploy | void    |</p>
-<p> | parameter     | required | description |
- | userConfig    | no | if a <code>userConfig</code> object is passed it will shallow merge/decorate it with a clean instantion of the <a href="http://riaevangelist.github.io/node-http-server/server/Config.js.html">Config class</a> |
- | readyCallback | no | called once the server is started |</p>
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>deploy</td>
+<td>void</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>parameter</th>
+<th>required</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>userConfig</td>
+<td>no</td>
+<td>if a <code>userConfig</code> object is passed it will shallow merge/decorate it with a clean instantion of the <a href="http://riaevangelist.github.io/node-http-server/Config.js.html">Config class</a></td>
+</tr>
+<tr>
+<td>readyCallback</td>
+<td>no</td>
+<td>called once the server is started</td>
+</tr>
+</tbody>
+</table>
 <pre><code class="lang-javascript">
  <span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
 

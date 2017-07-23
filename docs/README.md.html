@@ -127,37 +127,37 @@ $ nodeserver port=1942 verbose=<span class="hljs-literal">true</span>
 <tbody>
 <tr>
 <td>deploy</td>
-<td>config obj (optional), readyCallback fn (optional)</td>
+<td><code>userConfig</code> obj (optional), <code>readyCallback</code> fn (optional)</td>
 <td>returns void</td>
 <td>Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class.</td>
 </tr>
 <tr>
 <td>onRequest</td>
-<td>request obj, response obj, serve fn</td>
+<td><code>request</code> obj, <code>response</code> obj, <code>serve</code> fn</td>
 <td>should return true,false or void</td>
 <td>Called when request received. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the <code>serve</code> argument, <code>server.serve</code> or <code>server.serveFile</code> to manually serve the response.</td>
 </tr>
 <tr>
 <td>beforeServe</td>
-<td>request obj, response obj, body obj, encoding obj, serve fn</td>
+<td><code>request</code> obj, <code>response</code> obj, <code>body</code> obj, <code>encoding</code> obj, <code>serve</code> fn</td>
 <td>should return true,false or void</td>
 <td>Called just before data is served to the client. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the <code>serve</code> argument, <code>server.serve</code> or <code>server.serveFile</code> to manually serve the response.</td>
 </tr>
 <tr>
 <td>afterServe</td>
-<td>request obj</td>
+<td><code>request</code> obj</td>
 <td>void</td>
 <td>Called once data has been fully sent to client.</td>
 </tr>
 <tr>
 <td>Config</td>
-<td>config object (optional)</td>
+<td>n/a</td>
 <td>n/a</td>
 <td>This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.</td>
 </tr>
 <tr>
 <td>Server</td>
-<td>none</td>
+<td>n/a</td>
 <td>n/a</td>
 <td>This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.</td>
 </tr>
@@ -167,11 +167,41 @@ $ nodeserver port=1942 verbose=<span class="hljs-literal">true</span>
 <h4 id="deploy">deploy</h4>
 <p><code>server.deploy</code> starts the server.</p>
 <p><code>server.deploy(userConfig,readyCallback)</code></p>
-<p>|method  | returns |
-| deploy | void    |</p>
-<p>| parameter     | required | description |
-| userConfig    | no | if a <code>userConfig</code> object is passed it will shallow merge/decorate it with a clean instantion of the <a href="http://riaevangelist.github.io/node-http-server/Config.js.html">Config class</a> |
-| readyCallback | no | called once the server is started |</p>
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>deploy</td>
+<td>void</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>parameter</th>
+<th>required</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>userConfig</td>
+<td>no</td>
+<td>if a <code>userConfig</code> object is passed it will shallow merge/decorate it with a clean instantion of the <a href="http://riaevangelist.github.io/node-http-server/Config.js.html">Config class</a></td>
+</tr>
+<tr>
+<td>readyCallback</td>
+<td>no</td>
+<td>called once the server is started</td>
+</tr>
+</tbody>
+</table>
 <pre><code class="lang-javascript">
 <span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
 
