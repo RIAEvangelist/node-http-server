@@ -37,7 +37,7 @@ const http = require('http'),
 class Server{
     constructor(userConfig){
       // ` server.config ` is where the servers configuration will reside.
-      // It is a new instance of the [Config class](http://riaevangelist.github.io/node-http-server/server/Config.js.html) which will be shallow merged and/or decorated by with
+      // It is a new instance of the [Config class](./) which will be shallow merged and/or decorated by with
       // the passed ` userConfig ` if one is passed upon construction of the Server class, or to the ` server.deploy ` method.
       //
       // [Detailed info on the server.config or userConfig](https://github.com/RIAEvangelist/node-http-server#custom-configuration)
@@ -55,7 +55,7 @@ class Server{
     // | deploy | void    |
     //
     // | parameter     | required | description |
-    // | userConfig    | no | if a ` userConfig ` object is passed it will shallow merge/decorate it with a clean instantion of the [Config class](http://riaevangelist.github.io/node-http-server/server/Config.js.html) |
+    // | userConfig    | no | if a ` userConfig ` object is passed it will shallow merge/decorate it with a clean instantion of the [Config class](./Config.js.html) |
     // | readyCallback | no | called once the server is started |
     //
     // ```javascript
@@ -86,7 +86,7 @@ class Server{
     //
     // [More Examples for deploying a node server](https://github.com/RIAEvangelist/node-http-server#examples)
     //
-    get deploy(){
+    get deploy(userConfig, readyCallback){
       return deploy;
     }
 
@@ -118,11 +118,11 @@ class Server{
 
     }
 
-    get serve(){
+    get serve(request,response,body,encoding){
       return serve;
     }
 
-    get serveFile(){
+    get serveFile(filename,exists,request,response){
       return serveFile;
     }
 

@@ -73,19 +73,57 @@ If you want to create a custom Server or extend the Server Class you can require
 
 ```
 
-|Server Method| params | description |
+## Server Class
+
+|Server Method or member| params | returns / should return | description |
 |-------------|--------|-------------|
-|deploy       | config obj (optional), readyCallback fn (optional)        | Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class. |
-|onRequest    | request obj, response obj, serve fn                       | Called when request received. If this function manually serves or requires manual async serving, it should return true and use the ` serve ` argument to manually serve the response. |
-|beforeServe  |request obj, response obj, body obj, encoding obj, serve fn| Called just before data is served to the client. If this function manually serves or requires manual async serving, it should return true and use the ` serve ` argument to manually serve the response.  |
-|afterServe   |request obj                                                | Called once data has been fully sent to client. |
-|Config       | config object (optional)                                  | This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.|
-|Server       | none                                                      | This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
+|deploy       | config obj (optional), readyCallback fn (optional)        | returns void | Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class. |
+|onRequest    | request obj, response obj, serve fn                       | should return true,false or void | Called when request received. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response. |
+|beforeServe  |request obj, response obj, body obj, encoding obj, serve fn| should return true,false or void | Called just before data is served to the client. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response.   |
+|afterServe   |request obj                                                | void | Called once data has been fully sent to client. |
+|Config       | config object (optional)                                  | n/a | This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.|
+|Server       | none                                                      | n/a | This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
 
-|function | parameters | description |
-|serve    | request obj, response obj, body str, encoding str | serves the response with the specified body and encoding for the given request |
+### Server Methods
 
----
+#### deploy
+
+` server.deploy ` starts the server.
+
+` server.deploy(userConfig,readyCallback) `
+
+|method  | returns |
+| deploy | void    |
+
+| parameter     | required | description |
+| userConfig    | no | if a ` userConfig ` object is passed it will shallow merge/decorate it with a clean instantion of the [Config class](http://riaevangelist.github.io/node-http-server/Config.js.html) |
+| readyCallback | no | called once the server is started |
+
+```javascript
+
+const server=require('node-http-server');
+
+server.deploy(
+    {
+        port:8000,
+        root:'~/myApp/'
+    },
+    serverReady
+);
+
+server.deploy(
+    {
+        port:8888,
+        root:'~/myOtherApp/'
+    },
+    serverReady
+);
+
+function serverReady(server){
+   console.log( `Server on port ${server.config.port} is now up`);
+}
+
+```
 
 ## Examples
 
@@ -95,7 +133,7 @@ To start only an https example server ` npm run https ` from the root of this re
 
 To spin up both an http and an https server ` npm run both ` from the root of this repo and then visit [localhost:4433](http://localhost:4433) or [localhost:8000](http://localhost:8000).
 
-Detailed examples can be found in the [example folder](https://github.com/RIAEvangelist/node-http-server/tree/master/example) The basic example directory is static http and https file servers and the advanced directory has dynamic server side rendering http and https examples including a benchmark example.
+Detailed examples can be found in the [example folder](https://github.com/RIAEvangelist/node-http-server/tree/master/example) or under the example folder on the [node-http-server docs](http://riaevangelist.github.io/node-http-server/)  The basic example directory is static http and https file servers and the advanced directory has dynamic server side rendering http and https examples including a benchmark example. The ` proxy ` examples show manual serving and response modification examples.  
 
 # Basic http server example
 

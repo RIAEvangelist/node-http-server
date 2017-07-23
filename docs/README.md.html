@@ -80,6 +80,7 @@
 <p>npm info :  <a href="http://npm-stat.com/charts.html?package=node-http-server&amp;author=&amp;from=&amp;to=">See npm trends and stats for node-http-server</a><br><img src="https://img.shields.io/npm/v/node-http-server.svg" alt="node-http-server npm version"> <img src="https://img.shields.io/node/v/node-http-server.svg" alt="supported node version for node-http-server"> <img src="https://img.shields.io/npm/dt/node-http-server.svg" alt="total npm downloads for node-http-server"> <img src="https://img.shields.io/npm/dm/node-http-server.svg" alt="monthly npm downloads for node-http-server"> <img src="https://img.shields.io/npm/l/node-http-server.svg" alt="npm licence for node-http-server"></p>
 <p>GitHub info :<br><img src="https://img.shields.io/github/release/RIAEvangelist/node-http-server.svg" alt="node-http-server GitHub Release"> <img src="https://img.shields.io/github/license/RIAEvangelist/node-http-server.svg" alt="GitHub license node-http-server license"> <img src="https://img.shields.io/github/issues/RIAEvangelist/node-http-server.svg" alt="open issues for node-http-server on GitHub"></p>
 <p>Package Quality :<br><img src="http://npm.packagequality.com/badge/node-http-server.png" alt="node-http-server Package Quality"></p>
+<p><a href="http://riaevangelist.github.io/node-http-server/">See the code documentation on riaevangelist.github.io</a></p>
 <h2 id="cli-use-if-you-just-want-to-test">cli use if you just want to test</h2>
 <p>Now you can also use the nodeserver cli if you just want to spin up a basic file server to test something out quickly or share on the local network.</p>
 <pre><code class="lang-sh">
@@ -113,11 +114,13 @@ $ nodeserver port=1942 verbose=<span class="hljs-literal">true</span>
     <span class="hljs-keyword">const</span> server=<span class="hljs-keyword">new</span> MyCustomServer;
     server.deploy();
 </code></pre>
+<h2 id="server-class">Server Class</h2>
 <table>
 <thead>
 <tr>
-<th>Server Method</th>
+<th>Server Method or member</th>
 <th>params</th>
+<th>returns / should return</th>
 <th>description</th>
 </tr>
 </thead>
@@ -125,43 +128,78 @@ $ nodeserver port=1942 verbose=<span class="hljs-literal">true</span>
 <tr>
 <td>deploy</td>
 <td>config obj (optional), readyCallback fn (optional)</td>
+<td>returns void</td>
 <td>Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class.</td>
 </tr>
 <tr>
 <td>onRequest</td>
 <td>request obj, response obj, serve fn</td>
-<td>Called when request received. If this function manually serves or requires manual async serving, it should return true and use the <code>serve</code> argument to manually serve the response.</td>
+<td>should return true,false or void</td>
+<td>Called when request received. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the <code>serve</code> argument, <code>server.serve</code> or <code>server.serveFile</code> to manually serve the response.</td>
 </tr>
 <tr>
 <td>beforeServe</td>
 <td>request obj, response obj, body obj, encoding obj, serve fn</td>
-<td>Called just before data is served to the client. If this function manually serves or requires manual async serving, it should return true and use the <code>serve</code> argument to manually serve the response.</td>
+<td>should return true,false or void</td>
+<td>Called just before data is served to the client. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the <code>serve</code> argument, <code>server.serve</code> or <code>server.serveFile</code> to manually serve the response.</td>
 </tr>
 <tr>
 <td>afterServe</td>
 <td>request obj</td>
+<td>void</td>
 <td>Called once data has been fully sent to client.</td>
 </tr>
 <tr>
 <td>Config</td>
 <td>config object (optional)</td>
+<td>n/a</td>
 <td>This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.</td>
 </tr>
 <tr>
 <td>Server</td>
 <td>none</td>
+<td>n/a</td>
 <td>This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.</td>
 </tr>
 </tbody>
 </table>
-<p>|function | parameters | description |
-|serve    | request obj, response obj, body str, encoding str | serves the response with the specified body and encoding for the given request |</p>
-<hr>
+<h3 id="server-methods">Server Methods</h3>
+<h4 id="deploy">deploy</h4>
+<p><code>server.deploy</code> starts the server.</p>
+<p><code>server.deploy(userConfig,readyCallback)</code></p>
+<p>|method  | returns |
+| deploy | void    |</p>
+<p>| parameter     | required | description |
+| userConfig    | no | if a <code>userConfig</code> object is passed it will shallow merge/decorate it with a clean instantion of the <a href="http://riaevangelist.github.io/node-http-server/Config.js.html">Config class</a> |
+| readyCallback | no | called once the server is started |</p>
+<pre><code class="lang-javascript">
+<span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
+
+server.deploy(
+    {
+        <span class="hljs-attr">port</span>:<span class="hljs-number">8000</span>,
+        <span class="hljs-attr">root</span>:<span class="hljs-string">'~/myApp/'</span>
+    },
+    serverReady
+);
+
+server.deploy(
+    {
+        <span class="hljs-attr">port</span>:<span class="hljs-number">8888</span>,
+        <span class="hljs-attr">root</span>:<span class="hljs-string">'~/myOtherApp/'</span>
+    },
+    serverReady
+);
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">serverReady</span>(<span class="hljs-params">server</span>)</span>{
+   <span class="hljs-built_in">console</span>.log( <span class="hljs-string">`Server on port <span class="hljs-subst">${server.config.port}</span> is now up`</span>);
+}
+</code></pre>
 <h2 id="examples">Examples</h2>
 <p>To see the node http server in action run <code>npm start</code> from the root of this repo and then visit <a href="http://localhost:8000">localhost:8000</a>.</p>
 <p>To start only an https example server <code>npm run https</code> from the root of this repo and then visit <a href="http://localhost:4433">localhost:4433</a>.</p>
 <p>To spin up both an http and an https server <code>npm run both</code> from the root of this repo and then visit <a href="http://localhost:4433">localhost:4433</a> or <a href="http://localhost:8000">localhost:8000</a>.</p>
-<p>Detailed examples can be found in the <a href="https://github.com/RIAEvangelist/node-http-server/tree/master/example">example folder</a> The basic example directory is static http and https file servers and the advanced directory has dynamic server side rendering http and https examples including a benchmark example.</p>
+<p>Detailed examples can be found in the <a href="https://github.com/RIAEvangelist/node-http-server/tree/master/example">example folder</a> or under the example folder on the <a href="http://riaevangelist.github.io/node-http-server/">node-http-server docs</a>  The basic example directory is static http and https file servers and the advanced directory has dynamic server side rendering http and https examples including a benchmark example. The <code>proxy</code> examples show manual serving and response modification examples.  </p>
 <h1 id="basic-http-server-example">Basic http server example</h1>
 <pre><code class="lang-javascript">
     <span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
