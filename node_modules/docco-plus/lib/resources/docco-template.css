@@ -1,0 +1,196 @@
+html, body {
+    margin: 0;
+}
+
+body.markdown-body {
+    overflow: auto;
+}
+
+body.markdown-body > h1 {
+    padding: 2rem 1rem 1rem 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+body > .subHeading {
+    padding: 0 1rem;
+    position: absolute;
+    color: #9d9d9d;
+    top: 0;
+}
+
+.navigatorToggle {
+    font-size: 12px;
+    border: 0 none;
+    background: #9c9c9c;
+    cursor: pointer;
+    color: #ffffff;
+    position: fixed;
+    top: 0;
+    right: 5px;
+    border-radius: 0 0 12px 12px;
+    padding: 4px 10px 10px;
+    z-index: 20;
+}
+
+body > nav.navigationTree {
+    padding: 2em;
+    background: rgba(0, 0, 0, .8);
+    position: fixed;
+    width: 100%;
+    max-width: 500px;
+    left: calc(50% - 250px);
+    z-index: 10;
+    top: 100px;
+    bottom: 100px;
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+body > nav.navigationTree ul {
+    margin: 0;
+    padding: 0;
+}
+
+@media (max-width: 500px) {
+    body > nav.navigationTree {
+        left: 0;
+    }
+}
+
+nav.navigationTree.minimized {
+    display: none;
+}
+
+body > section {
+    vertical-align: top;
+}
+
+ul.sectionDetails, ul.sectionDetails > li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul.sectionDetails {
+    position: relative;
+    z-index: 1;
+}
+
+ul.sectionDetails > li {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.annotation, .content {
+    display: inline-block;
+    vertical-align: top;
+    width: 50%;
+    padding: 1em;
+    box-sizing: border-box;
+}
+
+ul.sectionDetails::before {
+    content: ' ';
+    position: absolute;
+    z-index: -1;
+    background: #f7f7f7;
+    width: 50%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+}
+
+ul.sectionDetails.codeOnly::before {
+    width: 100%;
+}
+
+ul.sectionDetails.codeOnly .annotation {
+    display: none;
+}
+
+ul.sectionDetails.codeOnly .content {
+    width: 100%;
+}
+
+ul.sectionDetails.docsOnly::before {
+    content: '';
+    width: 0;
+}
+
+ul.sectionDetails.docsOnly .annotation {
+    width: 100%;
+}
+
+ul.sectionDetails.docsOnly .content {
+    display: none;
+}
+
+#jsTreeSearch {
+    width: 100%;
+    border: 0 none;
+    background: rgba(255, 255, 255, .8);
+    font-size: .8em;
+    padding: .8em;
+    box-sizing: border-box;
+    color: #000000;
+}
+
+#jsTreeSearch:hover, #jsTreeSearch:focus {
+    background: rgba(255, 255, 255, .5);
+}
+
+.jstree-default-dark a.jstree-search {
+    font-weight: normal;
+    color: #ffffff;
+}
+
+@media (max-width: 767px) {
+    body > nav {
+        width: 100%;
+    }
+
+    body > section {
+        width: 100%;
+    }
+
+    ul.sectionDetails::before {
+        background: none;
+    }
+
+    .annotation {
+        width: 100%;
+    }
+
+    .content {
+        width: 100%;
+        background: rgba(0, 0, 200, 0.05);
+    }
+
+}
+
+@media (min-width: 1000px) {
+    body > h1, body > .subHeading, body > section {
+        margin-left: 20%;
+    }
+
+    body > section {
+        width: 80%;
+    }
+
+    body > nav.navigationTree.minimized {
+        display: block;
+    }
+
+    body > nav.navigationTree {
+        left: 0;
+        bottom: 0;
+        top: 0;
+        width: 20%;
+        overflow: auto;
+        box-sizing: border-box;
+        position: fixed;
+    }
+
+    .navigatorToggle {
+        display: none;
+    }
+}

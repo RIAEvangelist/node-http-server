@@ -1,0 +1,319 @@
+{
+    "Cakefile": {
+        "name": "coffeescript",
+        "inlineComment": "#"
+    },
+    ".applescript": {
+        "name": "applescript",
+        "inlineComment": "--"
+    },
+    ".as": {
+        "name": "actionscript",
+        "inlineComment": "//"
+    },
+    ".asp": {
+        "name": "vbscript",
+        "inlineComment": "'"
+    },
+    ".bat": {
+        "name": "dos",
+        "inlineComment": "@?rem"
+    },
+    ".btm": {
+        "name": "dos",
+        "inlineComment": "@?rem"
+    },
+    ".c": {
+        "name": "c",
+        "inlineComment": "//"
+    },
+    ".clj": {
+        "name": "clojure",
+        "inlineComment": ";"
+    },
+    ".cls": {
+        "name": "tex",
+        "inlineComment": "%"
+    },
+    ".cmake": {
+        "name": "cmake",
+        "inlineComment": "#"
+    },
+    ".cmd": {
+        "name": "dos",
+        "inlineComment": "@?rem"
+    },
+    ".coffee": {
+        "name": "coffeescript",
+        "inlineComment": "#"
+    },
+    ".cpp": {
+        "name": "cpp",
+        "inlineComment": "//"
+    },
+    ".cs": {
+        "name": "cs",
+        "inlineComment": "//"
+    },
+    ".cson": {
+        "name": "coffeescript",
+        "inlineComment": "#"
+    },
+    ".d": {
+        "name": "d",
+        "inlineComment": "//"
+    },
+    ".dtx": {
+        "name": "tex",
+        "inlineComment": "%"
+    },
+    ".erl": {
+        "name": "erlang",
+        "inlineComment": "%"
+    },
+    ".frag": {
+        "name": "glsl",
+        "inlineComment": "//"
+    },
+    ".glsl": {
+        "name": "glsl",
+        "inlineComment": "//"
+    },
+    ".go": {
+        "name": "go",
+        "inlineComment": "//"
+    },
+    ".groovy": {
+        "name": "groovy",
+        "inlineComment": "//"
+    },
+    ".h": {
+        "name": "objectivec",
+        "inlineComment": "//"
+    },
+    ".hrl": {
+        "name": "erlang",
+        "inlineComment": "%"
+    },
+    ".hs": {
+        "name": "haskell",
+        "inlineComment": "--"
+    },
+    ".ini": {
+        "name": "ini",
+        "inlineComment": ";"
+    },
+    ".jade": {
+        "name": "jade",
+        "inlineComment": "//-"
+    },
+    ".js": {
+        "name": "javascript",
+        "inlineComment": "//"
+    },
+    ".jsm": {
+        "name": "javascript",
+        "inlineComment": "//"
+    },
+    ".jsx": {
+        "name": "javascript",
+        "inlineComment": "//"
+    },
+    ".java": {
+        "name": "java",
+        "inlineComment": "//"
+    },
+    ".latex": {
+        "name": "tex",
+        "inlineComment": "%"
+    },
+    ".less": {
+        "name": "less",
+        "inlineComment": "//"
+    },
+    ".lisp": {
+        "name": "lisp",
+        "inlineComment": ";"
+    },
+    ".litcoffee": {
+        "name": "coffeescript",
+        "inlineComment": "#",
+        "literate": true
+    },
+    ".ls": {
+        "name": "coffeescript",
+        "inlineComment": "#"
+    },
+    ".lua": {
+        "name": "lua",
+        "inlineComment": "--"
+    },
+    ".n": {
+        "name": "nemerle",
+        "inlineComment": "//"
+    },
+    ".m": {
+        "name": "objectivec",
+        "inlineComment": "//"
+    },
+    ".marko": {
+        "name": "html",
+        "inlineComment": "<!--"
+    },
+    ".mel": {
+        "name": "mel",
+        "inlineComment": "//"
+    },
+    ".markdown": {
+        "name": "markdown",
+        "inlineComment": ""
+    },
+    ".md": {
+        "name": "markdown",
+        "inlineComment": ""
+    },
+    ".mm": {
+        "name": "objectivec",
+        "inlineComment": "//"
+    },
+    ".p": {
+        "name": "delphi",
+        "inlineComment": "//"
+    },
+    ".pas": {
+        "name": "delphi",
+        "inlineComment": "//"
+    },
+    ".php": {
+        "name": "php",
+        "inlineComment": "//"
+    },
+    ".pl": {
+        "name": "perl",
+        "inlineComment": "#"
+    },
+    ".pm": {
+        "name": "perl",
+        "inlineComment": "#"
+    },
+    ".pod": {
+        "name": "perl",
+        "inlineComment": "#"
+    },
+    ".pp": {
+        "name": "delphi",
+        "inlineComment": "//"
+    },
+    ".py": {
+        "name": "python",
+        "inlineComment": "#"
+    },
+    ".rb": {
+        "name": "ruby",
+        "inlineComment": "#"
+    },
+    ".tex": {
+        "name": "tex",
+        "inlineComment": "%"
+    },
+    ".scala": {
+        "name": "scala",
+        "inlineComment": "//"
+    },
+    ".scpt": {
+        "name": "applescript",
+        "inlineComment": "--"
+    },
+    ".scss": {
+        "name": "scss",
+        "inlineComment": "//"
+    },
+    ".sh": {
+        "name": "bash",
+        "inlineComment": "#"
+    },
+    ".sql": {
+        "name": "sql",
+        "inlineComment": "--"
+    },
+    ".sty": {
+        "name": "tex",
+        "inlineComment": "%"
+    },
+    ".styl": {
+        "name": "stylus",
+        "inlineComment": "//"
+    },
+    ".stylus": {
+        "name": "stylus",
+        "inlineComment": "//"
+    },
+    ".swift": {
+        "name": "swift",
+        "inlineComment": "//"
+    },
+    ".t": {
+        "name": "perl",
+        "inlineComment": "#"
+    },
+    ".ts": {
+        "name": "typescript",
+        "inlineComment": "//"
+    },
+    ".v": {
+        "name": "verilog",
+        "inlineComment": "//"
+    },
+    ".vala": {
+        "name": "vala",
+        "inlineComment": "//"
+    },
+    ".vapi": {
+        "name": "vala",
+        "inlineComment": "//"
+    },
+    ".vbe": {
+        "name": "vbscript",
+        "inlineComment": "'"
+    },
+    ".vbs": {
+        "name": "vbscript",
+        "inlineComment": "'"
+    },
+    ".vert": {
+        "name": "glsl",
+        "inlineComment": "//"
+    },
+    ".vhdl": {
+        "name": "vhdl",
+        "inlineComment": "--"
+    },
+    ".vim": {
+        "name": "vim",
+        "inlineComment": "\""
+    },
+    ".r": {
+        "name": "r",
+        "inlineComment": "#"
+    },
+    ".rc": {
+        "name": "rust",
+        "inlineComment": "//"
+    },
+    ".rs": {
+        "name": "rust",
+        "inlineComment": "//"
+    },
+    ".wsc": {
+        "name": "vbscript",
+        "inlineComment": "'"
+    },
+    ".wsf": {
+        "name": "vbscript",
+        "inlineComment": "'"
+    },
+    ".yaml": {
+        "name": "yaml",
+        "inlineComment": "#"
+    }
+}

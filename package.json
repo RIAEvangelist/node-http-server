@@ -16,7 +16,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./example/basic/basicApp.js",
     "https": "node ./example/basic/https-ONLY-basicApp.js",
-    "both": "node ./example/basic/https-basicApp.js"
+    "both": "node ./example/basic/https-basicApp.js",
+    "docs": "docco-plus ./README.md ./example/**/* ./server/* ./bin/*"
   },
   "repository": {
     "type": "git",
@@ -41,6 +42,8 @@
   },
   "homepage": "https://github.com/RIAEvangelist/node-http-server",
   "devDependencies": {
+    "docco-plus": "^2.0.0",
     "request": "^2.74.0"
-  }
+  },
+  "dependencies": {}
 }
