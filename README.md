@@ -77,12 +77,12 @@ If you want to create a custom Server or extend the Server Class you can require
 
 |Server Method or member| params | returns / should return | description |
 |-----------------------|--------|-------------------------|-------------|
-|deploy       | config obj (optional), readyCallback fn (optional)        | returns void | Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class. |
-|onRequest    | request obj, response obj, serve fn                       | should return true,false or void | Called when request received. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response. |
-|beforeServe  |request obj, response obj, body obj, encoding obj, serve fn| should return true,false or void | Called just before data is served to the client. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response.   |
-|afterServe   |request obj                                                | void | Called once data has been fully sent to client. |
-|Config       | config object (optional)                                  | n/a | This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.|
-|Server       | none                                                      | n/a | This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
+|deploy       | `userConfig` obj (optional), `readyCallback` fn (optional)  | returns void | Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class. |
+|onRequest    | `request` obj, `response` obj, `serve` fn                   | should return true,false or void | Called when request received. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response. |
+|beforeServe  |`request` obj, `response` obj, `body` obj, `encoding` obj, `serve` fn| should return true,false or void | Called just before data is served to the client. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response.   |
+|afterServe   |`request` obj                                                | void | Called once data has been fully sent to client. |
+|Config       | n/a                                                         | n/a | This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.|
+|Server       | n/a                                                         | n/a | This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
 
 ### Server Methods
 
