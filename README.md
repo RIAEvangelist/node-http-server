@@ -19,6 +19,8 @@ GitHub info :
 Package Quality :  
 ![node-http-server Package Quality](http://npm.packagequality.com/badge/node-http-server.png)
 
+[See the code documentation on riaevangelist.github.io](http://riaevangelist.github.io/node-http-server/)
+
 ## cli use if you just want to test
 
 Now you can also use the nodeserver cli if you just want to spin up a basic file server to test something out quickly or share on the local network.
