@@ -90,9 +90,29 @@
             <div class="annotation">
                 <h1 id="server-class">SERVER CLASS</h1>
 <hr>
+<p> You can pass a <code>userConfig</code>  object to shallow merge and/or decorate the <code>server.config</code>
+ when instatiating if you desire.</p>
+<pre><code class="lang-javascript">
+ <span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
+ <span class="hljs-comment">// server is a Server instation already so to modify or decorate its config, you</span>
+ <span class="hljs-comment">// must call the server.deploy method.</span>
+
+ server.deploy({<span class="hljs-attr">verbose</span>:<span class="hljs-literal">true</span>})
+
+
+ <span class="hljs-keyword">const</span> Server=server.Server;
+ <span class="hljs-comment">// Server is a refrence to the Server class so you can extend or instatiate it.</span>
+
+ <span class="hljs-keyword">const</span> myServer=<span class="hljs-keyword">new</span> Server({<span class="hljs-attr">verbose</span>:<span class="hljs-literal">true</span>});
+ <span class="hljs-comment">// this is the instatiated server which now contains your desired defaults.</span>
+ <span class="hljs-comment">// like the first example, it too can still be modified on deployment</span>
+
+ myServer.deploy({<span class="hljs-attr">port</span>:<span class="hljs-number">8888</span>},(server)=&gt;{<span class="hljs-built_in">console</span>.log(server)});
+</code></pre>
 
             </div><div class="content">
-                <div class="highlight"><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Server</span></span>{
+                <div class="highlight"><pre>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Server</span></span>{
     <span class="hljs-keyword">constructor</span>(userConfig){</pre></div>
             </div>
         </li>
@@ -101,7 +121,7 @@
         <li id="section-3">
             <div class="annotation">
                 <p> <code>server.config</code> is where the servers configuration will reside.
- It is a new instance of the <a href="../assets/file_9.html">Config class</a> which will be shallow merged with
+ It is a new instance of the <a href="http://riaevangelist.github.io/node-http-server/server/Config.js.html">Config class</a> which will be shallow merged and/or decorated by with
  the passed <code>userConfig</code> if one is passed upon construction of the Server class, or to the <code>server.deploy</code> method.</p>
 <p> <a href="https://github.com/RIAEvangelist/node-http-server#custom-configuration">Detailed info on the server.config or userConfig</a></p>
 
@@ -114,9 +134,44 @@
         
         <li id="section-4">
             <div class="annotation">
-                <p> <code>server.deploy</code> starts the server.
- if a <code>userConfig</code> object is passed it will shallow merge/decorate it with a clean instantion of the <a href="../assets/file_9.html">Config class</a>
- once the server is up and running it will call the <code>readyCallback</code></p>
+                <h4 id="deploy">deploy</h4>
+<p> <code>server.deploy</code> starts the server.</p>
+<p> <code>server.deploy(userConfig,readyCallback)</code></p>
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>deploy</td>
+<td>void</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>parameter</th>
+<th>required</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>userConfig</td>
+<td>no</td>
+<td>if a <code>userConfig</code> object is passed it will shallow merge/decorate it with a clean instantion of the <a href="http://riaevangelist.github.io/node-http-server/Config.js.html">Config class</a></td>
+</tr>
+<tr>
+<td>readyCallback</td>
+<td>no</td>
+<td>called once the server is started</td>
+</tr>
+</tbody>
+</table>
 <pre><code class="lang-javascript">
  <span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
 
@@ -152,7 +207,13 @@
         
         <li id="section-5">
             <div class="annotation">
-                <p>executed before any processing of request. If returns true response serving will be delayed.</p>
+                <h1 id="server-onrawrequest">server.onRawRequest</h1>
+<p> <code>server.onRawRequest</code> is executed immediately upon request reciept
+ before any processing. It is the absolute fastest place to intercept a request
+ but that means it contains a raw request object.</p>
+<p> If your <code>onRawRequest</code> returns <code>true</code>  the server will delay serving the response
+ until you manually call the <code>serve</code> method. This allows you to modify the response
+ or body in any way you want, including async style.</p>
 
             </div><div class="content">
                 <div class="highlight"><pre>    onRawRequest(request,response,serve){
@@ -212,7 +273,7 @@
     }
 }
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">deploy</span>(<span class="hljs-params">userConfig, readyCallback</span>)</span>{
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">deploy</span>(<span class="hljs-params">userConfig, readyCallback=function(</span>)</span>{}){
     <span class="hljs-built_in">Object</span>.defineProperty(
         <span class="hljs-keyword">this</span>,
         <span class="hljs-string">'server'</span>,
@@ -276,8 +337,7 @@
             <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
                 <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>.config.verbose){
                     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-keyword">this</span>.config.logID}</span> listening on port <span class="hljs-subst">${<span class="hljs-keyword">this</span>.config.port}</span> ###\n\n`</span>);
-                }
-                <span class="hljs-keyword">if</span> (readyCallback){</pre></div>
+                }</pre></div>
             </div>
         </li>
         
@@ -290,8 +350,8 @@
  callback… think about it ;)</p>
 
             </div><div class="content">
-                <div class="highlight"><pre>                    readyCallback(<span class="hljs-keyword">this</span>);
-                }
+                <div class="highlight"><pre>                readyCallback(<span class="hljs-keyword">this</span>);
+
             }.bind(<span class="hljs-keyword">this</span>)
         );
     }
@@ -302,8 +362,7 @@
             <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
                 <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>.config.verbose){
                     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`HTTPS: <span class="hljs-subst">${<span class="hljs-keyword">this</span>.config.logID}</span> listening on port <span class="hljs-subst">${<span class="hljs-keyword">this</span>.config.https.port}</span> ###\n\n`</span>);
-                }
-                <span class="hljs-keyword">if</span> (readyCallback){</pre></div>
+                }</pre></div>
             </div>
         </li>
         
@@ -314,8 +373,7 @@
  https and http servers with a simple test for the servers port</p>
 
             </div><div class="content">
-                <div class="highlight"><pre>                    readyCallback(<span class="hljs-keyword">this</span>);
-                }
+                <div class="highlight"><pre>                readyCallback(<span class="hljs-keyword">this</span>);
             }.bind(<span class="hljs-keyword">this</span>)
         );
     }
@@ -579,17 +637,9 @@
         uri[key]=<span class="hljs-string">''</span>;
     }
 
-    request.uri=uri;</pre></div>
-            </div>
-        </li>
-        
-        
-        <li id="section-12">
-            <div class="annotation">
-                <p>return any value to force delayed serving</p>
+    request.uri=uri;
 
-            </div><div class="content">
-                <div class="highlight"><pre>    <span class="hljs-keyword">if</span>(
+    <span class="hljs-keyword">if</span>(
         <span class="hljs-keyword">this</span>.onRawRequest(
             request,
             response,
@@ -647,7 +697,7 @@
         </li>
         
         
-        <li id="section-13">
+        <li id="section-12">
             <div class="annotation">
                 <p>return any value to force or specify delayed or manual serving</p>
 
