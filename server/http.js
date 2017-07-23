@@ -15,7 +15,7 @@ const http = require('http'),
 class Server{
     constructor(userConfig){
       // ` server.config ` is where the servers configuration will reside.
-      // It is a new instance of the [Config class](./Config.html) which will be shallow merged with
+      // It is a new instance of the [Config class](./Config.js.html) which will be shallow merged with
       // the passed ` userConfig ` if one is passed upon construction of the Server class, or to the ` server.deploy ` method.
       //
       // [Detailed info on the server.config or userConfig](https://github.com/RIAEvangelist/node-http-server#custom-configuration)
@@ -24,7 +24,7 @@ class Server{
     }
 
     // ` server.deploy ` starts the server.
-    // if a ` userConfig ` object is passed it will shallow merge/decorate it with a clean instantion of the [Config class](./Config.html)
+    // if a ` userConfig ` object is passed it will shallow merge/decorate it with a clean instantion of the [Config class](./Config.js.html)
     // once the server is up and running it will call the ` readyCallback `
     //
     // ```javascript
