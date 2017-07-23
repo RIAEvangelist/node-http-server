@@ -75,8 +75,8 @@ If you want to create a custom Server or extend the Server Class you can require
 
 ## Server Class
 
-|Server Method or member| params | returns OR should return | description |
-|-------------|--------|-------------|
+|Server Method or member| params | returns / should return | description |
+|-----------------------|--------|-------------------------|-------------|
 |deploy       | config obj (optional), readyCallback fn (optional)        | returns void | Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class. |
 |onRequest    | request obj, response obj, serve fn                       | should return true,false or void | Called when request received. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response. |
 |beforeServe  |request obj, response obj, body obj, encoding obj, serve fn| should return true,false or void | Called just before data is served to the client. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response.   |
