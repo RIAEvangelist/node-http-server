@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>https-advancedApp.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="basicTemplate.html">
+                  basicTemplate.js
+                </a>
+              
+                
+                <a class="source" href="https-ONLY-basicTemplate.html">
+                  https-ONLY-basicTemplate.js
+                </a>
+              
+                
+                <a class="source" href="https-basicTemplate.html">
+                  https-basicTemplate.js
+                </a>
+              
+                
+                <a class="source" href="https-randomCSS.html">
+                  https-randomCSS.js
+                </a>
+              
+                
+                <a class="source" href="https-requestBenchmark.html">
+                  https-requestBenchmark.js
+                </a>
+              
+                
+                <a class="source" href="randomCSS.html">
+                  randomCSS.js
+                </a>
+              
+                
+                <a class="source" href="requestBenchmark.html">
+                  requestBenchmark.js
+                </a>
+              
+                
+                <a class="source" href="advancedApp.html">
+                  advancedApp.js
+                </a>
+              
+                
+                <a class="source" href="basicApp.html">
+                  basicApp.js
+                </a>
+              
+                
+                <a class="source" href="basicLogging.html">
+                  basicLogging.js
+                </a>
+              
+                
+                <a class="source" href="https-ONLY-basicApp.html">
+                  https-ONLY-basicApp.js
+                </a>
+              
+                
+                <a class="source" href="https-advancedApp.html">
+                  https-advancedApp.js
+                </a>
+              
+                
+                <a class="source" href="https-basicApp.html">
+                  https-basicApp.js
+                </a>
+              
+                
+                <a class="source" href="https-basicLogging.html">
+                  https-basicLogging.js
+                </a>
+              
+                
+                <a class="source" href="https-multipleDomains.html">
+                  https-multipleDomains.js
+                </a>
+              
+                
+                <a class="source" href="https-verboseApp.html">
+                  https-verboseApp.js
+                </a>
+              
+                
+                <a class="source" href="multipleDomains.html">
+                  multipleDomains.js
+                </a>
+              
+                
+                <a class="source" href="verboseApp.html">
+                  verboseApp.js
+                </a>
+              
+                
+                <a class="source" href="basic.html">
+                  basic.js
+                </a>
+              
+                
+                <a class="source" href="https-and-http-basic.html">
+                  https-and-http-basic.js
+                </a>
+              
+                
+                <a class="source" href="https-and-http-google-proxy.html">
+                  https-and-http-google-proxy.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>https-advancedApp.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../server/http.js'</span>);
+
+<span class="hljs-keyword">var</span> config=<span class="hljs-keyword">new</span> server.Config;
+
+<span class="hljs-built_in">console</span>.log(config);
+
+config.errors[<span class="hljs-string">'404'</span>]    = <span class="hljs-string">'These are not the files you are looking for...'</span>;
+config.contentType.mp4  = <span class="hljs-string">'video/mp4'</span>;
+config.port             = <span class="hljs-number">8005</span>;
+config.verbose          = <span class="hljs-literal">true</span>;
+config.root             = __dirname+<span class="hljs-string">'/appRoot/'</span>;
+config.https.privateKey = <span class="hljs-string">`<span class="hljs-subst">${__dirname}</span>/../../local-certs/private/server.key`</span>;
+config.https.certificate= <span class="hljs-string">`<span class="hljs-subst">${__dirname}</span>/../../local-certs/server.pub`</span>;
+config.https.port       = <span class="hljs-number">4433</span>;
+
+server.deploy(config);
+
+<span class="hljs-built_in">console</span>.log(server);</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
