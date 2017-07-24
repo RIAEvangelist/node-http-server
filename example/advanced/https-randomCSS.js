@@ -1,7 +1,7 @@
 var os = require( 'os' );
 
 //import the `node-http-server` module
-//const server=require('node-http-server');
+//const ` server=require(‘node-http-server’); `
 const server=require('../../server/Server.js');
 var config=new server.Config;
 

@@ -1,5 +1,5 @@
 //import the `node-http-server` module
-//const server=require('node-http-server');
+//const ` server=require(‘node-http-server’); `
 const server=require('../../server/Server.js');
 
 //examine the server instance
