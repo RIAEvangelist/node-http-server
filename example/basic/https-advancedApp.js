@@ -1,5 +1,5 @@
 //import the `node-http-server` module
-//const ` server=require(‘node-http-server’); `
+//` const server=require(‘node-http-server’); `
 const server=require('../../server/Server.js');
 
 // instantiate ` config ` as a new ` server.config ` instance so we get all the defaults.
