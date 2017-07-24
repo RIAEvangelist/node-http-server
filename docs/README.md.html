@@ -135,7 +135,7 @@ $ nodeserver port=1942 verbose=<span class="hljs-literal">true</span>
 <td>onRawRequest</td>
 <td><code>request</code> obj, <code>response</code> obj, <code>serve</code> fn</td>
 <td>should return true,false or void</td>
-<td>Called immediately upon reciept of http(s) request. Called before any request parsing, useful for request modification, high speed handling, or rejection. Mildly more complex to work with because the request object has not been parsed and decorated with helper members. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the <code>serve</code> argument, <code>server.serve</code> or <code>server.serveFile</code> to manually serve the response.</td>
+<td>Called immediately upon reciept of http(s) request. Called before any request parsing, useful for <code>proxy servers</code> and request modification, high speed handling, or rejection. Mildly more complex to work with because the request object has not been parsed and decorated with helper members. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the <code>serve</code> argument, <code>server.serve</code> or <code>server.serveFile</code> to manually serve the response.</td>
 </tr>
 <tr>
 <td>onRequest</td>
@@ -229,6 +229,73 @@ server.deploy(
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">serverReady</span>(<span class="hljs-params">server</span>)</span>{
    <span class="hljs-built_in">console</span>.log( <span class="hljs-string">`Server on port <span class="hljs-subst">${server.config.port}</span> is now up`</span>);
+}
+</code></pre>
+<h4 id="onrawrequest">onRawRequest</h4>
+<p><code>server.onRawRequest</code></p>
+<p><code>server.onRawRequest(request,response,serve)</code></p>
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>should return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>deploy</td>
+<td>bool</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>parameter</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request</td>
+<td>http(s) request obj</td>
+</tr>
+<tr>
+<td>response</td>
+<td>http(s) response obj</td>
+</tr>
+<tr>
+<td>serve</td>
+<td>ref to <code>server.serve</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="lang-javascript">
+<span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
+<span class="hljs-keyword">const</span> config=<span class="hljs-keyword">new</span> server.Config;
+
+config.port=<span class="hljs-number">8000</span>;
+
+server.onRawRequest=gotRequest;
+
+server.deploy(config);
+
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">gotRequest</span>(<span class="hljs-params">request,response,serve</span>)</span>{
+    <span class="hljs-built_in">console</span>.log(request.uri,request.headers);
+
+    serve(
+        request,
+        response,
+        <span class="hljs-built_in">JSON</span>.stringify(
+            {
+                <span class="hljs-attr">uri</span>:request.uri,
+                <span class="hljs-attr">headers</span>:request.headers
+            }
+        )
+    );
+
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
 }
 </code></pre>
 <h2 id="examples">Examples</h2>

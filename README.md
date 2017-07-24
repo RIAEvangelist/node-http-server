@@ -136,7 +136,7 @@ function serverReady(server){
 
 |method  | should return |
 |--------|---------|
-| deploy | bool    |
+| deploy | bool/void    |
 
 | parameter  | description |
 |------------|-------------|
