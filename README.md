@@ -90,7 +90,7 @@ If you want to create a custom Server or extend the Server Class you can require
 |Config       | n/a                                                         | n/a | This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.|
 |Server       | n/a                                                         | n/a | This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
 
-### [Server Methods](http://riaevangelist.github.io/node-http-server/server/http.js.html)
+### [Server Methods](http://riaevangelist.github.io/node-http-server/server/Server.js.html)
 
 #### deploy
 
@@ -253,7 +253,7 @@ To start only an https example server ` npm run https ` from the root of this re
 
 To spin up both an http and an https server ` npm run both ` from the root of this repo and then visit [localhost:4433](http://localhost:4433) or [localhost:8000](http://localhost:8000).
 
-Detailed examples can be found in the [example folder](https://github.com/RIAEvangelist/node-http-server/tree/master/example) or under the example folder on the [node-http-server docs](http://riaevangelist.github.io/node-http-server/)  The basic example directory is static http and https file servers and the advanced directory has dynamic server side rendering http and https examples including a benchmark example. The ` proxy ` examples show manual serving and response modification examples.  
+Detailed examples can be found in the [example folder](https://github.com/RIAEvangelist/node-http-server/tree/master/example) or under the example folder on the [node-http-server example docs](http://riaevangelist.github.io/node-http-server/example/readme.md.html)  The basic example directory is static http and https file servers and the advanced directory has dynamic server side rendering http and https examples including a benchmark example. The ` proxy ` examples show manual serving and response modification examples.  
 
 # Basic http server example
 
@@ -306,6 +306,34 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
                 certificate:`/path/to/your/certs/server.pub`,
                 port:4433
             }
+        }
+    );
+
+```
+
+## Template filling
+
+```javascript
+
+    const server=require('../../server/Server.js');
+
+    server.beforeServe=beforeServe;
+
+    function beforeServe(request,response,body,encoding){
+        //only parsing html files for this example
+        if(response.getHeader('Content-Type')!=server.config.contentType.html){
+            return;
+        }
+
+        const someVariable='this is some variable value';
+
+        body.value=body.value.replace('{{someVariable}}',someVariable);
+    }
+
+    server.deploy(
+        {
+            port:8000,
+            root:`${__dirname}/appRoot/`
         }
     );
 
@@ -376,36 +404,28 @@ for https :
 
 ```
 
-## Template filling
+## [Config Class](http://riaevangelist.github.io/node-http-server/Config.js.html)
+
+### Default node HTTP server configuration
+
+All of these can be modified and passed into ` new server.Server(myConfigs) ` or ` server.deploy(myConfigs) `
 
 ```javascript
 
-    const server=require('../../server/http.js');
+const myConfig=new server.Config;
+myConfig.verbose=true;
+myConfig.port=9922;
 
-    server.beforeServe=beforeServe;
+const myServer=new server.Server(config);
+myServer.deploy();
 
-    function beforeServe(request,response,body,encoding){
-        //only parsing html files for this example
-        if(response.getHeader('Content-Type')!=server.config.contentType.html){
-            return;
-        }
-
-        const someVariable='this is some variable value';
-
-        body.value=body.value.replace('{{someVariable}}',someVariable);
-    }
-
-    server.deploy(
-        {
-            port:8000,
-            root:`${__dirname}/appRoot/`
-        }
-    );
+//or more basically
+server.deploy({port:9922,verbose:true});
 
 ```
-## [Config Class](http://riaevangelist.github.io/node-http-server/Config.js.html)
 
-### Default Node HTTP Server Configuration
+#### defaults description
+
 
 ```javascript
 

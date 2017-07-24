@@ -1,4 +1,4 @@
-var server=require('../../server/http.js');
+var server=require('../../server/Server.js');
 var config={
     verbose:true,
     port:8000,

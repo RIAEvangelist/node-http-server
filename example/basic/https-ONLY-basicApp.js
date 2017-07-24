@@ -1,4 +1,4 @@
-var server=require('../../server/http.js');
+var server=require('../../server/Server.js');
 
 server.deploy(
     {

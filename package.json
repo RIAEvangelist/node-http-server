@@ -17,7 +17,7 @@
     "start": "node ./example/basic/basicApp.js",
     "https": "node ./example/basic/https-ONLY-basicApp.js",
     "both": "node ./example/basic/https-basicApp.js",
-    "docs": "docco-plus ./README.md ./example/**/* ./server/* ./bin/*"
+    "docs": "docco-plus ./README.md ./example/* ./example/**/* ./server/* ./bin/* ./local-certs/* "
   },
   "repository": {
     "type": "git",

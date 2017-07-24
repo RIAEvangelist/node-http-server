@@ -86,7 +86,7 @@ class Server{
     //
     // ```
     //
-    // [More Examples for deploying a node server](https://github.com/RIAEvangelist/node-http-server#examples)
+    // See the example folder for more detailed examples, or check the node-http-server readme for some [Quickstart Examples for deploying a node server](https://github.com/RIAEvangelist/node-http-server#examples)
     //
     get deploy(){
       return deploy;

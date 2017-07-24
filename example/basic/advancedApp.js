@@ -1,4 +1,4 @@
-var server=require('../../server/http.js');
+var server=require('../../server/Server.js');
 
 var config=new server.Config;
 config.errors['404']    = 'These are not the files you are looking for...';
