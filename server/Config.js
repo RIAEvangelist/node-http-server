@@ -2,16 +2,32 @@
 
 const fs=require('fs');
 
+const passedArgs = process.argv.splice(2),
+    argCount = passedArgs.length,
+    args = {};
+
+const defaults = {
+    port    : 8080,
+    root    : process.cwd(),
+    domain  : '0.0.0.0',
+    index   : 'index.html',
+    log     : false
+};
+
+for(let i=0; i<argCount; i++){
+    const data=passedArgs[i].split('=');
+    args[data[0]]=data[1];
+}
+
 // # Config Class
+//
+// [Detailed default config docs and explination](https://github.com/RIAEvangelist/node-http-server/#config-class)
 //
 class Config{
     constructor(userConfig){
         Object.defineProperties(
             this,
             {
-                // setting the ` config.verbose ` option will give you a lot of useful information
-                // this is good for testing and debugging, but might be a bit much for production.
-                //
                 verbose     : {
                     value:defaultConfigs.verbose,
                     enumerable:true,
@@ -32,31 +48,6 @@ class Config{
                     enumerable:true,
                     writable:true
                 },
-
-                // To have a properly secured ` https ` server you should set the ` https.privateKey `
-                // and ` https.certificate ` values in the user config. ***If*** you also need a
-                // passphrase for your certificate you can set that in the ` https.passphrase `
-                // You do not have to set the privateKey and certificate files for testing, but in production
-                // you really should.
-                //
-                // ```javascript
-                //
-                // const server=require('../../server/http.js');
-                // server.deploy(
-                //     {
-                //         verbose: true,
-                //         port: 8000,
-                //         root:__dirname+'/appRoot/',
-                //         https:{
-                //             privateKey:`${__dirname}/../../local-certs/private/server.key`,
-                //             certificate:`${__dirname}/../../local-certs/server.pub`,
-                //             port:4433
-                //         }
-                //     }
-                // );
-                //
-                // ```
-                //
                 https       : {
                     value:defaultConfigs.https,
                     enumerable:true,
@@ -67,7 +58,6 @@ class Config{
                     enumerable:true,
                     writable:true
                 },
-                //pass this as config for custom logging
                 logFunction : {
                     value:defaultConfigs.logFunction,
                     enumerable:true,
@@ -109,25 +99,25 @@ class Config{
     }
 }
 
-// ## CLI args
+// ### Default node HTTP server config values
 //
-const passedArgs = process.argv.splice(2),
-    argCount = passedArgs.length,
-    args = {},
-    defaults = {
-        port    : 8080,
-        root    : process.cwd(),
-        domain  : '0.0.0.0',
-        index   : 'index.html',
-        log     : false
-    };
-
-for(let i=0; i<argCount; i++){
-    const data=passedArgs[i].split('=');
-    args[data[0]]=data[1];
-}
-
-// ## Default node-http-server configs
+// All of these can be modified and passed into ` new server.Server(myConfigs) ` or ` server.deploy(myConfigs) `
+//
+// ```javascript
+//
+// const myConfig=new server.Config;
+// myConfig.verbose=true;
+// myConfig.port=9922;
+//
+// const myServer=new server.Server(config);
+// myServer.deploy();
+//
+// //or more basically
+// server.deploy({port:9922,verbose:true});
+//
+// ```
+// [Detailed default config docs and explination](https://github.com/RIAEvangelist/node-http-server/#default-node-http-server-configuration)
+//
 //
 const defaultConfigs={
     verbose     : (args.verbose=='true')||false,
@@ -135,21 +125,14 @@ const defaultConfigs={
     root        : args.root||defaults.root,
     domain      : args.domain||defaults.domain,
     log         : false,
-    //pass this as config for custom logging
     logFunction : serverLogging,
     domains   : {
-        /*******************\
-         * domain  : /that/domains/root/dir
-         *
-         * for sub domains, specify the whole host i.e. "my.sub.domain"
-         * you may need to edit your hosts file, cnames or iptable
-         * domain or my.domain etc. goes to 127.0.0.1 for local development
-         * *****************/
+
     },
     server      : {
         index   : args.index||defaults.index,
         noCache : args.noCache=='false' ? false : true,
-        timeout : 30000 //30 second timeout
+        timeout : 30000
     },
     https:{
         ca:'',
