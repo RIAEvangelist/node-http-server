@@ -74,6 +74,11 @@
                 
 <hr>
 <p>Simple to use stand alone node HTTP and HTTPS Server you can spin up in seconds.</p>
+<ul>
+<li><strong><em><a href="#examples">TLDR; Quick start examples</a></em></strong></li>
+<li><strong><em><a href="#server-class">Server Class</a></em></strong></li>
+<li><strong><em><a href="#config-class">Config Class</a></em></strong></li>
+</ul>
 <p>Support for building proxy servers has been added. Documentation coming in next release. <a href="https://github.com/RIAEvangelist/node-http-server/tree/master/example/proxy">For now see the node-http-server proxy examples</a>.</p>
 <p><code>npm i node-http-server</code></p>
 <p><a href="https://www.npmjs.com/package/node-http-server"><img src="https://nodei.co/npm/node-http-server.png?downloads=true&amp;downloadRank=true&amp;stars=true" alt="node-http-server stats"></a>  </p>
@@ -169,7 +174,7 @@ $ nodeserver port=1942 verbose=<span class="hljs-literal">true</span>
 </tr>
 </tbody>
 </table>
-<h3 id="server-methods">Server Methods</h3>
+<h3 id="-server-methods-http-riaevangelist-github-io-node-http-server-server-http-js-html-"><a href="http://riaevangelist.github.io/node-http-server/server/http.js.html">Server Methods</a></h3>
 <h4 id="deploy">deploy</h4>
 <p><code>server.deploy</code> starts the server.</p>
 <p><code>server.deploy(userConfig,readyCallback)</code></p>
@@ -298,7 +303,7 @@ server.deploy(config);
     <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
 }
 </code></pre>
-<h4 id="onrawrequest">onRawRequest</h4>
+<h4 id="onrequest">onRequest</h4>
 <p><code>server.onRequest</code></p>
 <p><code>server.onRequest(request,response,serve)</code></p>
 <table>
@@ -501,7 +506,8 @@ server.deploy(config);
         }
     );
 </code></pre>
-<h2 id="default-node-http-server-configuration">Default Node HTTP Server Configuration</h2>
+<h2 id="-config-class-http-riaevangelist-github-io-node-http-server-config-js-html-"><a href="http://riaevangelist.github.io/node-http-server/Config.js.html">Config Class</a></h2>
+<h3 id="default-node-http-server-configuration">Default Node HTTP Server Configuration</h3>
 <pre><code class="lang-javascript">
     {
         <span class="hljs-attr">verbose</span>     : (args.verbose==<span class="hljs-string">'true'</span>)||<span class="hljs-literal">false</span>,

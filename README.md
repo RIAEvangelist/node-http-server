@@ -4,6 +4,11 @@ Node http server with https and proxy support
 
 Simple to use stand alone node HTTP and HTTPS Server you can spin up in seconds.
 
+- ***[TLDR; Quick start examples](#examples)***
+- ***[Server Class](#server-class)***
+- ***[Config Class](#config-class)***
+
+
 Support for building proxy servers has been added. Documentation coming in next release. [For now see the node-http-server proxy examples](https://github.com/RIAEvangelist/node-http-server/tree/master/example/proxy).
 
 ` npm i node-http-server `
@@ -85,7 +90,7 @@ If you want to create a custom Server or extend the Server Class you can require
 |Config       | n/a                                                         | n/a | This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.|
 |Server       | n/a                                                         | n/a | This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
 
-### Server Methods
+### [Server Methods](http://riaevangelist.github.io/node-http-server/server/http.js.html)
 
 #### deploy
 
@@ -398,8 +403,9 @@ for https :
     );
 
 ```
+## [Config Class](http://riaevangelist.github.io/node-http-server/Config.js.html)
 
-## Default Node HTTP Server Configuration
+### Default Node HTTP Server Configuration
 
 ```javascript
 

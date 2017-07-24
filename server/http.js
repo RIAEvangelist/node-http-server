@@ -9,7 +9,7 @@ const http = require('http'),
     Config = require(`${__dirname}/Config.js`);
 
 //
-// # SERVER CLASS
+// # [SERVER CLASS](https://github.com/RIAEvangelist/node-http-server#server-class)
 // ---------------
 //
 // You can pass a ` userConfig `  object to shallow merge and/or decorate the ` server.config `

@@ -2,117 +2,8 @@
 
 const fs=require('fs');
 
-const passedArgs = process.argv.splice(2),
-    argCount = passedArgs.length,
-    args = {},
-    defaults = {
-        port    : 8080,
-        root    : process.cwd(),
-        domain  : '0.0.0.0',
-        index   : 'index.html',
-        log     : false
-    };
-
-for(let i=0; i<argCount; i++){
-    const data=passedArgs[i].split('=');
-    args[data[0]]=data[1];
-}
-
-/**************************************\
- *
- *    These are the valid basic configs
- *    that can be passed when deploying
- *    a server, content types are dynamic
- *    so you can pass whatever you like
- *
- * ************************************/
-
-const defaultConfigs={
-    verbose     : (args.verbose=='true')||false,
-    port        : args.port||defaults.port,
-    root        : args.root||defaults.root,
-    domain      : args.domain||defaults.domain,
-    log         : false,
-    //pass this as config for custom logging
-    logFunction : serverLogging,
-    domains   : {
-        /*******************\
-         * domain  : /that/domains/root/dir
-         *
-         * for sub domains, specify the whole host i.e. "my.sub.domain"
-         * you may need to edit your hosts file, cnames or iptable
-         * domain or my.domain etc. goes to 127.0.0.1 for local development
-         * *****************/
-    },
-    server      : {
-        index   : args.index||defaults.index,
-        noCache : args.noCache=='false' ? false : true,
-        timeout : 30000 //30 second timeout
-    },
-    https:{
-        ca:'',
-        privateKey:'',
-        certificate:'',
-        passphrase:false,
-        port:443,
-        only:false
-    },
-    contentType : {
-        html    : 'text/html',
-        css     : 'text/css',
-        js      : 'text/javascript',
-        json    : 'application/json',
-        txt     : 'text/plain',
-        jpeg    : 'image/jpeg',
-        jpg     : 'image/jpeg',
-        png     : 'image/png',
-        gif     : 'image/gif',
-        ico     : 'image/x-icon',
-        appcache: 'text/cache-manifest'
-    },
-    restrictedType: {
-
-    },
-    errors:{
-        headers : {
-            'Content-Type' : 'text/plain'
-        },
-        404: '404 MIA',
-        415: '415 File type not supported',
-        403: '403 Access Denied',
-        500: '500 {{err}}'
-    }
-};
-
-function serverLogging(data){
-    fs.exists(
-        this.log,
-        function serverLogExsits(exists){
-            data.timestamp=new Date().getTime();
-
-            const JSONData=JSON.stringify(data);
-            let method='appendFile';
-            if(!exists){
-                method='writeFile';
-            }
-            fs[method](
-                this.log,
-                JSONData,
-                function fsMethod(err) {
-                    if(err){
-                        console.log(err);
-                    }
-                }
-            );
-        }.bind(this)
-    );
-}
-
-
-/**************************************\
- *    Config Class.
- * ************************************/
-
+// # Config Class
+//
 class Config{
     constructor(userConfig){
         Object.defineProperties(
@@ -216,6 +107,107 @@ class Config{
             }
         }
     }
+}
+
+// ## CLI args
+//
+const passedArgs = process.argv.splice(2),
+    argCount = passedArgs.length,
+    args = {},
+    defaults = {
+        port    : 8080,
+        root    : process.cwd(),
+        domain  : '0.0.0.0',
+        index   : 'index.html',
+        log     : false
+    };
+
+for(let i=0; i<argCount; i++){
+    const data=passedArgs[i].split('=');
+    args[data[0]]=data[1];
+}
+
+// ## Default node-http-server configs
+//
+const defaultConfigs={
+    verbose     : (args.verbose=='true')||false,
+    port        : args.port||defaults.port,
+    root        : args.root||defaults.root,
+    domain      : args.domain||defaults.domain,
+    log         : false,
+    //pass this as config for custom logging
+    logFunction : serverLogging,
+    domains   : {
+        /*******************\
+         * domain  : /that/domains/root/dir
+         *
+         * for sub domains, specify the whole host i.e. "my.sub.domain"
+         * you may need to edit your hosts file, cnames or iptable
+         * domain or my.domain etc. goes to 127.0.0.1 for local development
+         * *****************/
+    },
+    server      : {
+        index   : args.index||defaults.index,
+        noCache : args.noCache=='false' ? false : true,
+        timeout : 30000 //30 second timeout
+    },
+    https:{
+        ca:'',
+        privateKey:'',
+        certificate:'',
+        passphrase:false,
+        port:443,
+        only:false
+    },
+    contentType : {
+        html    : 'text/html',
+        css     : 'text/css',
+        js      : 'text/javascript',
+        json    : 'application/json',
+        txt     : 'text/plain',
+        jpeg    : 'image/jpeg',
+        jpg     : 'image/jpeg',
+        png     : 'image/png',
+        gif     : 'image/gif',
+        ico     : 'image/x-icon',
+        appcache: 'text/cache-manifest'
+    },
+    restrictedType: {
+
+    },
+    errors:{
+        headers : {
+            'Content-Type' : 'text/plain'
+        },
+        404: '404 MIA',
+        415: '415 File type not supported',
+        403: '403 Access Denied',
+        500: '500 {{err}}'
+    }
+};
+
+function serverLogging(data){
+    fs.exists(
+        this.log,
+        function serverLogExsits(exists){
+            data.timestamp=new Date().getTime();
+
+            const JSONData=JSON.stringify(data);
+            let method='appendFile';
+            if(!exists){
+                method='writeFile';
+            }
+            fs[method](
+                this.log,
+                JSONData,
+                function fsMethod(err) {
+                    if(err){
+                        console.log(err);
+                    }
+                }
+            );
+        }.bind(this)
+    );
 }
 
 module.exports=Config;

@@ -75,128 +75,17 @@
             </div><div class="content">
                 <div class="highlight"><pre><span class="hljs-meta">'use strict'</span>;
 
-<span class="hljs-keyword">const</span> fs=<span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
-
-<span class="hljs-keyword">const</span> passedArgs = process.argv.splice(<span class="hljs-number">2</span>),
-    argCount = passedArgs.length,
-    args = {},
-    defaults = {
-        <span class="hljs-attr">port</span>    : <span class="hljs-number">8080</span>,
-        <span class="hljs-attr">root</span>    : process.cwd(),
-        <span class="hljs-attr">domain</span>  : <span class="hljs-string">'0.0.0.0'</span>,
-        <span class="hljs-attr">index</span>   : <span class="hljs-string">'index.html'</span>,
-        <span class="hljs-attr">log</span>     : <span class="hljs-literal">false</span>
-    };
-
-<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i=<span class="hljs-number">0</span>; i&lt;argCount; i++){
-    <span class="hljs-keyword">const</span> data=passedArgs[i].split(<span class="hljs-string">'='</span>);
-    args[data[<span class="hljs-number">0</span>]]=data[<span class="hljs-number">1</span>];
-}
-
-<span class="hljs-comment">/**************************************\
- *
- *    These are the valid basic configs
- *    that can be passed when deploying
- *    a server, content types are dynamic
- *    so you can pass whatever you like
- *
- * ************************************/</span>
-
-<span class="hljs-keyword">const</span> defaultConfigs={
-    <span class="hljs-attr">verbose</span>     : (args.verbose==<span class="hljs-string">'true'</span>)||<span class="hljs-literal">false</span>,
-    <span class="hljs-attr">port</span>        : args.port||defaults.port,
-    <span class="hljs-attr">root</span>        : args.root||defaults.root,
-    <span class="hljs-attr">domain</span>      : args.domain||defaults.domain,
-    <span class="hljs-attr">log</span>         : <span class="hljs-literal">false</span>,</pre></div>
+<span class="hljs-keyword">const</span> fs=<span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);</pre></div>
             </div>
         </li>
         
         
         <li id="section-2">
             <div class="annotation">
-                <p>pass this as config for custom logging</p>
+                <h1 id="config-class">Config Class</h1>
 
             </div><div class="content">
-                <div class="highlight"><pre>    logFunction : serverLogging,
-    <span class="hljs-attr">domains</span>   : {
-        <span class="hljs-comment">/*******************\
-         * domain  : /that/domains/root/dir
-         *
-         * for sub domains, specify the whole host i.e. "my.sub.domain"
-         * you may need to edit your hosts file, cnames or iptable
-         * domain or my.domain etc. goes to 127.0.0.1 for local development
-         * *****************/</span>
-    },
-    <span class="hljs-attr">server</span>      : {
-        <span class="hljs-attr">index</span>   : args.index||defaults.index,
-        <span class="hljs-attr">noCache</span> : args.noCache==<span class="hljs-string">'false'</span> ? <span class="hljs-literal">false</span> : <span class="hljs-literal">true</span>,
-        <span class="hljs-attr">timeout</span> : <span class="hljs-number">30000</span> <span class="hljs-comment">//30 second timeout</span>
-    },
-    <span class="hljs-attr">https</span>:{
-        <span class="hljs-attr">ca</span>:<span class="hljs-string">''</span>,
-        <span class="hljs-attr">privateKey</span>:<span class="hljs-string">''</span>,
-        <span class="hljs-attr">certificate</span>:<span class="hljs-string">''</span>,
-        <span class="hljs-attr">passphrase</span>:<span class="hljs-literal">false</span>,
-        <span class="hljs-attr">port</span>:<span class="hljs-number">443</span>,
-        <span class="hljs-attr">only</span>:<span class="hljs-literal">false</span>
-    },
-    <span class="hljs-attr">contentType</span> : {
-        <span class="hljs-attr">html</span>    : <span class="hljs-string">'text/html'</span>,
-        <span class="hljs-attr">css</span>     : <span class="hljs-string">'text/css'</span>,
-        <span class="hljs-attr">js</span>      : <span class="hljs-string">'text/javascript'</span>,
-        <span class="hljs-attr">json</span>    : <span class="hljs-string">'application/json'</span>,
-        <span class="hljs-attr">txt</span>     : <span class="hljs-string">'text/plain'</span>,
-        <span class="hljs-attr">jpeg</span>    : <span class="hljs-string">'image/jpeg'</span>,
-        <span class="hljs-attr">jpg</span>     : <span class="hljs-string">'image/jpeg'</span>,
-        <span class="hljs-attr">png</span>     : <span class="hljs-string">'image/png'</span>,
-        <span class="hljs-attr">gif</span>     : <span class="hljs-string">'image/gif'</span>,
-        <span class="hljs-attr">ico</span>     : <span class="hljs-string">'image/x-icon'</span>,
-        <span class="hljs-attr">appcache</span>: <span class="hljs-string">'text/cache-manifest'</span>
-    },
-    <span class="hljs-attr">restrictedType</span>: {
-
-    },
-    <span class="hljs-attr">errors</span>:{
-        <span class="hljs-attr">headers</span> : {
-            <span class="hljs-string">'Content-Type'</span> : <span class="hljs-string">'text/plain'</span>
-        },
-        <span class="hljs-number">404</span>: <span class="hljs-string">'404 MIA'</span>,
-        <span class="hljs-number">415</span>: <span class="hljs-string">'415 File type not supported'</span>,
-        <span class="hljs-number">403</span>: <span class="hljs-string">'403 Access Denied'</span>,
-        <span class="hljs-number">500</span>: <span class="hljs-string">'500 {{err}}'</span>
-    }
-};
-
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">serverLogging</span>(<span class="hljs-params">data</span>)</span>{
-    fs.exists(
-        <span class="hljs-keyword">this</span>.log,
-        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">serverLogExsits</span>(<span class="hljs-params">exists</span>)</span>{
-            data.timestamp=<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getTime();
-
-            <span class="hljs-keyword">const</span> JSONData=<span class="hljs-built_in">JSON</span>.stringify(data);
-            <span class="hljs-keyword">let</span> method=<span class="hljs-string">'appendFile'</span>;
-            <span class="hljs-keyword">if</span>(!exists){
-                method=<span class="hljs-string">'writeFile'</span>;
-            }
-            fs[method](
-                <span class="hljs-keyword">this</span>.log,
-                JSONData,
-                <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fsMethod</span>(<span class="hljs-params">err</span>) </span>{
-                    <span class="hljs-keyword">if</span>(err){
-                        <span class="hljs-built_in">console</span>.log(err);
-                    }
-                }
-            );
-        }.bind(<span class="hljs-keyword">this</span>)
-    );
-}
-
-
-<span class="hljs-comment">/**************************************\
- *    Config Class.
- * ************************************/</span>
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Config</span></span>{
+                <div class="highlight"><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Config</span></span>{
     <span class="hljs-keyword">constructor</span>(userConfig){
         <span class="hljs-built_in">Object</span>.defineProperties(
             <span class="hljs-keyword">this</span>,
@@ -317,6 +206,127 @@
             }
         }
     }
+}</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+                <h2 id="cli-args">CLI args</h2>
+
+            </div><div class="content">
+                <div class="highlight"><pre><span class="hljs-keyword">const</span> passedArgs = process.argv.splice(<span class="hljs-number">2</span>),
+    argCount = passedArgs.length,
+    args = {},
+    defaults = {
+        <span class="hljs-attr">port</span>    : <span class="hljs-number">8080</span>,
+        <span class="hljs-attr">root</span>    : process.cwd(),
+        <span class="hljs-attr">domain</span>  : <span class="hljs-string">'0.0.0.0'</span>,
+        <span class="hljs-attr">index</span>   : <span class="hljs-string">'index.html'</span>,
+        <span class="hljs-attr">log</span>     : <span class="hljs-literal">false</span>
+    };
+
+<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i=<span class="hljs-number">0</span>; i&lt;argCount; i++){
+    <span class="hljs-keyword">const</span> data=passedArgs[i].split(<span class="hljs-string">'='</span>);
+    args[data[<span class="hljs-number">0</span>]]=data[<span class="hljs-number">1</span>];
+}</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+                <h2 id="default-node-http-server-configs">Default node-http-server configs</h2>
+
+            </div><div class="content">
+                <div class="highlight"><pre><span class="hljs-keyword">const</span> defaultConfigs={
+    <span class="hljs-attr">verbose</span>     : (args.verbose==<span class="hljs-string">'true'</span>)||<span class="hljs-literal">false</span>,
+    <span class="hljs-attr">port</span>        : args.port||defaults.port,
+    <span class="hljs-attr">root</span>        : args.root||defaults.root,
+    <span class="hljs-attr">domain</span>      : args.domain||defaults.domain,
+    <span class="hljs-attr">log</span>         : <span class="hljs-literal">false</span>,</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+                <p>pass this as config for custom logging</p>
+
+            </div><div class="content">
+                <div class="highlight"><pre>    logFunction : serverLogging,
+    <span class="hljs-attr">domains</span>   : {
+        <span class="hljs-comment">/*******************\
+         * domain  : /that/domains/root/dir
+         *
+         * for sub domains, specify the whole host i.e. "my.sub.domain"
+         * you may need to edit your hosts file, cnames or iptable
+         * domain or my.domain etc. goes to 127.0.0.1 for local development
+         * *****************/</span>
+    },
+    <span class="hljs-attr">server</span>      : {
+        <span class="hljs-attr">index</span>   : args.index||defaults.index,
+        <span class="hljs-attr">noCache</span> : args.noCache==<span class="hljs-string">'false'</span> ? <span class="hljs-literal">false</span> : <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">timeout</span> : <span class="hljs-number">30000</span> <span class="hljs-comment">//30 second timeout</span>
+    },
+    <span class="hljs-attr">https</span>:{
+        <span class="hljs-attr">ca</span>:<span class="hljs-string">''</span>,
+        <span class="hljs-attr">privateKey</span>:<span class="hljs-string">''</span>,
+        <span class="hljs-attr">certificate</span>:<span class="hljs-string">''</span>,
+        <span class="hljs-attr">passphrase</span>:<span class="hljs-literal">false</span>,
+        <span class="hljs-attr">port</span>:<span class="hljs-number">443</span>,
+        <span class="hljs-attr">only</span>:<span class="hljs-literal">false</span>
+    },
+    <span class="hljs-attr">contentType</span> : {
+        <span class="hljs-attr">html</span>    : <span class="hljs-string">'text/html'</span>,
+        <span class="hljs-attr">css</span>     : <span class="hljs-string">'text/css'</span>,
+        <span class="hljs-attr">js</span>      : <span class="hljs-string">'text/javascript'</span>,
+        <span class="hljs-attr">json</span>    : <span class="hljs-string">'application/json'</span>,
+        <span class="hljs-attr">txt</span>     : <span class="hljs-string">'text/plain'</span>,
+        <span class="hljs-attr">jpeg</span>    : <span class="hljs-string">'image/jpeg'</span>,
+        <span class="hljs-attr">jpg</span>     : <span class="hljs-string">'image/jpeg'</span>,
+        <span class="hljs-attr">png</span>     : <span class="hljs-string">'image/png'</span>,
+        <span class="hljs-attr">gif</span>     : <span class="hljs-string">'image/gif'</span>,
+        <span class="hljs-attr">ico</span>     : <span class="hljs-string">'image/x-icon'</span>,
+        <span class="hljs-attr">appcache</span>: <span class="hljs-string">'text/cache-manifest'</span>
+    },
+    <span class="hljs-attr">restrictedType</span>: {
+
+    },
+    <span class="hljs-attr">errors</span>:{
+        <span class="hljs-attr">headers</span> : {
+            <span class="hljs-string">'Content-Type'</span> : <span class="hljs-string">'text/plain'</span>
+        },
+        <span class="hljs-number">404</span>: <span class="hljs-string">'404 MIA'</span>,
+        <span class="hljs-number">415</span>: <span class="hljs-string">'415 File type not supported'</span>,
+        <span class="hljs-number">403</span>: <span class="hljs-string">'403 Access Denied'</span>,
+        <span class="hljs-number">500</span>: <span class="hljs-string">'500 {{err}}'</span>
+    }
+};
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">serverLogging</span>(<span class="hljs-params">data</span>)</span>{
+    fs.exists(
+        <span class="hljs-keyword">this</span>.log,
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">serverLogExsits</span>(<span class="hljs-params">exists</span>)</span>{
+            data.timestamp=<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getTime();
+
+            <span class="hljs-keyword">const</span> JSONData=<span class="hljs-built_in">JSON</span>.stringify(data);
+            <span class="hljs-keyword">let</span> method=<span class="hljs-string">'appendFile'</span>;
+            <span class="hljs-keyword">if</span>(!exists){
+                method=<span class="hljs-string">'writeFile'</span>;
+            }
+            fs[method](
+                <span class="hljs-keyword">this</span>.log,
+                JSONData,
+                <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fsMethod</span>(<span class="hljs-params">err</span>) </span>{
+                    <span class="hljs-keyword">if</span>(err){
+                        <span class="hljs-built_in">console</span>.log(err);
+                    }
+                }
+            );
+        }.bind(<span class="hljs-keyword">this</span>)
+    );
 }
 
 <span class="hljs-built_in">module</span>.exports=Config;</pre></div>
