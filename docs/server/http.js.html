@@ -112,8 +112,7 @@
 
             </div><div class="content">
                 <div class="highlight"><pre>
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Server</span></span>{
-    <span class="hljs-keyword">constructor</span>(userConfig){</pre></div>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Server</span></span>{</pre></div>
             </div>
         </li>
         
@@ -126,7 +125,8 @@
 <p> <a href="https://github.com/RIAEvangelist/node-http-server#custom-configuration">Detailed info on the server.config or userConfig</a></p>
 
             </div><div class="content">
-                <div class="highlight"><pre>      <span class="hljs-keyword">this</span>.config=<span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.Config(userConfig);
+                <div class="highlight"><pre>    <span class="hljs-keyword">constructor</span>(userConfig){
+      <span class="hljs-keyword">this</span>.config=<span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.Config(userConfig);
     }</pre></div>
             </div>
         </li>
@@ -163,7 +163,7 @@
 <tr>
 <td>userConfig</td>
 <td>no</td>
-<td>if a <code>userConfig</code> object is passed it will shallow merge/decorate it with a clean instantion of the <a href="http://riaevangelist.github.io/node-http-server/Config.js.html">Config class</a></td>
+<td>if a <code>userConfig</code> object is passed it will decorate the <a href="http://riaevangelist.github.io/node-http-server/Config.js.html">Config class</a></td>
 </tr>
 <tr>
 <td>readyCallback</td>
@@ -207,13 +207,73 @@
         
         <li id="section-5">
             <div class="annotation">
-                <h1 id="server-onrawrequest">server.onRawRequest</h1>
-<p> <code>server.onRawRequest</code> is executed immediately upon request reciept
- before any processing. It is the absolute fastest place to intercept a request
- but that means it contains a raw request object.</p>
-<p> If your <code>onRawRequest</code> returns <code>true</code>  the server will delay serving the response
- until you manually call the <code>serve</code> method. This allows you to modify the response
- or body in any way you want, including async style.</p>
+                <h4 id="onrawrequest">onRawRequest</h4>
+<p> <code>server.onRawRequest</code></p>
+<p> <code>server.onRawRequest(request,response,serve)</code></p>
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>should return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>deploy</td>
+<td>bool</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>parameter</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request</td>
+<td>http(s) request obj</td>
+</tr>
+<tr>
+<td>response</td>
+<td>http(s) response obj</td>
+</tr>
+<tr>
+<td>serve</td>
+<td>ref to <code>server.serve</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="lang-javascript">
+ <span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
+ <span class="hljs-keyword">const</span> config=<span class="hljs-keyword">new</span> server.Config;
+
+ config.port=<span class="hljs-number">8000</span>;
+
+ server.onRawRequest=gotRequest;
+
+ server.deploy(config);
+
+
+ <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">gotRequest</span>(<span class="hljs-params">request,response,serve</span>)</span>{
+     <span class="hljs-built_in">console</span>.log(request.uri,request.headers);
+
+     serve(
+         request,
+         response,
+         <span class="hljs-built_in">JSON</span>.stringify(
+             {
+                 <span class="hljs-attr">uri</span>:request.uri,
+                 <span class="hljs-attr">headers</span>:request.headers
+             }
+         )
+     );
+
+     <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+ }
+</code></pre>
 
             </div><div class="content">
                 <div class="highlight"><pre>    onRawRequest(request,response,serve){

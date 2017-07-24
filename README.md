@@ -78,6 +78,7 @@ If you want to create a custom Server or extend the Server Class you can require
 |Server Method or member| params | returns / should return | description |
 |-----------------------|--------|-------------------------|-------------|
 |deploy       | `userConfig` obj (optional), `readyCallback` fn (optional)  | returns void | Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class. |
+|onRawRequest | `request` obj, `response` obj, `serve` fn                   | should return true,false or void | Called immediately upon reciept of http(s) request. Called before any request parsing, useful for request modification, high speed handling, or rejection. Mildly more complex to work with because the request object has not been parsed and decorated with helper members. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response. |
 |onRequest    | `request` obj, `response` obj, `serve` fn                   | should return true,false or void | Called when request received. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response. |
 |beforeServe  |`request` obj, `response` obj, `body` obj, `encoding` obj, `serve` fn| should return true,false or void | Called just before data is served to the client. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response.   |
 |afterServe   |`request` obj                                                | void | Called once data has been fully sent to client. |
@@ -98,7 +99,7 @@ If you want to create a custom Server or extend the Server Class you can require
 
 | parameter     | required | description |
 |---------------|----------|-------------|
-| userConfig    | no | if a ` userConfig ` object is passed it will shallow merge/decorate it with a clean instantion of the [Config class](http://riaevangelist.github.io/node-http-server/Config.js.html) |
+| userConfig    | no | if a ` userConfig ` object is passed it will decorate the [Config class](http://riaevangelist.github.io/node-http-server/Config.js.html) |
 | readyCallback | no | called once the server is started |
 
 ```javascript
@@ -126,6 +127,56 @@ function serverReady(server){
 }
 
 ```
+
+#### onRawRequest
+
+` server.onRawRequest `
+
+` server.onRawRequest(request,response,serve) `
+
+|method  | should return |
+|--------|---------|
+| deploy | bool    |
+
+| parameter  | description |
+|------------|-------------|
+| request    | http(s) request obj  |
+| response   | http(s) response obj |
+| serve      | ref to ` server.serve ` |
+
+
+```javascript
+
+const server=require('node-http-server');
+const config=new server.Config;
+
+config.port=8000;
+
+server.onRawRequest=gotRequest;
+
+server.deploy(config);
+
+
+function gotRequest(request,response,serve){
+    console.log(request.uri,request.headers);
+
+    serve(
+        request,
+        response,
+        JSON.stringify(
+            {
+                uri:request.uri,
+                headers:request.headers
+            }
+        )
+    );
+
+    return true;
+}
+
+```
+
+
 
 ## Examples
 

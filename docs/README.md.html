@@ -132,6 +132,12 @@ $ nodeserver port=1942 verbose=<span class="hljs-literal">true</span>
 <td>Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class.</td>
 </tr>
 <tr>
+<td>onRawRequest</td>
+<td><code>request</code> obj, <code>response</code> obj, <code>serve</code> fn</td>
+<td>should return true,false or void</td>
+<td>Called immediately upon reciept of http(s) request. Called before any request parsing, useful for request modification, high speed handling, or rejection. Mildly more complex to work with because the request object has not been parsed and decorated with helper members. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the <code>serve</code> argument, <code>server.serve</code> or <code>server.serveFile</code> to manually serve the response.</td>
+</tr>
+<tr>
 <td>onRequest</td>
 <td><code>request</code> obj, <code>response</code> obj, <code>serve</code> fn</td>
 <td>should return true,false or void</td>
@@ -193,7 +199,7 @@ $ nodeserver port=1942 verbose=<span class="hljs-literal">true</span>
 <tr>
 <td>userConfig</td>
 <td>no</td>
-<td>if a <code>userConfig</code> object is passed it will shallow merge/decorate it with a clean instantion of the <a href="http://riaevangelist.github.io/node-http-server/Config.js.html">Config class</a></td>
+<td>if a <code>userConfig</code> object is passed it will decorate the <a href="http://riaevangelist.github.io/node-http-server/Config.js.html">Config class</a></td>
 </tr>
 <tr>
 <td>readyCallback</td>

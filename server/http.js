@@ -35,13 +35,13 @@ const http = require('http'),
 // ```
 
 class Server{
+    // ` server.config ` is where the servers configuration will reside.
+    // It is a new instance of the [Config class](http://riaevangelist.github.io/node-http-server/server/Config.js.html) which will be shallow merged and/or decorated by with
+    // the passed ` userConfig ` if one is passed upon construction of the Server class, or to the ` server.deploy ` method.
+    //
+    // [Detailed info on the server.config or userConfig](https://github.com/RIAEvangelist/node-http-server#custom-configuration)
+    //
     constructor(userConfig){
-      // ` server.config ` is where the servers configuration will reside.
-      // It is a new instance of the [Config class](http://riaevangelist.github.io/node-http-server/server/Config.js.html) which will be shallow merged and/or decorated by with
-      // the passed ` userConfig ` if one is passed upon construction of the Server class, or to the ` server.deploy ` method.
-      //
-      // [Detailed info on the server.config or userConfig](https://github.com/RIAEvangelist/node-http-server#custom-configuration)
-      //
       this.config=new this.Config(userConfig);
     }
 
@@ -57,7 +57,7 @@ class Server{
     //
     // | parameter     | required | description |
     // |---------------|----------|-------------|
-    // | userConfig    | no | if a ` userConfig ` object is passed it will shallow merge/decorate it with a clean instantion of the [Config class](http://riaevangelist.github.io/node-http-server/Config.js.html) |
+    // | userConfig    | no | if a ` userConfig ` object is passed it will decorate the [Config class](http://riaevangelist.github.io/node-http-server/Config.js.html) |
     // | readyCallback | no | called once the server is started |
     //
     // ```javascript
@@ -92,15 +92,54 @@ class Server{
       return deploy;
     }
 
-    // # server.onRawRequest
+    // #### onRawRequest
     //
-    // ` server.onRawRequest ` is executed immediately upon request reciept
-    // before any processing. It is the absolute fastest place to intercept a request
-    // but that means it contains a raw request object.
+    // ` server.onRawRequest `
     //
-    // If your ` onRawRequest ` returns ` true `  the server will delay serving the response
-    // until you manually call the ` serve ` method. This allows you to modify the response
-    // or body in any way you want, including async style.
+    // ` server.onRawRequest(request,response,serve) `
+    //
+    // |method  | should return |
+    // |--------|---------|
+    // | deploy | bool    |
+    //
+    // | parameter  | description |
+    // |------------|-------------|
+    // | request    | http(s) request obj  |
+    // | response   | http(s) response obj |
+    // | serve      | ref to ` server.serve ` |
+    //
+    //
+    // ```javascript
+    //
+    // const server=require('node-http-server');
+    // const config=new server.Config;
+    //
+    // config.port=8000;
+    //
+    // server.onRawRequest=gotRequest;
+    //
+    // server.deploy(config);
+    //
+    //
+    // function gotRequest(request,response,serve){
+    //     console.log(request.uri,request.headers);
+    //
+    //     serve(
+    //         request,
+    //         response,
+    //         JSON.stringify(
+    //             {
+    //                 uri:request.uri,
+    //                 headers:request.headers
+    //             }
+    //         )
+    //     );
+    //
+    //     return true;
+    // }
+    //
+    // ```
+    //
     onRawRequest(request,response,serve){
 
     }
