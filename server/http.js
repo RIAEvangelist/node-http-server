@@ -100,7 +100,7 @@ class Server{
     //
     // |method  | should return |
     // |--------|---------|
-    // | deploy | bool/void    |
+    // | onRawRequest | bool/void    |
     //
     // | parameter  | description |
     // |------------|-------------|
@@ -144,7 +144,68 @@ class Server{
 
     }
 
-    //executed just after request recieved allowing user to modify if needed. If returns true response serving will be delayed.
+    // #### onRawRequest
+    //
+    // ` server.onRequest `
+    //
+    // ` server.onRequest(request,response,serve) `
+    //
+    // |method  | should return |
+    // |--------|--------------|
+    // | onRequest | bool/void    |
+    //
+    // | parameter  | description |
+    // |------------|-------------|
+    // | request    | http(s) request obj  |
+    // | response   | http(s) response obj |
+    // | serve      | ref to ` server.serve ` |
+    //
+    //
+    // ```javascript
+    //
+    // const server=require('node-http-server');
+    // const config=new server.Config;
+    //
+    // config.port=8099;
+    // config.verbose=true;
+    //
+    // server.onRequest=gotRequest;
+    //
+    // server.deploy(config);
+    //
+    //
+    // function gotRequest(request,response,serve){
+    //     //at this point the request is decorated with helper members lets take a look at the query params if there are any.
+    //     console.log(request.query,request.uri,request.headers);
+    //
+    //     //lets only let the requests with a query param of hello go through
+    //     if(request.query.hello){
+    //        // remember returning false means do not inturrupt the response lifecycle
+    //        // and that you will not be manually serving
+    //        return false;
+    //     }
+    //
+    //     serve(
+    //         request,
+    //         response,
+    //         JSON.stringify(
+    //             {
+    //                 success:false,
+    //                 message:'you must have a query param of hello to access the server i.e. /index.html?hello'
+    //                 uri:request.uri,
+    //                 query:request.query
+    //             }
+    //         )
+    //     );
+    //
+    //     //now we let the server know we want it to kill the normal request lifecycle
+    //     //because we just completed it by serving above. we could also handle it async style
+    //     //and request a meme or something from the web and put that on the page (or something...)
+    //     return true;
+    // }
+    //
+    // ```
+    //
     onRequest(request,response,serve){
 
     }

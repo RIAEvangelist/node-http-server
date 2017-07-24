@@ -219,8 +219,8 @@
 </thead>
 <tbody>
 <tr>
-<td>deploy</td>
-<td>bool</td>
+<td>onRawRequest</td>
+<td>bool/void</td>
 </tr>
 </tbody>
 </table>
@@ -285,7 +285,87 @@
         
         <li id="section-6">
             <div class="annotation">
-                <p>executed just after request recieved allowing user to modify if needed. If returns true response serving will be delayed.</p>
+                <h4 id="onrawrequest">onRawRequest</h4>
+<p> <code>server.onRequest</code></p>
+<p> <code>server.onRequest(request,response,serve)</code></p>
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>should return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>onRequest</td>
+<td>bool/void</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>parameter</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request</td>
+<td>http(s) request obj</td>
+</tr>
+<tr>
+<td>response</td>
+<td>http(s) response obj</td>
+</tr>
+<tr>
+<td>serve</td>
+<td>ref to <code>server.serve</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="lang-javascript">
+ <span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
+ <span class="hljs-keyword">const</span> config=<span class="hljs-keyword">new</span> server.Config;
+
+ config.port=<span class="hljs-number">8099</span>;
+ config.verbose=<span class="hljs-literal">true</span>;
+
+ server.onRequest=gotRequest;
+
+ server.deploy(config);
+
+
+ <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">gotRequest</span>(<span class="hljs-params">request,response,serve</span>)</span>{
+     <span class="hljs-comment">//at this point the request is decorated with helper members lets take a look at the query params if there are any.</span>
+     <span class="hljs-built_in">console</span>.log(request.query,request.uri,request.headers);
+
+     <span class="hljs-comment">//lets only let the requests with a query param of hello go through</span>
+     <span class="hljs-keyword">if</span>(request.query.hello){
+        <span class="hljs-comment">// remember returning false means do not inturrupt the response lifecycle</span>
+        <span class="hljs-comment">// and that you will not be manually serving</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+     }
+
+     serve(
+         request,
+         response,
+         <span class="hljs-built_in">JSON</span>.stringify(
+             {
+                 <span class="hljs-attr">success</span>:<span class="hljs-literal">false</span>,
+                 <span class="hljs-attr">message</span>:<span class="hljs-string">'you must have a query param of hello to access the server i.e. /index.html?hello'</span>
+                 uri:request.uri,
+                 <span class="hljs-attr">query</span>:request.query
+             }
+         )
+     );
+
+     <span class="hljs-comment">//now we let the server know we want it to kill the normal request lifecycle</span>
+     <span class="hljs-comment">//because we just completed it by serving above. we could also handle it async style</span>
+     <span class="hljs-comment">//and request a meme or something from the web and put that on the page (or something...)</span>
+     <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+ }
+</code></pre>
 
             </div><div class="content">
                 <div class="highlight"><pre>    onRequest(request,response,serve){
