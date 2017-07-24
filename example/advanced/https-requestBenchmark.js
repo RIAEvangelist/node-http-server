@@ -1,6 +1,9 @@
-var os = require( 'os' );
+const os = require( 'os' );
+
+//import the `node-http-server` module
+//const server=require('node-http-server');
 const server=require('../../server/Server.js');
-var config=new server.Config;
+const config=new server.Config;
 
 config.verbose=false;
 config.port=8000;

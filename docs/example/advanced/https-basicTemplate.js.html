@@ -73,9 +73,19 @@
             <div class="annotation">
                 
             </div><div class="content">
-                <div class="highlight"><pre><span class="hljs-keyword">var</span> os = <span class="hljs-built_in">require</span>( <span class="hljs-string">'os'</span> );
-<span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../server/Server.js'</span>);
-<span class="hljs-keyword">var</span> config=<span class="hljs-keyword">new</span> server.Config;
+                <div class="highlight"><pre><span class="hljs-keyword">const</span> os = <span class="hljs-built_in">require</span>( <span class="hljs-string">'os'</span> );</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+                <p>import the <code>node-http-server</code> module
+const server=require(‘node-http-server’);</p>
+
+            </div><div class="content">
+                <div class="highlight"><pre><span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../server/Server.js'</span>);
+<span class="hljs-keyword">const</span> config=<span class="hljs-keyword">new</span> server.Config;
 
 config.verbose=<span class="hljs-literal">true</span>;
 config.port=<span class="hljs-number">8000</span>;
@@ -92,7 +102,7 @@ server.beforeServe=beforeServe;
         </li>
         
         
-        <li id="section-2">
+        <li id="section-3">
             <div class="annotation">
                 <p>only parse the /index.html request</p>
 
@@ -104,7 +114,7 @@ server.beforeServe=beforeServe;
         </li>
         
         
-        <li id="section-3">
+        <li id="section-4">
             <div class="annotation">
                 <p>dynamically detect available interfaces</p>
 
