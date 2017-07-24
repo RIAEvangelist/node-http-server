@@ -1,5 +1,5 @@
 var os = require( 'os' );
-var server=require('../../server/Server.js');
+const server=require('../../server/Server.js');
 var config=new server.Config;
 
 config.verbose=true;

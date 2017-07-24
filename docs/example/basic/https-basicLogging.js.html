@@ -66,16 +66,26 @@
     <div></div>
 </nav>
 <section>
-    <ul class="sectionDetails codeOnly">
+    <ul class="sectionDetails ">
         
         
         <li id="section-1">
             <div class="annotation">
-                
-            </div><div class="content">
-                <div class="highlight"><pre><span class="hljs-keyword">var</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../server/Server.js'</span>);
+                <p>import the <code>node-http-server</code> module
+const server=require(‘node-http-server’);</p>
 
-server.deploy(
+            </div><div class="content">
+                <div class="highlight"><pre><span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../server/Server.js'</span>);</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+                <p>start the server</p>
+
+            </div><div class="content">
+                <div class="highlight"><pre>server.deploy(
     {
         <span class="hljs-attr">port</span>:<span class="hljs-number">8000</span>,
         <span class="hljs-attr">root</span>:__dirname+<span class="hljs-string">'/appRoot/'</span>,
@@ -86,9 +96,17 @@ server.deploy(
             <span class="hljs-attr">port</span>:<span class="hljs-number">4433</span>
         }
     }
-);
+);</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+                <p>checkout the server instance</p>
 
-<span class="hljs-built_in">console</span>.log(server);</pre></div>
+            </div><div class="content">
+                <div class="highlight"><pre><span class="hljs-built_in">console</span>.log(server);</pre></div>
             </div>
         </li>
         

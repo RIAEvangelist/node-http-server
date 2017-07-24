@@ -66,25 +66,97 @@
     <div></div>
 </nav>
 <section>
-    <ul class="sectionDetails codeOnly">
+    <ul class="sectionDetails ">
         
         
         <li id="section-1">
             <div class="annotation">
-                
+                <p>import the <code>node-http-server</code> module
+const server=require(‘node-http-server’);</p>
+
             </div><div class="content">
-                <div class="highlight"><pre><span class="hljs-keyword">var</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../server/Server.js'</span>);
+                <div class="highlight"><pre><span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../server/Server.js'</span>);</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+                <p> instantiate <code>config</code> as a new <code>server.config</code> instance so we get all the defaults.
+ This will allow us to perform deeper modifications without corrupting the default set.</p>
 
-<span class="hljs-keyword">var</span> config=<span class="hljs-keyword">new</span> server.Config;
-config.errors[<span class="hljs-string">'404'</span>]    = <span class="hljs-string">'These are not the files you are looking for...'</span>;
-config.contentType.mp4  = <span class="hljs-string">'video/mp4'</span>;
-config.port             = <span class="hljs-number">8005</span>;
-config.verbose          = <span class="hljs-literal">true</span>;
-config.root             = __dirname+<span class="hljs-string">'/appRoot/'</span>;
+            </div><div class="content">
+                <div class="highlight"><pre><span class="hljs-keyword">const</span> config=<span class="hljs-keyword">new</span> server.Config;</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+                <p>customize the 404 error body</p>
 
-server.deploy(config);
+            </div><div class="content">
+                <div class="highlight"><pre>config.errors[<span class="hljs-string">'404'</span>]    = <span class="hljs-string">'These are not the files you are looking for...'</span>;</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+                <p>add support for mp4</p>
 
-<span class="hljs-built_in">console</span>.log(server);</pre></div>
+            </div><div class="content">
+                <div class="highlight"><pre>config.contentType.mp4  = <span class="hljs-string">'video/mp4'</span>;</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+                <p>set the node server port to 8005</p>
+
+            </div><div class="content">
+                <div class="highlight"><pre>config.port             = <span class="hljs-number">8005</span>;</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+                <p>set the server to be verbose so we can see detailed info on the server, it’s requests and responses</p>
+
+            </div><div class="content">
+                <div class="highlight"><pre>config.verbose          = <span class="hljs-literal">true</span>;</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+                <p>set the root public directory</p>
+
+            </div><div class="content">
+                <div class="highlight"><pre>config.root             = __dirname+<span class="hljs-string">'/appRoot/'</span>;</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+                <p>start the server</p>
+
+            </div><div class="content">
+                <div class="highlight"><pre>server.deploy(config);</pre></div>
+            </div>
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+                <p>checkout the server instance</p>
+
+            </div><div class="content">
+                <div class="highlight"><pre><span class="hljs-built_in">console</span>.log(server);</pre></div>
             </div>
         </li>
         

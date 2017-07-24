@@ -1,5 +1,9 @@
-var server=require('../../server/Server.js');
-var config={
+//import the `node-http-server` module
+//const server=require('node-http-server');
+const server=require('../../server/Server.js');
+
+//set up a config with multiple domains over ssl
+const config={
     verbose:true,
     port:8000,
     root:__dirname+'/appRoot/',
@@ -15,6 +19,8 @@ var config={
     }
 }
 
+//checkout the multi domain server instance
 console.log(server);
 
+//start the server
 server.deploy(config);
