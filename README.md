@@ -80,15 +80,15 @@ If you want to create a custom Server or extend the Server Class you can require
 
 ## Server Class
 
-|Server Method or member| params | returns / should return | description |
-|-----------------------|--------|-------------------------|-------------|
-|deploy       | `userConfig` obj (optional), `readyCallback` fn (optional)  | returns void | Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class. |
-|onRawRequest | `request` obj, `response` obj, `serve` fn                   | should return true,false or void | Called immediately upon reciept of http(s) request. Called before any request parsing, useful for ` proxy servers ` and request modification, high speed handling, or rejection. Mildly more complex to work with because the request object has not been parsed and decorated with helper members. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response. |
-|onRequest    | `request` obj, `response` obj, `serve` fn                   | should return true,false or void | Called when request received. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response. |
-|beforeServe  |`request` obj, `response` obj, `body` obj, `encoding` obj, `serve` fn| should return true,false or void | Called just before data is served to the client. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response.   |
-|afterServe   |`request` obj                                                | void | Called once data has been fully sent to client. |
-|Config       | n/a                                                         | n/a | This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.|
-|Server       | n/a                                                         | n/a | This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
+|Server Method or member       | params | returns / should return                            | description |
+|------------------------------|--------|----------------------------------------------------|-------------|
+|[deploy](#deploy)             | `userConfig` obj (optional), `readyCallback` fn (optional)  | returns void | Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class. |
+|[onRawRequest](#onrawrequest) | `request` obj, `response` obj, `serve` fn                   | should return true,false or void | Called immediately upon reciept of http(s) request. Called before any request parsing, useful for ` proxy servers ` and request modification, high speed handling, or rejection. Mildly more complex to work with because the request object has not been parsed and decorated with helper members. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response. |
+|[onRequest](#onrequest)       | `request` obj, `response` obj, `serve` fn                   | should return true,false or void | Called when request received. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response. |
+|[beforeServe](#beforeserve)   |`request` obj, `response` obj, `body` obj, `encoding` obj, `serve` fn| should return true,false or void | Called just before data is served to the client. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the ` serve ` argument, ` server.serve ` or ` server.serveFile ` to manually serve the response.   |
+|[afterServe](#afterserve)     |`request` obj                                                | void | Called once data has been fully sent to client. |
+|[Config](#config-class)       | n/a                                                         | n/a | This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.|
+|[Server](#server-class)       | n/a                                                         | n/a | This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
 
 ### [Server Methods](http://riaevangelist.github.io/node-http-server/server/Server.js.html)
 
@@ -243,7 +243,61 @@ function gotRequest(request,response,serve){
 
 ```
 
+#### beforeServe
 
+` server.beforeServe `
+
+` server.beforeServe(request,response,body,encoding,serve) `
+
+|method  | should return |
+|--------|---------|
+| beforeServe | bool/void    |
+
+| parameter  | description |
+|------------|-------------|
+| request    | http(s) request obj  |
+| response   | http(s) response obj |
+| body       | response content body RefString  |
+| encoding   | response body encoding RefString |
+| serve      | ref to ` server.serve ` |
+
+
+type ` RefString `
+
+|type     |keys     |description|
+|---------|---------|-----------|
+|RefString| `value` |a way to allow modifying a string by refrence.|
+
+```javascript
+
+const server=require('node-http-server');
+
+server.beforeServe=beforeServe;
+
+function beforeServe(request,response,body,encoding){
+    //only parsing html files for this example
+    if(response.getHeader('Content-Type')!=server.config.contentType.html){
+        //return void||false to allow response lifecycle to continue as normal
+        return;
+    }
+
+    const someVariable='this is some variable value';
+
+    body.value=body.value.replace('{{someVariable}}',someVariable);
+
+    //return void||false to allow response lifecycle to continue as normal
+    //with modified body content
+    return;
+}
+
+server.deploy(
+    {
+        port:8000,
+        root:`${__dirname}/appRoot/`
+    }
+);
+
+```
 
 ## Examples
 
@@ -315,7 +369,7 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
 
 ```javascript
 
-    const server=require('../../server/Server.js');
+    const server=require('node-http-server');
 
     server.beforeServe=beforeServe;
 

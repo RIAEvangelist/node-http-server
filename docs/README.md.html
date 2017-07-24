@@ -131,43 +131,43 @@ $ nodeserver port=1942 verbose=<span class="hljs-literal">true</span>
 </thead>
 <tbody>
 <tr>
-<td>deploy</td>
+<td><a href="#deploy">deploy</a></td>
 <td><code>userConfig</code> obj (optional), <code>readyCallback</code> fn (optional)</td>
 <td>returns void</td>
 <td>Starts the server. if a config object is passed it will shallow merge it with a clean instantion of the Config class.</td>
 </tr>
 <tr>
-<td>onRawRequest</td>
+<td><a href="#onrawrequest">onRawRequest</a></td>
 <td><code>request</code> obj, <code>response</code> obj, <code>serve</code> fn</td>
 <td>should return true,false or void</td>
 <td>Called immediately upon reciept of http(s) request. Called before any request parsing, useful for <code>proxy servers</code> and request modification, high speed handling, or rejection. Mildly more complex to work with because the request object has not been parsed and decorated with helper members. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the <code>serve</code> argument, <code>server.serve</code> or <code>server.serveFile</code> to manually serve the response.</td>
 </tr>
 <tr>
-<td>onRequest</td>
+<td><a href="#onrequest">onRequest</a></td>
 <td><code>request</code> obj, <code>response</code> obj, <code>serve</code> fn</td>
 <td>should return true,false or void</td>
 <td>Called when request received. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the <code>serve</code> argument, <code>server.serve</code> or <code>server.serveFile</code> to manually serve the response.</td>
 </tr>
 <tr>
-<td>beforeServe</td>
+<td><a href="#beforeserve">beforeServe</a></td>
 <td><code>request</code> obj, <code>response</code> obj, <code>body</code> obj, <code>encoding</code> obj, <code>serve</code> fn</td>
 <td>should return true,false or void</td>
 <td>Called just before data is served to the client. If this function returns true, the servers response lifecycle will be exited and you must manually call serve. this allows manual immediate and manual async serving. use the <code>serve</code> argument, <code>server.serve</code> or <code>server.serveFile</code> to manually serve the response.</td>
 </tr>
 <tr>
-<td>afterServe</td>
+<td><a href="#afterserve">afterServe</a></td>
 <td><code>request</code> obj</td>
 <td>void</td>
 <td>Called once data has been fully sent to client.</td>
 </tr>
 <tr>
-<td>Config</td>
+<td><a href="#config-class">Config</a></td>
 <td>n/a</td>
 <td>n/a</td>
 <td>This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.</td>
 </tr>
 <tr>
-<td>Server</td>
+<td><a href="#server-class">Server</a></td>
 <td>n/a</td>
 <td>n/a</td>
 <td>This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.</td>
@@ -384,6 +384,98 @@ server.deploy(config);
     <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
 }
 </code></pre>
+<h4 id="beforeserve">beforeServe</h4>
+<p><code>server.beforeServe</code></p>
+<p><code>server.beforeServe(request,response,body,encoding,serve)</code></p>
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>should return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>beforeServe</td>
+<td>bool/void</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>parameter</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request</td>
+<td>http(s) request obj</td>
+</tr>
+<tr>
+<td>response</td>
+<td>http(s) response obj</td>
+</tr>
+<tr>
+<td>body</td>
+<td>response content body RefString</td>
+</tr>
+<tr>
+<td>encoding</td>
+<td>response body encoding RefString</td>
+</tr>
+<tr>
+<td>serve</td>
+<td>ref to <code>server.serve</code></td>
+</tr>
+</tbody>
+</table>
+<p>type <code>RefString</code></p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>keys</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RefString</td>
+<td><code>value</code></td>
+<td>a way to allow modifying a string by refrence.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="lang-javascript">
+<span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
+
+server.beforeServe=beforeServe;
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">beforeServe</span>(<span class="hljs-params">request,response,body,encoding</span>)</span>{
+    <span class="hljs-comment">//only parsing html files for this example</span>
+    <span class="hljs-keyword">if</span>(response.getHeader(<span class="hljs-string">'Content-Type'</span>)!=server.config.contentType.html){
+        <span class="hljs-comment">//return void||false to allow response lifecycle to continue as normal</span>
+        <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">const</span> someVariable=<span class="hljs-string">'this is some variable value'</span>;
+
+    body.value=body.value.replace(<span class="hljs-string">'{{someVariable}}'</span>,someVariable);
+
+    <span class="hljs-comment">//return void||false to allow response lifecycle to continue as normal</span>
+    <span class="hljs-comment">//with modified body content</span>
+    <span class="hljs-keyword">return</span>;
+}
+
+server.deploy(
+    {
+        <span class="hljs-attr">port</span>:<span class="hljs-number">8000</span>,
+        <span class="hljs-attr">root</span>:<span class="hljs-string">`<span class="hljs-subst">${__dirname}</span>/appRoot/`</span>
+    }
+);
+</code></pre>
 <h2 id="examples">Examples</h2>
 <p>To see the node http server in action run <code>npm start</code> from the root of this repo and then visit <a href="http://localhost:8000">localhost:8000</a>.</p>
 <p>To start only an https example server <code>npm run https</code> from the root of this repo and then visit <a href="http://localhost:4433">localhost:4433</a>.</p>
@@ -435,7 +527,7 @@ server.deploy(config);
 </code></pre>
 <h2 id="template-filling">Template filling</h2>
 <pre><code class="lang-javascript">
-    <span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../server/Server.js'</span>);
+    <span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
 
     server.beforeServe=beforeServe;
 

@@ -377,7 +377,98 @@
         
         <li id="section-7">
             <div class="annotation">
-                <p>executed just before response sent allowing user to modify if needed. If returns true response serving will be delayed.</p>
+                <h4 id="beforeserve">beforeServe</h4>
+<p> <code>server.beforeServe</code></p>
+<p> <code>server.beforeServe(request,response,body,encoding,serve)</code></p>
+<table>
+<thead>
+<tr>
+<th>method</th>
+<th>should return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>beforeServe</td>
+<td>bool/void</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>parameter</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request</td>
+<td>http(s) request obj</td>
+</tr>
+<tr>
+<td>response</td>
+<td>http(s) response obj</td>
+</tr>
+<tr>
+<td>body</td>
+<td>response content body RefString</td>
+</tr>
+<tr>
+<td>encoding</td>
+<td>response body encoding RefString</td>
+</tr>
+<tr>
+<td>serve</td>
+<td>ref to <code>server.serve</code></td>
+</tr>
+</tbody>
+</table>
+<p> <code>type RefString</code></p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>keys</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RefString</td>
+<td><code>value</code></td>
+<td>a way to allow modifying a string by refrence.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="lang-javascript">
+ <span class="hljs-keyword">const</span> server=<span class="hljs-built_in">require</span>(<span class="hljs-string">'node-http-server'</span>);
+
+ server.beforeServe=beforeServe;
+
+ <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">beforeServe</span>(<span class="hljs-params">request,response,body,encoding</span>)</span>{
+     <span class="hljs-comment">//only parsing html files for this example</span>
+     <span class="hljs-keyword">if</span>(response.getHeader(<span class="hljs-string">'Content-Type'</span>)!=server.config.contentType.html){
+         <span class="hljs-comment">//return void||false to allow response lifecycle to continue as normal</span>
+         <span class="hljs-keyword">return</span>;
+     }
+
+     <span class="hljs-keyword">const</span> someVariable=<span class="hljs-string">'this is some variable value'</span>;
+
+     body.value=body.value.replace(<span class="hljs-string">'{{someVariable}}'</span>,someVariable);
+
+     <span class="hljs-comment">//return void||false to allow response lifecycle to continue as normal</span>
+     <span class="hljs-comment">//with modified body content</span>
+     <span class="hljs-keyword">return</span>;
+ }
+
+ server.deploy(
+     {
+         <span class="hljs-attr">port</span>:<span class="hljs-number">8000</span>,
+         <span class="hljs-attr">root</span>:<span class="hljs-string">`<span class="hljs-subst">${__dirname}</span>/appRoot/`</span>
+     }
+ );
+</code></pre>
 
             </div><div class="content">
                 <div class="highlight"><pre>    beforeServe(request,response,body,encoding,serve){
@@ -718,17 +809,21 @@
     );
 }
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">RefString</span>(<span class="hljs-params">value</span>)</span>{
-    <span class="hljs-built_in">Object</span>.defineProperties(
-        <span class="hljs-keyword">this</span>,
-        {
-            <span class="hljs-attr">value</span>:{
-                <span class="hljs-attr">value</span>:value||<span class="hljs-string">''</span>,
-                <span class="hljs-attr">enumerable</span>:<span class="hljs-literal">true</span>,
-                <span class="hljs-attr">writable</span>:<span class="hljs-literal">true</span>
-            }
-        }
-    );
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RefString</span>()</span>{
+  <span class="hljs-keyword">constructor</span>(value){
+    <span class="hljs-keyword">if</span>(value){
+      <span class="hljs-keyword">this</span>._string=value;
+    }
+  }
+
+  get value(){
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._string;
+  }
+
+  set value(value){
+    <span class="hljs-keyword">this</span>._string=value;
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._string;
+  }
 }
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">requestRecieved</span>(<span class="hljs-params">request,response</span>)</span>{

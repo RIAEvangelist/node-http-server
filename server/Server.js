@@ -210,7 +210,62 @@ class Server{
 
     }
 
-    //executed just before response sent allowing user to modify if needed. If returns true response serving will be delayed.
+    // #### beforeServe
+    //
+    // ` server.beforeServe `
+    //
+    // ` server.beforeServe(request,response,body,encoding,serve) `
+    //
+    // |method  | should return |
+    // |--------|---------|
+    // | beforeServe | bool/void    |
+    //
+    // | parameter  | description |
+    // |------------|-------------|
+    // | request    | http(s) request obj  |
+    // | response   | http(s) response obj |
+    // | body       | response content body RefString  |
+    // | encoding   | response body encoding RefString |
+    // | serve      | ref to ` server.serve ` |
+    //
+    //
+    // `type RefString`
+    //
+    // |type     |keys     |description|
+    // |---------|---------|-----------|
+    // |RefString| `value` |a way to allow modifying a string by refrence.|
+    //
+    // ```javascript
+    //
+    // const server=require('node-http-server');
+    //
+    // server.beforeServe=beforeServe;
+    //
+    // function beforeServe(request,response,body,encoding){
+    //     //only parsing html files for this example
+    //     if(response.getHeader('Content-Type')!=server.config.contentType.html){
+    //         //return void||false to allow response lifecycle to continue as normal
+    //         return;
+    //     }
+    //
+    //     const someVariable='this is some variable value';
+    //
+    //     body.value=body.value.replace('{{someVariable}}',someVariable);
+    //
+    //     //return void||false to allow response lifecycle to continue as normal
+    //     //with modified body content
+    //     return;
+    // }
+    //
+    // server.deploy(
+    //     {
+    //         port:8000,
+    //         root:`${__dirname}/appRoot/`
+    //     }
+    // );
+    //
+    // ```
+    //
     beforeServe(request,response,body,encoding,serve){
 
     }
@@ -522,17 +577,21 @@ function completeServing(request,response,refBody,refEncoding){
     );
 }
 
-function RefString(value){
-    Object.defineProperties(
-        this,
-        {
-            value:{
-                value:value||'',
-                enumerable:true,
-                writable:true
-            }
-        }
-    );
+class RefString(){
+  constructor(value){
+    if(value){
+      this._string=value;
+    }
+  }
+
+  get value(){
+    return this._string;
+  }
+
+  set value(value){
+    this._string=value;
+    return this._string;
+  }
 }
 
 function requestRecieved(request,response){
