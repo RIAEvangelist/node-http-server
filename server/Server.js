@@ -156,7 +156,7 @@ class Server{
     //
     // | parameter  | description |
     // |------------|-------------|
-    // | request    | http(s) request obj  |
+    // | request    | raw http(s) request obj  |
     // | response   | http(s) response obj |
     // | serve      | ref to ` server.serve ` |
     //
@@ -222,7 +222,7 @@ class Server{
     //
     // | parameter  | description |
     // |------------|-------------|
-    // | request    | http(s) request obj  |
+    // | request    | decorated http(s) request obj  |
     // | response   | http(s) response obj |
     // | body       | response content body RefString  |
     // | encoding   | response body encoding RefString |
@@ -270,7 +270,40 @@ class Server{
 
     }
 
-    //executed after each full response completely sent
+    // #### afterServe
+    //
+    // ` server.afterServe `
+    //
+    // ` server.afterServe(request) `
+    //
+    // |method      | should return |
+    // |------------|---------|
+    // | afterServe | n/a   |
+    //
+    // | parameter  | description |
+    // |------------|-------------|
+    // | request    | decorated http(s) request obj  |
+    //
+    //
+    // ```javascript
+    //
+    // const server=require('node-http-server');
+    //
+    // server.afterServe=afterServe;
+    //
+    // function afterServe(request){
+    //     console.log(`just served ${request.uri}`);
+    // }
+    //
+    // server.deploy(
+    //     {
+    //         port:8075,
+    //         root:`${__dirname}/appRoot/`
+    //     }
+    // );
+    //
+    // ```
+    //
     afterServe(request){
 
     }
