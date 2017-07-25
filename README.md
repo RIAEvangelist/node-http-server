@@ -18,8 +18,9 @@ npm info :  [See npm trends and stats for node-http-server](http://npm-stat.com/
 ![node-http-server npm version](https://img.shields.io/npm/v/node-http-server.svg) ![supported node version for node-http-server](https://img.shields.io/node/v/node-http-server.svg) ![total npm downloads for node-http-server](https://img.shields.io/npm/dt/node-http-server.svg) ![monthly npm downloads for node-http-server](https://img.shields.io/npm/dm/node-http-server.svg) ![npm licence for node-http-server](https://img.shields.io/npm/l/node-http-server.svg)
 
 GitHub info :  
-![node-http-server GitHub Release](https://img.shields.io/github/release/RIAEvangelist/node-http-server.svg) ![GitHub license node-http-server license](https://img.shields.io/github/license/RIAEvangelist/node-http-server.svg) ![open issues for node-http-server on GitHub](https://img.shields.io/github/issues/RIAEvangelist/node-http-server.svg)  [![Codacy Badge](https://api.codacy.com/project/badge/Grade/fbfd39a7b56643d290bb93db61b14db3)](https://www.codacy.com/app/RIAEvangelist/node-http-server?utm_source=github.com&utm_medium=referral&utm_content=RIAEvangelist/node-http-server&utm_campaign=badger)
-[![node-http-server stats](https://nodei.co/npm/node-http-server.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/node-http-server) 
+![node-http-server GitHub Release](https://img.shields.io/github/release/RIAEvangelist/node-http-server.svg) ![GitHub license node-http-server license](https://img.shields.io/github/license/RIAEvangelist/node-http-server.svg) ![open issues for node-http-server on GitHub](https://img.shields.io/github/issues/RIAEvangelist/node-http-server.svg)  [![Codacy Badge](https://api.codacy.com/project/badge/Grade/fbfd39a7b56643d290bb93db61b14db3)](https://www.codacy.com/app/RIAEvangelist/node-http-server?utm_source=github.com&utm_medium=referral&utm_content=RIAEvangelist/node-http-server&utm_campaign=badger)  
+
+[![node-http-server stats](https://nodei.co/npm/node-http-server.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/node-http-server)
 
 Package Quality :  
 ![node-http-server Package Quality](http://npm.packagequality.com/badge/node-http-server.png)
