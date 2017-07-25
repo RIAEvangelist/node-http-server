@@ -7,6 +7,7 @@ Simple to use stand alone node HTTP and HTTPS Server you can spin up in seconds.
 - ***[TLDR; Quick start examples](#examples)***
 - ***[Server Class](#server-class)***
 - ***[Config Class](#config-class)***
+- ***[Basic use with cluster example](#basic-cluster-server)***
 
 
 Support for building proxy servers has been added. Documentation coming in next release. [For now see the node-http-server proxy examples](https://github.com/RIAEvangelist/node-http-server/tree/master/example/proxy).
@@ -414,6 +415,51 @@ Detailed examples can be found in the [example folder](https://github.com/RIAEva
             }
         }
     );
+
+```
+
+## Basic cluster server
+
+```javascript
+
+//import the `node-http-server` module
+//` const server=require(‘node-http-server’); `
+const server=require('../../server/Server.js');
+
+//import cluster
+const cluster = require('cluster');
+const numCPUs = require('os').cpus().length;
+
+if (cluster.isMaster) {
+  console.log(`Master ${process.pid} is running`);
+
+  // Fork node-http-server cluster workers.
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on(
+    'exit',
+    (worker, code, signal) => {
+      console.log(`worker ${worker.process.pid} died`);
+    }
+  );
+} else {
+  server.afterServe=(request)=>{
+    console.log(`${process.pid} served ${request.uri.path}`);
+  }
+
+  //start server in clustered children
+  server.deploy(
+      {
+          verbose: false,
+          port: 8000,
+          root:__dirname+'/appRoot/'
+      }
+  );
+
+  console.log(`Worker ${process.pid} started listening on ${server.config.port}`);
+}
 
 ```
 

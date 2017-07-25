@@ -19,6 +19,7 @@
     "https": "node ./example/basic/https-ONLY-basicApp.js",
     "both": "node ./example/basic/https-basicApp.js",
     "template":"node ./example/advanced/basicTemplate.js",
+    "cluster":"node ./example/basic/cluster-basicApp.js",
 
     "docs": "docco-plus ./README.md ./example/* ./example/**/* ./server/* ./bin/* ./local-certs/* "
   },
