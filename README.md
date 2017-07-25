@@ -65,6 +65,9 @@ npm run both
 #node ./example/advanced/basicTemplate.js
 npm run template
 
+#node ./example/basic/cluster-basicApp.js
+npm run cluster
+
 ```
 
 ## writing a node http or https server
