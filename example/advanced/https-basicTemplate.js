@@ -5,23 +5,28 @@ const os = require( 'os' );
 const server=require('../../server/Server.js');
 const config=new server.Config;
 
+//setup basic server configs and allow http serving with https serving
 config.verbose=true;
 config.port=8000;
 config.root=__dirname+'/appRoot/';
+
+//add ssl certs and set ssl port
 config.https.privateKey = `${__dirname}/../../local-certs/private/server.key`;
 config.https.certificate= `${__dirname}/../../local-certs/server.pub`;
 config.https.port       = 4433;
 
-
+//set listener to process body template
 server.beforeServe=beforeServe;
 
+//just before serving process the template
 function beforeServe(request,response,body,encoding){
-    //only parse the /index.html request
+    //only parse the /index.html request for this example
     if(request.url!='/index.html'){
         return;
     }
 
     //dynamically detect available interfaces
+    //and build content list
     var networkInterfaces = os.networkInterfaces();
     var serverIPs='';
     var interfaceKeys=Object.keys(networkInterfaces);
@@ -40,7 +45,7 @@ function beforeServe(request,response,body,encoding){
         serverIPs+='</li>';
     }
 
-
+    //replace {{some-content}} variable with the generated content list
     body.value=body.value.replace('{{some-content}}',serverIPs);
 }
 

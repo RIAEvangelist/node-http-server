@@ -5,13 +5,13 @@ const os = require( 'os' );
 const server=require('../../server/Server.js');
 const config=new server.Config;
 
+//setup basic server configs and allow http serving with https serving
 config.verbose=true;
-config.port=8000;
 config.root=__dirname+'/appRoot/';
 config.https.privateKey = `${__dirname}/../../local-certs/private/server.key`;
 config.https.certificate= `${__dirname}/../../local-certs/server.pub`;
 config.https.port       = 4433;
-config.https.only       = 4433;
+config.https.only       = true
 
 server.beforeServe=beforeServe;
 

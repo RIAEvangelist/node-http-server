@@ -610,7 +610,7 @@ function completeServing(request,response,refBody,refEncoding){
     );
 }
 
-class RefString(){
+class RefString{
   constructor(value){
     if(value){
       this._string=value;
