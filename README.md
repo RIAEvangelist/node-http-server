@@ -14,6 +14,7 @@ Support for building proxy servers has been added. Documentation coming in next 
 
 ` npm i node-http-server `
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fbfd39a7b56643d290bb93db61b14db3)](https://www.codacy.com/app/RIAEvangelist/node-http-server?utm_source=github.com&utm_medium=referral&utm_content=RIAEvangelist/node-http-server&utm_campaign=badger)
 [![node-http-server stats](https://nodei.co/npm/node-http-server.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/node-http-server)  
 
 npm info :  [See npm trends and stats for node-http-server](http://npm-stat.com/charts.html?package=node-http-server&author=&from=&to=)  
