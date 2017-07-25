@@ -122,7 +122,7 @@ If you want to create a custom Server or extend the Server Class you can require
 
 | parameter     | required | description |
 |---------------|----------|-------------|
-| userConfig    | no       | if a ` userConfig ` object is passed it will decorate the [Config class](http://riaevangelist.github.io/node-http-server/Config.js.html) |
+| userConfig    | no       | if a ` userConfig ` object is passed it will decorate the [Config class](http://riaevangelist.github.io/node-http-server/server/Config.js.html) |
 | readyCallback | no       | called once the server is started |
 
 ```javascript
@@ -556,7 +556,7 @@ for https :
 
 ```
 
-## [Config Class](http://riaevangelist.github.io/node-http-server/Config.js.html)
+## [Config Class](http://riaevangelist.github.io/node-http-server/server/Config.js.html)
 
 ### Default node HTTP server configuration
 
