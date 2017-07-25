@@ -25,77 +25,13 @@ for(let i=0; i<argCount; i++){
 //
 class Config{
     constructor(userConfig){
-        Object.defineProperties(
-            this,
-            {
-                verbose     : {
-                    value:defaultConfigs.verbose,
-                    enumerable:true,
-                    writable:true
-                },
-                port        : {
-                    value:defaultConfigs.port,
-                    enumerable:true,
-                    writable:true
-                },
-                root        : {
-                    value:defaultConfigs.root,
-                    enumerable:true,
-                    writable:true
-                },
-                domain      : {
-                    value:defaultConfigs.domain,
-                    enumerable:true,
-                    writable:true
-                },
-                https       : {
-                    value:defaultConfigs.https,
-                    enumerable:true,
-                    writable:true
-                },
-                log         : {
-                    value:defaultConfigs.log,
-                    enumerable:true,
-                    writable:true
-                },
-                logFunction : {
-                    value:defaultConfigs.logFunction,
-                    enumerable:true,
-                    writable:true
-                },
-                domains     : {
-                    value:defaultConfigs.domains,
-                    enumerable:true,
-                    writable:true
-                },
-                server      : {
-                    value:defaultConfigs.server,
-                    enumerable:true,
-                    writable:true
-                },
-                contentType : {
-                    value:defaultConfigs.contentType,
-                    enumerable:true,
-                    writable:true
-                },
-                restrictedType: {
-                    value:defaultConfigs.restrictedType,
-                    enumerable:true,
-                    writable:true
-                },
-                errors      : {
-                    value:defaultConfigs.errors,
-                    enumerable:true,
-                    writable:true
-                }
-            }
-        );
+      Object.assign(this,defaultConfigs);
 
-        if(userConfig){
-            for(const k in userConfig){
-                config[k]=userConfig[k];
-            }
-        }
+      if(userConfig){
+          for(const k in userConfig){
+              this[k]=userConfig[k];
+          }
+      }
     }
 }
 
