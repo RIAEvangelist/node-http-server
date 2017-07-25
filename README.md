@@ -48,6 +48,23 @@ $ nodeserver port=1942 verbose=true
 
 ```
 
+### quick npm script tests and examples
+
+```sh
+
+#node ./example/basic/basicApp.js
+npm run basic
+
+#node ./example/basic/https-ONLY-basicApp.js
+npm run https
+
+#node ./example/basic/https-basicApp.js
+npm run both
+
+#node ./example/advanced/basicTemplate.js
+npm run template
+
+```
 
 ## writing a node http or https server
 

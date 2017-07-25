@@ -14,9 +14,12 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./example/basic/basicApp.js",
+
+    "basic": "node ./example/basic/basicApp.js",
     "https": "node ./example/basic/https-ONLY-basicApp.js",
     "both": "node ./example/basic/https-basicApp.js",
+    "template":"node ./example/advanced/basicTemplate.js",
+
     "docs": "docco-plus ./README.md ./example/* ./example/**/* ./server/* ./bin/* ./local-certs/* "
   },
   "repository": {
