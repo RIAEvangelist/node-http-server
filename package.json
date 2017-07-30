@@ -4,7 +4,9 @@
   "description": "A very simple and fast http server for node, bash, and spawnable from C, Python etc. It is lightweight and great for embedded solutions as well as everyday development or public facing apps.",
   "main": "server/http.js",
   "directories": {
-    "example": "example"
+    "example": "example",
+    "doc":"docs",
+    "lib":"server"
   },
   "engines": {
     "node": ">=6.5.0"
