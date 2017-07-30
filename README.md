@@ -29,14 +29,14 @@ Package Quality :
 
 ## cli use if you just want to test
 
-Now you can also use the nodeserver cli if you just want to spin up a basic file server to test something out quickly or share on the local network.
+Now you can also use the node-http-server cli if you just want to spin up a basic file server to test something out quickly or share on the local network.
 
 ```sh
 
 $ sudo npm i -g node-http-server
 
-//start a nodeserver from the current directory on the default port 8080
-$ nodeserver
+//start a node-http-server from the current directory on the default port 8080
+$ node-http-server
 
 ```
 
@@ -44,8 +44,8 @@ You can modify any of the config keys by passing their key value pairs as args.
 
 ```sh
 
-//start a verbose nodeserver from the current directory on port 1942
-$ nodeserver port=1942 verbose=true
+//start a verbose node-http-server from the current directory on port 1942
+$ node-http-server port=1942 verbose=true
 
 ```
 
