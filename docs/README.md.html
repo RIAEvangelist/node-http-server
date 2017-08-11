@@ -192,6 +192,63 @@ npm run cluster
 </tr>
 </tbody>
 </table>
+<h2 id="request-uri-query-and-body">request uri, query, and, body</h2>
+<p>For handling api requests, posts, puts patches etc with body data, we are now making that available on the request as both a <code>String</code> and <code>Buffer</code> incase you need images or videos uploaded.</p>
+<table>
+<thead>
+<tr>
+<th>key</th>
+<th>type</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request.body</td>
+<td>string</td>
+<td>request body</td>
+</tr>
+<tr>
+<td>request.url</td>
+<td>string</td>
+<td>processed uri</td>
+</tr>
+<tr>
+<td>request.uri</td>
+<td>object</td>
+<td>parsed url information and query</td>
+</tr>
+<tr>
+<td>request.serverRoot</td>
+<td>string</td>
+<td>local dir for publicly served data</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>key</th>
+<th>type</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>uri.protocol</td>
+<td>string</td>
+<td>protocol of request</td>
+</tr>
+<tr>
+<td>uri.host</td>
+<td>string</td>
+<td>hostname for domain</td>
+</tr>
+</tbody>
+</table>
+<p>uri.hostname  |string| hostname for domain|
+|uri.query    |object| parsed querystring|
+|uri.port     |number| port request was received on|</p>
 <h3 id="-server-methods-http-riaevangelist-github-io-node-http-server-server-server-js-html-"><a href="http://riaevangelist.github.io/node-http-server/server/Server.js.html">Server Methods</a></h3>
 <h4 id="deploy">deploy</h4>
 <p><code>server.deploy</code> starts the server.</p>

@@ -973,7 +973,31 @@
     }
 
     request.url=uri;
-    request.serverRoot=root;</pre></div>
+    request.serverRoot=root;
+
+    request.body=<span class="hljs-string">''</span>;
+
+    request.on(
+      <span class="hljs-string">'data'</span>,
+      <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">chunk</span>)</span>{
+        request.body+=chunk;
+      }.bind(<span class="hljs-keyword">this</span>)
+    ).on(
+      <span class="hljs-string">'end'</span>,
+      <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+        <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>.config.verbose){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`###REQUEST BODY :
+<span class="hljs-subst">${request.body}</span>
+###
+            `</span>);
+        }
+
+        requestBodyComplete.bind(<span class="hljs-keyword">this</span>,request,response)();
+      }.bind(<span class="hljs-keyword">this</span>)
+    );
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">requestBodyComplete</span>(<span class="hljs-params">request,response</span>)</span>{</pre></div>
             </div>
         </li>
         
@@ -983,27 +1007,27 @@
                 <p>return any value to force or specify delayed or manual serving</p>
 
             </div><div class="content">
-                <div class="highlight"><pre>    <span class="hljs-keyword">if</span>(
-        <span class="hljs-keyword">this</span>.onRequest(
-            request,
-            response,
-            completeServing.bind(<span class="hljs-keyword">this</span>)
-        )
-    ){
-        <span class="hljs-keyword">return</span>;
-    };
+                <div class="highlight"><pre>  <span class="hljs-keyword">if</span>(
+      <span class="hljs-keyword">this</span>.onRequest(
+          request,
+          response,
+          completeServing.bind(<span class="hljs-keyword">this</span>)
+      )
+  ){
+      <span class="hljs-keyword">return</span>;
+  };
 
-    <span class="hljs-keyword">const</span> filename = path.join(
-        request.serverRoot,
-        request.url
-    );
+  <span class="hljs-keyword">const</span> filename = path.join(
+      request.serverRoot,
+      request.url
+  );
 
-    fs.exists(
-        filename,
-        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fileExists</span>(<span class="hljs-params">exists</span>)</span>{
-            <span class="hljs-keyword">this</span>.serveFile(filename,exists,request,response);
-        }.bind(<span class="hljs-keyword">this</span>)
-    );
+  fs.exists(
+      filename,
+      <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fileExists</span>(<span class="hljs-params">exists</span>)</span>{
+          <span class="hljs-keyword">this</span>.serveFile(filename,exists,request,response);
+      }.bind(<span class="hljs-keyword">this</span>)
+  );
 }
 
 <span class="hljs-built_in">module</span>.exports=<span class="hljs-keyword">new</span> Server;</pre></div>
