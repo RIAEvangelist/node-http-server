@@ -730,28 +730,51 @@ function requestRecieved(request,response){
     request.url=uri;
     request.serverRoot=root;
 
-    //return any value to force or specify delayed or manual serving
-    if(
-        this.onRequest(
-            request,
-            response,
-            completeServing.bind(this)
-        )
-    ){
-        return;
-    };
+    request.body='';
 
-    const filename = path.join(
-        request.serverRoot,
-        request.url
-    );
+    request.on(
+      'data',
+      function(chunk){
+        request.body+=chunk;
+      }.bind(this)
+    ).on(
+      'end',
+      function(){
+        if(this.config.verbose){
+            console.log(`###REQUEST BODY :
+${request.body}
+###
+            `);
+        }
 
-    fs.exists(
-        filename,
-        function fileExists(exists){
-            this.serveFile(filename,exists,request,response);
-        }.bind(this)
+        requestBodyComplete.bind(this,request,response)();
+      }.bind(this)
     );
+}
+
+function requestBodyComplete(request,response){
+  //return any value to force or specify delayed or manual serving
+  if(
+      this.onRequest(
+          request,
+          response,
+          completeServing.bind(this)
+      )
+  ){
+      return;
+  };
+
+  const filename = path.join(
+      request.serverRoot,
+      request.url
+  );
+
+  fs.exists(
+      filename,
+      function fileExists(exists){
+          this.serveFile(filename,exists,request,response);
+      }.bind(this)
+  );
 }
 
 module.exports=new Server;

@@ -111,6 +111,25 @@ If you want to create a custom Server or extend the Server Class you can require
 |[Config](#config-class)       | n/a                                                         | n/a                                      | This is a reference to the Default Config class. Use it to generate a complete config file based off of the default values and arguments passed in when launching the app. Will perform a shallow merge of default values and passed values if a config object passed.|
 |[Server](#server-class)       | n/a                                                         | n/a                                      | This is a reference to the Server Class. Use it to start multiple servers on different ports or to extend the node-http-server.|
 
+## request uri, query, and, body
+
+For handling api requests, posts, puts patches etc with body data, we are now making that available on the request as both a ` String ` and ` Buffer ` incase you need images or videos uploaded.
+
+|key|type |value|
+|---|-----|-----|
+|request.body| string | request body |
+|request.url| string | processed uri |
+|request.uri| object | parsed url information and query |
+|request.serverRoot| string | local dir for publicly served data |
+
+|key|type |value|
+|---|-----|-----|
+|uri.protocol |string| protocol of request|
+|uri.host     |string| hostname for domain|
+uri.hostname  |string| hostname for domain|
+|uri.query    |object| parsed querystring|
+|uri.port     |number| port request was received on|
+
 ### [Server Methods](http://riaevangelist.github.io/node-http-server/server/Server.js.html)
 
 #### deploy
