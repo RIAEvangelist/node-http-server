@@ -144,7 +144,7 @@ class Server{
 
     }
 
-    // #### onRawRequest
+    // #### onRequest
     //
     // ` server.onRequest `
     //
