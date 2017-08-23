@@ -81,7 +81,7 @@ const defaultConfigs={
     contentType : {
         html    : 'text/html',
         css     : 'text/css',
-        js      : 'text/javascript',
+        js      : 'application/javascript',
         json    : 'application/json',
         txt     : 'text/plain',
         jpeg    : 'image/jpeg',
