@@ -695,11 +695,7 @@ node yourServer.js local
 
 const server=require('node-http-server');
 
-server.deploy(
-  {
-    domain:(process.argv[2]=='local')?'0.0.0.0' : 'my.awesome.domain'
-  }
-);
+server.deploy(config);
 
 ```
 
