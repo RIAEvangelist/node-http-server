@@ -2,7 +2,7 @@
 
 const fs=require('fs');
 
-const passedArgs = process.argv.splice(2),
+const passedArgs = process.argv.slice(2),
     argCount = passedArgs.length,
     args = {};
 
