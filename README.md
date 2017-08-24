@@ -99,6 +99,7 @@ If you want to create a custom Server or extend the Server Class you can require
 
 ```
 
+
 ## Server Class
 
 |Server Method or member       | params                                                              | returns / should return          | description |
@@ -660,7 +661,6 @@ server.deploy({port:9922,verbose:true});
 
 ```
 
-
 |key|description|
 |---|-----|
 |verbose| display detailed info about what server is doing via terminal. |
@@ -681,6 +681,42 @@ server.deploy({port:9922,verbose:true});
 |restrictedType.*| extensions to which access will be denied. |
 |errors.headers| these are the headers that will automatically be applied to all error responses. You can add custom headers per error in the ` beforeServe ` function |
 |errors.*| error headers and error strings, these can be anything you like from html to text etc. The **500** error will replace ` {{err}} ` in the specified value with the actual error message from the server.  |
+
+
+#### Local and Production domains
+
+```sh
+
+node yourServer.js local
+
+```
+
+```javascript
+
+const server=require('node-http-server');
+
+server.deploy(
+  {
+    domain:(process.argv[2]=='local')?'0.0.0.0' : 'my.awesome.domain'
+  }
+);
+
+```
+
+```javascript
+
+const server=require('node-http-server');
+const config=new server.Config;
+
+config.domain = (process.argv[2]=='local')?'0.0.0.0' : 'my.awesome.domain';
+
+server.deploy(
+  {
+    domain:(process.argv[2]=='local')?'0.0.0.0' : 'api.electron.cafe'
+  }
+);
+
+```
 
 
 #### config.domains.*
