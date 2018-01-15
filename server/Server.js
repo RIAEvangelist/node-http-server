@@ -53,7 +53,7 @@ class Server{
     //
     // |method  | returns |
     // |--------|---------|
-    // | deploy | void    |
+    // | deploy | Server  |
     //
     // | parameter     | required | description |
     // |---------------|----------|-------------|
@@ -400,6 +400,8 @@ function deploy(userConfig, readyCallback=function(){}){
 
             }.bind(this)
         );
+        
+        return this.server;
     }
 
     if(this.config.httpsOptions){
@@ -415,6 +417,8 @@ function deploy(userConfig, readyCallback=function(){}){
                 readyCallback(this);
             }.bind(this)
         );
+        
+        return this.secureServer;
     }
 }
 
