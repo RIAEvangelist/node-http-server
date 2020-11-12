@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/RIAEvangelist/node-http-server",
   "devDependencies": {
-    "docco-plus": "^2.0.0"
+    "docco-plus": "2.0.2"
   },
   "dependencies": {}
 }
