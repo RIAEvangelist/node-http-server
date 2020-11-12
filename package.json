@@ -40,7 +40,7 @@
     "lightweight"
   ],
   "author": "Brandon Nozaki Miller",
-  "license": "DBAD",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/RIAEvangelist/node-http-server/issues"
   },
