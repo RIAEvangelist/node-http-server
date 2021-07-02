@@ -1,6 +1,6 @@
 {
   "name": "node-http-server",
-  "version": "8.1.3",
+  "version": "8.1.4",
   "description": "A very simple and fast http server for node, bash, and spawnable from C, Python etc. It is lightweight and great for embedded solutions as well as everyday development or public facing apps.",
   "main": "server/Server.js",
   "directories": {
