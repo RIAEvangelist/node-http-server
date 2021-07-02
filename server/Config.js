@@ -89,6 +89,7 @@ const defaultConfigs={
         png     : 'image/png',
         gif     : 'image/gif',
         ico     : 'image/x-icon',
+        svg     : 'image/svg+xml',
         appcache: 'text/cache-manifest'
     },
     restrictedType: {
