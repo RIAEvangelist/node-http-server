@@ -2,6 +2,8 @@ Node http server with https and proxy support
 ================
 ----
 
+[![Sponsor RIAEvangelist to help development of node-http-server](https://img.shields.io/static/v1?label=Sponsor%20Me%20On%20Github&message=%E2%9D%A4&logo=GitHub&link=https://github.com/sponsors/RIAEvangelist)](https://github.com/sponsors/RIAEvangelist)
+
 Simple to use stand alone node HTTP and HTTPS Server you can spin up in seconds.
 
 - ***[TLDR; Quick start examples](#examples)***
