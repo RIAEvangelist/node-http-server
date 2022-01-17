@@ -639,13 +639,20 @@ server.deploy({port:9922,verbose:true});
             css     : 'text/css',
             js      : 'text/javascript',
             json    : 'application/json',
+            xml     : 'text/xml',
             txt     : 'text/plain',
             jpeg    : 'image/jpeg',
             jpg     : 'image/jpeg',
             png     : 'image/png',
             gif     : 'image/gif',
             ico     : 'image/x-icon',
-            appcache: 'text/cache-manifest'
+            svg     : 'image/svg+xml',
+            appcache: 'text/cache-manifest',
+            eot     : 'application/vnd.ms-fontobject',
+            otf     : 'font/otf',
+            ttf     : 'font/ttf',
+            woff    : 'font/woff',
+            woff2   : 'font/woff2'
         },
         restrictedType: {
 

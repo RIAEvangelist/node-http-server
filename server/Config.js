@@ -81,8 +81,9 @@ const defaultConfigs={
     contentType : {
         html    : 'text/html',
         css     : 'text/css',
-        js      : 'application/javascript',
+        js      : 'text/javascript',
         json    : 'application/json',
+        xml     : 'text/xml',
         txt     : 'text/plain',
         jpeg    : 'image/jpeg',
         jpg     : 'image/jpeg',
@@ -90,7 +91,12 @@ const defaultConfigs={
         gif     : 'image/gif',
         ico     : 'image/x-icon',
         svg     : 'image/svg+xml',
-        appcache: 'text/cache-manifest'
+        appcache: 'text/cache-manifest',
+        eot     : 'application/vnd.ms-fontobject',
+        otf     : 'font/otf',
+        ttf     : 'font/ttf',
+        woff    : 'font/woff',
+        woff2   : 'font/woff2'
     },
     restrictedType: {
 
