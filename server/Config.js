@@ -82,6 +82,8 @@ const defaultConfigs={
         html    : 'text/html',
         css     : 'text/css',
         js      : 'text/javascript',
+        mjs      : 'text/javascript',
+        cjs      : 'text/javascript',
         json    : 'application/json',
         xml     : 'text/xml',
         txt     : 'text/plain',
