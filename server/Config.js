@@ -120,7 +120,7 @@ function serverLogging(data){
         function serverLogExsits(exists){
             data.timestamp=new Date().getTime();
 
-            const JSONData=JSON.stringify(data);
+            const JSONData=JSON.stringify(data)+"\n";
             let method='appendFile';
             if(!exists){
                 method='writeFile';
