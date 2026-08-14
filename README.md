@@ -271,7 +271,7 @@ function gotRequest(request,response,serve){
         JSON.stringify(
             {
                 success:false,
-                message:'you must have a query param of hello to access the server i.e. /index.html?hello'
+                message:'you must have a query param of hello to access the server i.e. /index.html?hello',
                 uri:request.uri,
                 query:request.query
             }
