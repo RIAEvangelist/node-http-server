@@ -8,7 +8,6 @@ const copyOutputButton=document.querySelector('[data-copy-output]');
 const formatLabel=document.querySelector('#snippet-format');
 const warningLabel=document.querySelector('#snippet-warning');
 const validationLabel=document.querySelector('#config-validation');
-const scrollMeter=document.querySelector('.scroll-meter span');
 const customLogger=Symbol('custom log function');
 const unsafeKeys=new Set(['__proto__','constructor','prototype']);
 
@@ -303,6 +302,22 @@ function cliOmitsOptions(config){
     );
 }
 
+function configurationWarning(config){
+    if(config.domains && (config.domain==='0.0.0.0' || config.domain==='*')){
+        return 'Set a non-wildcard primary Host to use domain roots';
+    }
+
+    if(config.https && (!config.https.privateKey || !config.https.certificate)){
+        return 'HTTPS needs both key and certificate paths';
+    }
+
+    if(config.logFunction && !config.log){
+        return 'Set a log value to enable the custom logger';
+    }
+
+    return '';
+}
+
 function syncDependentFields(){
     fields.spaFile.disabled=!fields.spa.checked;
     fields.maxBody.disabled=!fields.bodyLimit.checked;
@@ -343,6 +358,7 @@ function renderSnippet(){
     }
 
     const config=currentConfig();
+    const configWarning=configurationWarning(config);
     output.textContent=generatedSnippet(config,activeFormat);
     formatLabel.textContent=formats[activeFormat];
     outputPanel.setAttribute('aria-labelledby',`tab-${activeFormat}`);
@@ -350,6 +366,9 @@ function renderSnippet(){
 
     if(validationMessages.length){
         warningLabel.textContent='Fix marked JSON fields';
+        warningLabel.dataset.warning='true';
+    }else if(configWarning){
+        warningLabel.textContent=configWarning;
         warningLabel.dataset.warning='true';
     }else if(activeFormat==='cli' && cliOmitsOptions(config)){
         warningLabel.textContent='Advanced options need the module API';
@@ -453,6 +472,13 @@ for(const button of document.querySelectorAll('[data-copy-text]')){
     button.addEventListener('click',()=>copyText(button.dataset.copyText,button));
 }
 
+for(const button of document.querySelectorAll('[data-copy-target]')){
+    const target=document.getElementById(button.dataset.copyTarget);
+    if(target){
+        button.addEventListener('click',()=>copyText(target.textContent,button));
+    }
+}
+
 form?.addEventListener(
     'input',
     ()=>{
@@ -477,47 +503,6 @@ if(form && output){
     syncDependentFields();
     renderSnippet();
 }
-
-const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const revealItems=[...document.querySelectorAll('.reveal')];
-
-if(reduceMotion || !('IntersectionObserver' in window)){
-    for(const item of revealItems){
-        item.classList.add('is-visible');
-    }
-}else{
-    const observer=new IntersectionObserver(
-        entries=>{
-            for(const entry of entries){
-                if(!entry.isIntersecting){
-                    continue;
-                }
-
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
-            }
-        },
-        {rootMargin:'0px 0px -8%'}
-    );
-
-    for(const item of revealItems){
-        observer.observe(item);
-    }
-}
-
-function updateScrollMeter(){
-    if(!scrollMeter){
-        return;
-    }
-
-    const available=document.documentElement.scrollHeight-window.innerHeight;
-    const progress=available>0 ? window.scrollY/available : 0;
-    scrollMeter.style.transform=`scaleX(${Math.min(1,Math.max(0,progress))})`;
-}
-
-window.addEventListener('scroll',updateScrollMeter,{passive:true});
-window.addEventListener('resize',updateScrollMeter);
-updateScrollMeter();
 
 const year=document.querySelector('[data-year]');
 

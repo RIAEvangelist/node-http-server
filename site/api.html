@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="node-http-server CommonJS and ESM library API, lifecycle, request data, and hooks."><meta name="theme-color" content="#08110d"><title>Library API — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/api.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script></head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./cli.html">CLI</a><a href="./api.html" aria-current="page">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
+        <main id="main"><header class="page-header page-header-compact"><p class="kicker">CommonJS + ESM library</p><h1>Own the listener lifecycle.</h1><p class="lead">Create isolated servers, inspect active Node listeners, serve custom responses, and extend the request lifecycle with hooks.</p></header>
+            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#imports">Imports</a><a href="#lifecycle">Lifecycle</a><a href="#members">Public members</a><a href="#requests">Request data</a><a href="#hooks">Hooks</a><a href="#manual">Manual serving</a><a href="#errors">Error contract</a></aside>
+                <div class="doc-content">
+                    <section class="doc-section" id="imports"><p class="kicker">Imports</p><h2>Use the singleton or create instances.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Module style</th><th>Default</th><th>Named exports</th></tr></thead><tbody><tr><td>CommonJS</td><td><code>require('node-http-server')</code></td><td><code>Server</code>, <code>Config</code>, <code>RefString</code></td></tr><tr><td>ESM</td><td><code>import server from 'node-http-server'</code></td><td><code>Server</code>, <code>Config</code>, <code>RefString</code></td></tr></tbody></table></div>
+                        <div class="quick-grid">
+                            <div class="code-block"><div class="code-head"><span class="code-label">CommonJS · isolated instance</span><button type="button" data-copy-target="api-cjs">Copy</button></div><pre><code id="api-cjs">const {Server}=require('node-http-server');
+
+const server=new Server({root:'./public'});
+server.deploy();</code></pre></div>
+                            <div class="code-block"><div class="code-head"><span class="code-label">ESM · isolated instance</span><button type="button" data-copy-target="api-esm">Copy</button></div><pre><code id="api-esm">import {Server} from 'node-http-server';
+
+const server=new Server({root:'./public'});
+server.deploy();</code></pre></div>
+                        </div>
+                        <div class="callout"><strong>Compatibility:</strong> the default export is the original shared singleton. Prefer <code>new Server()</code> when code may own more than one listener or needs independent configuration.</div>
+                    </section>
+
+                    <section class="doc-section" id="lifecycle"><p class="kicker">Lifecycle</p><h2>Deploy, observe readiness, close, redeploy.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">ESM · readiness and shutdown</span><button type="button" data-copy-target="api-life">Copy</button></div><pre><code id="api-life">import {Server} from 'node-http-server';
+
+const server=new Server({root:'./public',port:8080});
+
+server.deploy((instance,nodeServer)=>{
+    console.log(nodeServer.address());
+});
+
+process.once('SIGTERM',async()=>{
+    await server.close();
+});</code></pre></div>
+                        <div class="table-wrap"><table><thead><tr><th>Step</th><th>Contract</th></tr></thead><tbody>
+                            <tr><td><code>new Server(config?)</code></td><td>Creates isolated configuration and listener state.</td></tr>
+                            <tr><td><code>deploy(config?, callback?)</code></td><td>Overlays current config, starts HTTP and optional HTTPS, returns the same instance immediately, and calls the callback once as each listener becomes ready. A function first argument is accepted as the callback.</td></tr>
+                            <tr><td><code>close(callback?)</code></td><td>Returns a Promise that resolves after every owned listener closes. Concurrent calls share it; idle close is safe; callback receives no arguments or an error.</td></tr>
+                            <tr><td>Redeploy</td><td>The same instance may deploy again after <code>close()</code> resolves.</td></tr>
+                        </tbody></table></div>
+                        <div class="callout-error callout"><strong>Do not deploy twice:</strong> deploying an already active instance throws <code>ERR_SERVER_ALREADY_DEPLOYED</code>. Await <code>close()</code> before reusing it. Omitted settings persist across later deployment overlays.</div>
+                    </section>
+
+                    <section class="doc-section" id="members"><p class="kicker">Public members</p><h2>Methods and state.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Member</th><th>Returns</th><th>Use</th></tr></thead><tbody>
+                            <tr><td><code>deploy(config?, callback?)</code></td><td><code>Server</code></td><td>Start the instance's listeners.</td></tr>
+                            <tr><td><code>close(callback?)</code></td><td><code>Promise&lt;void&gt;</code></td><td>Close every listener owned by the instance.</td></tr>
+                            <tr><td><code>address()</code></td><td>address object or <code>null</code></td><td>Read the first active listener address.</td></tr>
+                            <tr><td><code>serve(request,response,body='',encoding='utf8')</code></td><td><code>Promise</code></td><td>Complete a deliberate response through hooks; defaults to text/plain, honors HEAD and Content-Length.</td></tr>
+                            <tr><td><code>serveFile(filename,request,response)</code></td><td><code>Promise&lt;boolean&gt;</code></td><td>Serve a deliberate trusted file; legacy <code>(filename,exists,request,response)</code> remains accepted.</td></tr>
+                            <tr><td><code>config</code></td><td><code>Config</code></td><td>Read the instance's isolated active configuration.</td></tr>
+                            <tr><td><code>server</code></td><td>Node HTTP server or <code>null</code></td><td>Access the active HTTP listener.</td></tr>
+                            <tr><td><code>secureServer</code></td><td>Node HTTPS server or <code>null</code></td><td>Access the active HTTPS listener.</td></tr>
+                            <tr><td><code>lastError</code></td><td>Error or <code>null</code></td><td>Last captured request, hook, stream, or logging failure.</td></tr>
+                        </tbody></table></div>
+                    </section>
+
+                    <section class="doc-section" id="requests"><p class="kicker">Parsed request data</p><h2>Use text or original bytes.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Member</th><th>Type</th><th>Value</th></tr></thead><tbody>
+                            <tr><td><code>request.body</code></td><td>string</td><td>UTF-8 request body.</td></tr><tr><td><code>request.bodyBuffer</code></td><td>Buffer</td><td>Original request bytes.</td></tr><tr><td><code>request.uri</code></td><td>object</td><td>Parsed URL and query information.</td></tr><tr><td><code>request.url</code></td><td>string</td><td>Processed request path.</td></tr><tr><td><code>request.serverRoot</code></td><td>string</td><td>Selected static root after Host routing.</td></tr>
+                        </tbody></table></div>
+                        <p>When <a href="./configuration.html#limits"><code>maxRequestBodyBytes</code></a> is set and the request crosses it, parsing stops with <code>413 Payload Too Large</code>.</p>
+                    </section>
+
+                    <section class="doc-section" id="hooks"><p class="kicker">Hooks</p><h2>Take over only the step you need.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Hook</th><th>Arguments</th><th>When</th><th>Takeover</th></tr></thead><tbody>
+                            <tr><td><code>onRawRequest</code></td><td><code>request,response,serve</code></td><td>Immediately after receipt, before body parsing.</td><td>Return truthy; supplied <code>serve</code> is the public safe serve path.</td></tr>
+                            <tr><td><code>onRequest</code></td><td><code>request,response,serve</code></td><td>After URL helpers and body forms are ready.</td><td>Return truthy; supplied <code>serve</code> is the public safe serve path.</td></tr>
+                            <tr><td><code>beforeServe</code></td><td><code>request,response,bodyRef,encodingRef,complete</code></td><td>Before a buffered response is sent.</td><td>Return truthy; <code>complete</code> is one-shot and does not re-enter <code>beforeServe</code>.</td></tr>
+                            <tr><td><code>afterServe</code></td><td><code>request,response</code></td><td>After the response finishes.</td><td>Observe; may return a Promise.</td></tr>
+                        </tbody></table></div>
+                        <div class="code-block"><div class="code-head"><span class="code-label">ESM · JSON health route plus static files</span><button type="button" data-copy-target="api-hook">Copy</button></div><pre><code id="api-hook">import {Server} from 'node-http-server';
+
+class AppServer extends Server{
+    async onRequest(request,response,serve){
+        if(request.url!='/health') return false;
+
+        response.setHeader('Content-Type','application/json');
+        await serve(request,response,JSON.stringify({ok:true}));
+        return true;
+    }
+}
+
+new AppServer({root:'./public'}).deploy();</code></pre></div>
+                        <h3>Rewrite a buffered text file safely</h3>
+                        <div class="code-block"><div class="code-head"><span class="code-label">JavaScript · Buffer-aware beforeServe</span><button type="button" data-copy-target="api-before">Copy</button></div><pre><code id="api-before">server.beforeServe=function(request,response,bodyRef){
+    if(!Buffer.isBuffer(bodyRef.value)) return false;
+
+    const text=bodyRef.value.toString('utf8');
+    bodyRef.value=Buffer.from(text.replaceAll('{{mode}}','preview'));
+    return false;
+};</code></pre></div>
+                        <div class="callout-warning callout"><strong>Buffering cost:</strong> defining a custom <code>beforeServe</code> buffers every static file and bypasses normal streaming/automatic compression. Static file bodies arrive as Buffers; convert explicitly before string replacement. <code>RefString</code> remains exported for this compatibility shape.</div>
+                        <div class="callout"><strong>Completion boundary:</strong> <code>afterServe</code> runs for library completion paths. A hook that calls <code>response.end()</code> directly bypasses it. Use and await the supplied <code>serve</code> function when completion observation matters.</div>
+                    </section>
+
+                    <section class="doc-section" id="manual"><p class="kicker">Manual serving</p><h2>Respond from a hook without replacing the server.</h2>
+                        <p>Call and await the supplied safe <code>serve</code> continuation for generated content. Use <code>serveFile()</code> only when custom routing selects a deliberate trusted file. Both preserve the server's response/error lifecycle.</p>
+                        <div class="table-wrap"><table><thead><tr><th>Need</th><th>Call</th><th>Expected result</th></tr></thead><tbody><tr><td>Generated text/JSON</td><td><code>await serve(request,response,body,'utf8')</code></td><td>Completes through <code>beforeServe</code>/<code>afterServe</code>.</td></tr><tr><td>Selected trusted file</td><td><code>await this.serveFile(filename,request,response)</code></td><td>Returns whether a file was served.</td></tr><tr><td>Low-level Node behavior</td><td><code>response.end(...)</code></td><td>Your hook owns headers/body and bypasses library completion hooks; return truthy to stop fallback.</td></tr></tbody></table></div>
+                        <div class="callout-error callout"><strong>Trusted filenames only:</strong> <code>serveFile()</code> does not root-contain an arbitrary caller-provided filename. Never pass raw request input into it; resolve and validate application-selected files yourself.</div>
+                    </section>
+
+                    <section class="doc-section" id="errors"><p class="kicker">Error contract</p><h2>Listener errors remain native Node events.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">CommonJS · bind failure handler</span><button type="button" data-copy-target="api-listener-error">Copy</button></div><pre><code id="api-listener-error">const {Server}=require('node-http-server');
+const server=new Server({root:'./public'});
+
+server.deploy();
+server.server.once('error',error=>{
+    console.error(error);
+});</code></pre></div>
+                        <p><code>lastError</code> is for captured request, hook, stream, and logging failures. It does not replace the Node listener's <code>error</code> event. Attach handlers to both <code>server.server</code> and <code>server.secureServer</code> when both protocols run. Synchronous deployment validation—invalid roots, ports, timeout values, or incomplete HTTPS configuration—throws before a usable listener is ready.</p>
+                        <div class="page-links"><a href="./configuration.html">Configuration reference →</a><a href="./examples.html">Copyable examples →</a><a href="./operations.html#failures">HTTP and operational failures →</a></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>Library API for v9. <span data-year></span></p><div><a href="./configuration.html">Config</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
+    </body>
+</html>

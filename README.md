@@ -12,7 +12,7 @@
 [![function coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Ffunctions.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
 [![branch coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Fbranches.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
 
-[Overview](https://riaevangelist.github.io/node-http-server/) · [Developer guide](https://riaevangelist.github.io/node-http-server/guide.html) · [Configuration playground](https://riaevangelist.github.io/node-http-server/playground.html) · [Migration and security](https://riaevangelist.github.io/node-http-server/resources.html)
+[Start](https://riaevangelist.github.io/node-http-server/) · [Docs hub](https://riaevangelist.github.io/node-http-server/guide.html) · [CLI](https://riaevangelist.github.io/node-http-server/cli.html) · [Library API](https://riaevangelist.github.io/node-http-server/api.html) · [Configuration](https://riaevangelist.github.io/node-http-server/configuration.html) · [Examples](https://riaevangelist.github.io/node-http-server/examples.html) · [Playground](https://riaevangelist.github.io/node-http-server/playground.html) · [Testing](https://riaevangelist.github.io/node-http-server/testing.html) · [Operations](https://riaevangelist.github.io/node-http-server/operations.html)
 
 [![Sponsor RIAEvangelist to help development of node-http-server](https://img.shields.io/static/v1?label=Sponsor%20Me%20On%20GitHub&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/RIAEvangelist)
 
@@ -103,14 +103,14 @@ npx node-http-server --root ./public
 | `--cache` | Allow client caching |
 | `--spa[=<file>]` | Enable SPA fallback; optional fallback file |
 | `--compression` | Enable negotiated Brotli or gzip responses |
-| `--max-body <bytes or false>` | Set or disable the request-body limit |
-| `--timeout <ms or false>` | Set or disable the socket inactivity timeout |
-| `--request-timeout <ms or false>` | Set or disable the complete-request timeout |
-| `--headers-timeout <ms or false>` | Set or disable the request-header timeout |
-| `--keep-alive-timeout <ms or false>` | Set or disable the keep-alive timeout |
+| `--max-body <bytes or false>` | Set the request-body limit; `false`, `off`, or `0` is unlimited |
+| `--timeout <ms or false>` | Set the socket inactivity timeout; `false`, `off`, or `0` disables |
+| `--request-timeout <ms or false>` | Set the complete-request timeout; `false`, `off`, or `0` disables |
+| `--headers-timeout <ms or false>` | Set the request-header timeout; `false`, `off`, or `0` disables |
+| `--keep-alive-timeout <ms or false>` | Set the keep-alive timeout; `false`, `off`, or `0` disables |
 | `--log <path>` | Append request records as NDJSON |
-| `--verbose` | Print server activity |
-| `--help` | Print command help |
+| `-v, --verbose` | Print server activity |
+| `-h, --help` | Print command help |
 | `--version` | Print the package version |
 
 The v8 `key=value` form still works:
@@ -190,6 +190,8 @@ server.deploy();
 server.server.once('error',error=>console.error(error));
 ```
 
+Attach the same handler to `server.secureServer` when HTTPS also runs. `serveFile()` trusts its filename; never pass unvalidated request input to it.
+
 ## Configuration
 
 Pass configuration to `new Server(config)` or `server.deploy(config)`. Known nested objects merge with isolated defaults, so changing one instance never changes another. Unsafe prototype keys are rejected.
@@ -240,23 +242,23 @@ const config={
 | `requestTimeout` | `300000` | Complete-request timeout in milliseconds |
 | `headersTimeout` | `60000` | Request-header timeout in milliseconds |
 | `keepAliveTimeout` | `5000` | Keep-alive timeout in milliseconds |
-| `maxRequestBodyBytes` | `false` | Maximum body size in bytes; `false` or `0` means unlimited |
+| `maxRequestBodyBytes` | `false` | Maximum body size in bytes; `false`, `null`, or `0` means unlimited |
 | `compression` | `false` | Negotiate Brotli or gzip for eligible responses |
 | `compressionThreshold` | `1024` | Minimum uncompressed size in bytes |
 | `spaFallback` | `false` | `true` uses `server.index`; a string selects another fallback file |
 
-Every timeout accepts a nonnegative millisecond value. Set a timeout to `false` or `0` to disable it. Limits and compression stay under your control; no request-body limit or compression is enabled by default.
+Every timeout accepts a nonnegative millisecond value. Programmatic configuration accepts `false`, `null`, or `0` to disable it. Limits and compression stay under your control; no request-body limit or compression is enabled by default.
 
 ### Disable and opt-out values
 
-| Setting | `false` | `0` |
-|---|---|---|
-| `server.timeout` | Disabled | Disabled |
-| `server.requestTimeout` | Disabled | Disabled |
-| `server.headersTimeout` | Disabled | Disabled |
-| `server.keepAliveTimeout` | Disabled | Disabled |
-| `server.maxRequestBodyBytes` | Unlimited | Unlimited |
-| `contentType` | Automatic MIME map removed; files use `application/octet-stream` | Not a supported map value |
+| Setting | `false` | `null` | `0` |
+|---|---|---|---|
+| `server.timeout` | Disabled | Disabled | Disabled |
+| `server.requestTimeout` | Disabled | Disabled | Disabled |
+| `server.headersTimeout` | Disabled | Disabled | Disabled |
+| `server.keepAliveTimeout` | Disabled | Disabled | Disabled |
+| `server.maxRequestBodyBytes` | Unlimited | Unlimited | Unlimited |
+| `contentType` | Automatic MIME map removed; files use `application/octet-stream` | Not a supported map value | Not a supported map value |
 
 Deployment validates port ranges, requires a nonempty listen address, verifies static roots, and rejects negative timeout or limit values before opening a listener.
 
@@ -334,7 +336,7 @@ new Server({
 }).deploy();
 ```
 
-`host` decides which network interface listens. `domain` and `domains` decide which Host headers and roots the server accepts.
+`host` decides which network interface listens. `domain` and `domains` decide which Host headers and roots the server accepts. A wildcard primary `domain` (`'0.0.0.0'` or `'*'`) selects the primary root before the `domains` map; set a non-wildcard primary domain when using virtual hosts.
 
 ### Error responses and extension controls
 
@@ -354,7 +356,7 @@ new Server({
 - A satisfiable single `GET` byte range returns `206 Partial Content`; a valid but unsatisfiable range returns `416`.
 - Malformed, unsupported-unit, and multi-range headers are ignored, so the response remains a full `200`. `HEAD` ignores Range and mirrors the full `GET` headers without a body.
 - Weak ETags and `Last-Modified` support conditional `304 Not Modified` responses.
-- Compression negotiates Brotli or gzip only when enabled, accepted by the client, and appropriate for the response.
+- Compression negotiates Brotli or gzip only for eligible static responses when enabled, accepted by the client, above the threshold, and not a byte range. Manual `serve()` responses are not compressed automatically.
 - SPA fallback is off by default. When enabled, an extensionless missing path that accepts HTML falls back to the configured index or root-relative filename.
 - Requested paths are decoded and resolved inside the configured root. Traversal and filesystem escapes are rejected.
 
@@ -383,7 +385,7 @@ Subclass `Server` or assign hook functions to intercept the lifecycle. The first
 | `onRawRequest` | `request, response, serve` | Immediately after receipt, before body parsing |
 | `onRequest` | `request, response, serve` | After the request body and URL helpers are ready |
 | `beforeServe` | `request, response, bodyRef, encodingRef, serve` | Immediately before a buffered response is sent |
-| `afterServe` | `request, response` | After the response finishes |
+| `afterServe` | `request, response` | After a library completion path finishes |
 
 Return a truthy value from the first three hooks when the hook is taking over that step. Complete the response with the supplied `serve` function or the Node response object.
 
@@ -393,13 +395,13 @@ Return a truthy value from the first three hooks when the hook is taking over th
 import {Server} from 'node-http-server';
 
 class ApiAndFiles extends Server{
-    onRequest(request,response,serve){
+    async onRequest(request,response,serve){
         if(request.url!='/health'){
             return false;
         }
 
         response.setHeader('Content-Type','application/json');
-        serve(request,response,JSON.stringify({ok:true}));
+        await serve(request,response,JSON.stringify({ok:true}));
 
         return true;
     }
@@ -409,6 +411,8 @@ new ApiAndFiles({root:'./public'}).deploy();
 ```
 
 Static files stream by default. Defining a custom `beforeServe` hook uses the compatibility buffered path for those responses so `bodyRef.value` and `encodingRef.value` can still be modified.
+
+Static bodies reach `beforeServe` as Buffers; convert them explicitly before string replacement. A custom `beforeServe` buffers files and bypasses automatic streaming/compression. A hook that calls `response.end()` directly also bypasses `afterServe`.
 
 The named `RefString` export remains available in CommonJS and ESM for hook compatibility.
 
@@ -432,16 +436,17 @@ Install the exact workspace state once with `npm ci`. Published installs have ze
 |---|---|
 | `npm start` | Serve the current directory with the CLI |
 | `npm test` | Run the Node test suite |
+| `npm run test:site` | Check docs pages, local links/fragments, IDs, label/ARIA targets, image alt text, nav state, CSS, and site JavaScript |
 | `npm run coverage` | Run `vanilla-test` Node coverage gates, write `coverage/node/`, and refresh measured badge JSON |
 | `npm run test:package` | Pack, install, and smoke-test the publishable package |
-| `npm run verify` | Run tests, coverage, and the package smoke test |
+| `npm run verify` | Run tests, static-doc checks, coverage, and the package smoke test |
 | `npm run basic` | Run the basic HTTP example |
 | `npm run https` | Run the HTTPS-only example; local certificates are required |
 | `npm run both` | Run the combined HTTP/HTTPS example; local certificates are required |
 | `npm run template` | Run the template example |
 | `npm run cluster` | Run the cluster example |
 
-GitHub Actions tests Node.js 22.12 and Node.js 24, runs the Node-only `vanilla-test` coverage gate, smoke-tests the packed npm artifact, uploads the report and measured badges, and publishes them with the static project site from `main`.
+GitHub Actions tests Node.js 22.12 and Node.js 24, validates the dependency-free static docs, runs the Node-only `vanilla-test` coverage gate, smoke-tests the packed npm artifact, uploads the report and measured badges, and publishes them with the static project site from `main`.
 
 When upgrading from v8, read [MIGRATION.md](MIGRATION.md). Release details are in [CHANGELOG.md](CHANGELOG.md).
 

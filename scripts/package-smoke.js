@@ -68,10 +68,28 @@ try{
     assert.equal(fs.existsSync(tarball), true, 'npm pack did not create a tarball');
     assert.equal(
         filenames.some(function(filename){
-            return /^(test|tests|docs)\//.test(filename);
+            return /^(site|scripts|test|tests|docs)\//.test(filename);
         }),
         false,
-        'tests or generated documentation were included in the package'
+        'repository-only scripts, tests, or generated documentation were included in the package'
+    );
+    const publishedTopLevels = new Set([
+        'assets',
+        'bin',
+        'server',
+        'CHANGELOG.md',
+        'MIGRATION.md',
+        'README.md',
+        'SECURITY.md',
+        'licence',
+        'package.json'
+    ]);
+    assert.deepEqual(
+        filenames.filter(function(filename){
+            return !publishedTopLevels.has(filename.split('/')[0]);
+        }),
+        [],
+        'the packed package contains a path outside the publish allowlist'
     );
     assert.equal(
         filenames.some(function(filename){

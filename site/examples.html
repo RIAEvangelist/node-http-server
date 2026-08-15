@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Copyable node-http-server CLI and library examples for SPA, HTTPS, domains, hooks, logging, limits, and shutdown."><meta name="theme-color" content="#08110d"><title>Examples — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/examples.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script></head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html" aria-current="page">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
+        <main id="main"><header class="page-header page-header-compact"><p class="kicker">Copyable tasks</p><h1>Start from a working pattern.</h1><p class="lead">Each example states what it should do and where to look when it does not.</p></header>
+            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#cli">CLI recipes</a><a href="#spa">SPA + compression</a><a href="#limits">Limits</a><a href="#shutdown">Multiple servers</a><a href="#https">HTTPS</a><a href="#domains">Domain roots</a><a href="#hook">API + files</a><a href="#logging">Logging</a><a href="#mime">MIME controls</a></aside>
+                <div class="doc-content">
+                    <section class="doc-section" id="cli"><p class="kicker">CLI recipes</p><h2>Local first, public only when deliberate.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">shell</span><button type="button" data-copy-target="examples-cli">Copy</button></div><pre><code id="examples-cli"># Local static build
+node-http-server --root ./dist --port 8080
+
+# Free local port; read the printed URL
+node-http-server ./dist --port 0
+
+# SPA plus eligible Brotli/gzip responses
+node-http-server --root ./dist --spa --compression
+
+# LAN-facing — review firewall/auth/TLS first
+node-http-server --root ./dist --host 0.0.0.0 --port 8080</code></pre></div>
+                        <div class="output-block"><span class="expected-label">Expected startup</span><pre>node-http-server listening at http://127.0.0.1:8080</pre></div>
+                        <div class="callout-warning callout"><strong>Failure checks:</strong> the root must already exist. <code>0.0.0.0</code> is a bind address, not a browser destination. Use the machine's real network address from another device.</div>
+                        <div class="page-links"><a href="./cli.html#tasks">All CLI tasks and flags →</a><a href="./operations.html#exposure">Exposure checklist →</a></div>
+                    </section>
+
+                    <section class="doc-section" id="spa"><p class="kicker">Single-page application</p><h2>Fallback only for application routes.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-spa">Copy</button></div><pre><code id="examples-spa">import {Server} from 'node-http-server';
+
+new Server({
+    root:'./dist',
+    server:{
+        spaFallback:true,
+        compression:true,
+        compressionThreshold:1024
+    }
+}).deploy();</code></pre></div>
+                        <p><strong>Expected:</strong> an extensionless missing route accepting HTML falls back to <code>index.html</code>. Missing assets and requests not accepting HTML remain <code>404</code>. Brotli/gzip is negotiated only for accepted, compressible, non-range responses at or above 1024 bytes.</p>
+                        <div class="callout"><strong>Custom entry:</strong> use <code>spaFallback:'app.html'</code> or CLI <code>--spa=app.html</code>.</div>
+                    </section>
+
+                    <section class="doc-section" id="limits"><p class="kicker">Ingress limits</p><h2>Cap bodies and tighten request timing.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">CommonJS</span><button type="button" data-copy-target="examples-limits">Copy</button></div><pre><code id="examples-limits">const {Server}=require('node-http-server');
+
+new Server({
+    root:'./public',
+    server:{
+        maxRequestBodyBytes:1024*1024,
+        headersTimeout:15000,
+        requestTimeout:30000,
+        timeout:30000,
+        keepAliveTimeout:5000
+    }
+}).deploy();</code></pre></div>
+                        <p><strong>Expected:</strong> bodies above 1 MiB receive <code>413</code>. Values are milliseconds except the body limit, which is bytes. False/0 disables a control; use disabled protection only intentionally.</p>
+                    </section>
+
+                    <section class="doc-section" id="shutdown"><p class="kicker">Multiple servers and shutdown</p><h2>Keep instances isolated and close both.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-multi">Copy</button></div><pre><code id="examples-multi">import {Server} from 'node-http-server';
+
+const publicServer=new Server({
+    root:'./public',
+    port:8080
+}).deploy();
+
+const previewServer=new Server({
+    root:'./preview',
+    port:8081
+}).deploy();
+
+process.once('SIGTERM',async()=>{
+    await Promise.all([
+        publicServer.close(),
+        previewServer.close()
+    ]);
+});</code></pre></div>
+                        <p><strong>Expected:</strong> each instance owns its own root, port, configuration, and listener. <code>close()</code> resolves after owned listeners close; either instance can deploy again later.</p>
+                        <div class="callout-error callout"><strong>Failure:</strong> calling <code>deploy()</code> again before <code>close()</code> completes throws. Port conflicts surface through the listener's native <code>error</code> event.</div>
+                    </section>
+
+                    <section class="doc-section" id="https"><p class="kicker">HTTPS only</p><h2>Load fresh local certificate paths.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-https">Copy</button></div><pre><code id="examples-https">import {Server} from 'node-http-server';
+
+new Server({
+    host:'127.0.0.1',
+    https:{
+        privateKey:'./local-certs/private/server.key',
+        certificate:'./local-certs/server.crt',
+        port:8443,
+        only:true
+    }
+}).deploy();</code></pre></div>
+                        <p><strong>Expected:</strong> only <code>secureServer</code> listens on <code>https://127.0.0.1:8443</code>. Set <code>only:false</code> to run HTTP and HTTPS; <code>close()</code> closes both.</p>
+                        <div class="callout-warning callout"><strong>Failure:</strong> key and certificate are both required. Generate fresh local material; old v8 fixture keys are public and untrusted.</div>
+                    </section>
+
+                    <section class="doc-section" id="domains"><p class="kicker">Host-based roots</p><h2>Map accepted hostnames to directories.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">CommonJS</span><button type="button" data-copy-target="examples-domains">Copy</button></div><pre><code id="examples-domains">const {Server}=require('node-http-server');
+
+new Server({
+    root:'./www/default',
+    domain:'example.test',
+    domains:{
+        'docs.example.test':'./www/docs',
+        'app.example.test':'./www/app'
+    }
+}).deploy();</code></pre></div>
+                        <p><strong>Expected:</strong> matching Host values select their roots; unknown values receive <code>421</code>. Port text in the Host header does not change hostname matching.</p>
+                        <div class="callout"><strong>Separate concerns:</strong> this does not configure DNS or listen interfaces. Use <code>host</code> for the bind address.</div>
+                    </section>
+
+                    <section class="doc-section" id="hook"><p class="kicker">JSON route plus static files</p><h2>Handle one route, then return to fallback.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-hook">Copy</button></div><pre><code id="examples-hook">import {Server} from 'node-http-server';
+
+class AppServer extends Server{
+    async onRequest(request,response,serve){
+        if(request.url!='/health') return false;
+
+        response.setHeader('Content-Type','application/json');
+        await serve(request,response,JSON.stringify({ok:true}));
+        return true;
+    }
+}
+
+new AppServer({root:'./public'}).deploy();</code></pre></div>
+                        <div class="output-block"><span class="expected-label">Expected GET /health body</span><pre>{"ok":true}</pre></div>
+                        <p>All other requests continue to static fallback. Return truthy only after the hook takes over. See the <a href="./api.html#hooks">hook contract</a> before asynchronous or buffered customization.</p>
+                    </section>
+
+                    <section class="doc-section" id="logging"><p class="kicker">Request logging</p><h2>Append redacted NDJSON.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-log">Copy</button></div><pre><code id="examples-log">import {Server} from 'node-http-server';
+
+new Server({
+    root:'./public',
+    log:'./logs/requests.ndjson',
+    logBody:false,
+    verbose:true
+}).deploy();</code></pre></div>
+                        <p><strong>Expected:</strong> one parseable JSON record is appended for each request. Common credential headers are redacted; body storage remains off.</p>
+                        <div class="callout-warning callout"><strong>Failure:</strong> create the parent directory first. Async write failures do not stop the server; verbose output exposes them and <code>lastError</code> retains the captured failure.</div>
+                    </section>
+
+                    <section class="doc-section" id="mime"><p class="kicker">MIME and extension policy</p><h2>Add one type and deny secrets.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-mime">Copy</button></div><pre><code id="examples-mime">import {Server} from 'node-http-server';
+
+new Server({
+    contentType:{
+        md:'text/markdown; charset=utf-8',
+        private:false
+    },
+    restrictedType:{
+        key:true,
+        pem:true
+    }
+}).deploy();</code></pre></div>
+                        <p><strong>Expected:</strong> <code>.md</code> gets the custom type, <code>.private</code> returns <code>415</code>, and <code>.key</code>/<code>.pem</code> return <code>403</code>. Unknown extensions use <code>application/octet-stream</code>.</p>
+                        <div class="page-links"><a href="./configuration.html#mime">MIME configuration details →</a><a href="./playground.html">Generate a combined config →</a><a href="./testing.html#add-test">Add a regression test →</a></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>Copyable v9 examples. <span data-year></span></p><div><a href="./testing.html">Testing</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
+    </body>
+</html>

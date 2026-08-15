@@ -18,51 +18,33 @@
     </head>
     <body>
         <a class="skip-link" href="#main">Skip to content</a>
-        <div class="scroll-meter" aria-hidden="true"><span></span></div>
-
         <header class="site-header">
-            <a class="wordmark" href="./index.html" aria-label="node-http-server home">
-                <span class="wordmark-mark" aria-hidden="true">n</span>
-                <span>node-http-server</span>
-            </a>
-            <nav aria-label="Primary navigation">
-                <a href="./index.html">Overview</a>
-                <a href="./guide.html">Guide</a>
-                <a href="./playground.html" aria-current="page">Playground</a>
-                <a href="./resources.html">Resources</a>
-                <a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub <span aria-hidden="true">↗</span></a>
-            </nav>
+            <a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a>
+            <nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html" aria-current="page">Playground</a><a href="./testing.html">Testing</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav>
         </header>
 
-        <main id="main" class="page-main">
-            <section class="page-hero reveal">
-                <p class="eyebrow">CommonJS + ESM + CLI + JSON</p>
-                <h1>Build the config <em>you need.</em></h1>
-                <p>Set the server options below. The matching snippets update immediately.</p>
-                <div class="page-jumps" aria-label="Playground links">
-                    <a href="#generator">Generator</a>
-                    <a href="./guide.html#configuration">Full reference</a>
-                    <a href="./resources.html#security">Security</a>
-                </div>
-            </section>
+        <main id="main">
+            <header class="page-header page-header-compact">
+                <p class="kicker">CommonJS + ESM + CLI + JSON</p>
+                <h1>Build a configuration.</h1>
+                <p class="lead">Every choice updates the copyable output. Links beside each group explain the exact Config key, default, and runtime behavior.</p>
+            </header>
 
-            <section class="compact-section playground-section" id="generator" aria-labelledby="generator-heading">
-                <div class="section-heading reveal">
-                    <p class="eyebrow">Configuration generator</p>
-                    <h2 id="generator-heading">Choose. Copy. Run locally.</h2>
-                    <p>The module snippets cover the full serializable Config surface. The CLI output includes only options the CLI accepts.</p>
+            <section class="doc-section playground-page" id="generator" aria-labelledby="generator-heading">
+                <h2 id="generator-heading">Choose values, then copy one format.</h2>
+                <div class="playground-intro">
+                    <div class="card"><h3>Module output</h3><p>CommonJS and ESM include the full representable Config surface.</p></div>
+                    <div class="card"><h3>CLI output</h3><p>Includes only flags the command supports and warns when advanced choices are omitted.</p></div>
+                    <div class="card"><h3>JSON output</h3><p>A serializable Config object for module code or storage—not a CLI config file.</p></div>
                 </div>
 
-                <div class="browser-note reveal" role="note">
-                    <strong>This simulates configuration. It does not run a server.</strong>
-                    <span>Everything stays in this browser page. GitHub Pages cannot launch Node.js, read your files, validate certificate contents, or start a local listener. Copy a snippet and run it on your own machine.</span>
-                </div>
+                <div class="callout-warning callout" role="note"><strong>This page generates text only.</strong> GitHub Pages cannot launch Node.js, read your files, validate certificate contents, or start a local listener. Copy a snippet and run it on your machine. Generated shell quoting is basic and not designed for adversarial shell characters.</div>
 
-                <div class="playground-grid reveal">
+                <div class="playground-grid">
                     <form class="configurator" id="config-form">
                         <div class="configurator-heading">
                             <div>
-                                <p class="feature-number">FULL CONFIG SURFACE</p>
+                                <p class="kicker">Full Config surface</p>
                                 <h3>Configuration</h3>
                             </div>
                             <button type="reset">Reset defaults</button>
@@ -70,6 +52,7 @@
 
                         <fieldset>
                             <legend>Location and host routing</legend>
+                            <p class="field-doc">Keys: <code>root</code>, <code>host</code>, <code>port</code>, <code>domain</code>, <code>domains</code>, and <code>server.index</code>. <a href="./configuration.html#network">Defaults and Host-routing rules →</a></p>
                             <div class="field-grid">
                                 <label>
                                     <span>Root directory</span>
@@ -84,7 +67,7 @@
                                     <input id="config-port" name="port" type="number" min="0" max="65535" step="1" value="8080">
                                 </label>
                                 <label>
-                                    <span>Primary Host check</span>
+                                    <span>Primary Host check <small>Use a non-wildcard value before adding domain roots</small></span>
                                     <input id="config-domain" name="domain" type="text" value="0.0.0.0" spellcheck="false">
                                 </label>
                                 <label>
@@ -100,6 +83,7 @@
 
                         <fieldset>
                             <legend>HTTP behavior</legend>
+                            <p class="field-doc">Keys: <code>server.noCache</code>, <code>compression</code>, <code>compressionThreshold</code>, <code>spaFallback</code>, <code>maxRequestBodyBytes</code>, and top-level <code>verbose</code>. <a href="./configuration.html#server">Behavior details →</a></p>
                             <div class="switch-list">
                                 <label class="switch-row">
                                     <span><strong>No-cache headers</strong><small>Default is on</small></span>
@@ -148,6 +132,7 @@
 
                         <fieldset>
                             <legend>Timeouts <small>milliseconds</small></legend>
+                            <p class="field-doc">Keys: <code>server.timeout</code>, <code>requestTimeout</code>, <code>headersTimeout</code>, and <code>keepAliveTimeout</code>. <a href="./configuration.html#limits">Disable semantics and units →</a></p>
                             <div class="timeout-grid">
                                 <div class="timeout-field">
                                     <label for="config-timeout">Socket inactivity</label>
@@ -175,6 +160,7 @@
 
                         <fieldset>
                             <legend>File types and restrictions</legend>
+                            <p class="field-doc">Keys: <code>contentType</code> and <code>restrictedType</code>. <a href="./configuration.html#mime">MIME fallback, 403, and 415 rules →</a></p>
                             <div class="field-grid">
                                 <label>
                                     <span>Automatic MIME types</span>
@@ -199,6 +185,7 @@
 
                         <fieldset>
                             <legend>Logging and errors</legend>
+                            <p class="field-doc">Keys: <code>log</code>, <code>logBody</code>, <code>logFunction</code>, and <code>errors</code>. <a href="./configuration.html#logging">Logging →</a> <a href="./configuration.html#errors">Error responses →</a></p>
                             <div class="field-grid">
                                 <label>
                                     <span>NDJSON log path</span>
@@ -227,6 +214,7 @@
 
                         <fieldset>
                             <legend>HTTPS</legend>
+                            <p class="field-doc">Keys: <code>https.privateKey</code>, <code>certificate</code>, <code>ca</code>, <code>passphrase</code>, <code>port</code>, and <code>only</code>. <a href="./configuration.html#https">HTTPS requirements →</a></p>
                             <label class="switch-row standalone-switch">
                                 <span><strong>Configure HTTPS</strong><small>Both key and certificate are required to listen</small></span>
                                 <input id="config-https" name="httpsEnabled" type="checkbox">
@@ -286,25 +274,14 @@ server.deploy();</code></pre>
                     </div>
                 </div>
 
-                <div class="install-line reveal">
+                <div class="install-line">
                     <code>npm install node-http-server</code>
                     <button type="button" data-copy-text="npm install node-http-server">Copy install command</button>
                 </div>
-            </section>
-
-            <section class="page-cta reveal">
-                <div><p class="eyebrow">Exact defaults and behavior</p><h2>Keep the reference nearby.</h2></div>
-                <a class="button button-secondary" href="./guide.html#configuration">Open configuration tables <span aria-hidden="true">→</span></a>
+                <div class="page-links"><a href="./configuration.html">Complete Config reference →</a><a href="./cli.html#limits">What the CLI cannot represent →</a><a href="./examples.html">Working task examples →</a><a href="./operations.html#exposure">Exposure and security →</a></div>
             </section>
         </main>
 
-        <footer>
-            <a class="wordmark" href="./index.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a>
-            <p>Small on purpose. MIT licensed. <span data-year></span></p>
-            <div>
-                <a href="https://www.npmjs.com/package/node-http-server">npm</a>
-                <a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a>
-            </div>
-        </footer>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>In-browser configuration generator. <span data-year></span></p><div><a href="./configuration.html">Config</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
     </body>
 </html>

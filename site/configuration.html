@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Complete node-http-server configuration defaults, opt-out values, MIME controls, HTTPS, errors, and validation."><meta name="theme-color" content="#08110d"><title>Configuration — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/configuration.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script></head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html" aria-current="page">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
+        <main id="main"><header class="page-header page-header-compact"><p class="kicker">Complete Config reference</p><h1>Set only what should change.</h1><p class="lead">Known nested objects merge with isolated defaults. Values are validated before listeners open.</p><div class="header-actions"><a class="button button-primary" href="./playground.html">Generate a config</a><a class="button" href="./examples.html">Copy examples</a></div></header>
+            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#using-config">Using Config</a><a href="#network">Network and roots</a><a href="#server">Static server</a><a href="#limits">Limits and timeouts</a><a href="#mime">MIME and restrictions</a><a href="#errors">Error responses</a><a href="#logging">Logging</a><a href="#https">HTTPS</a><a href="#validation">Validation</a></aside>
+                <div class="doc-content">
+                    <section class="doc-section" id="using-config"><p class="kicker">Using configuration</p><h2>Pass an object or use Config directly.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">CommonJS · representative configuration</span><button type="button" data-copy-target="config-base">Copy</button></div><pre><code id="config-base">const {Server}=require('node-http-server');
+
+const server=new Server({
+    host:'127.0.0.1',
+    port:8080,
+    root:'./public',
+    server:{
+        noCache:false,
+        compression:true,
+        maxRequestBodyBytes:1048576
+    }
+});
+
+server.deploy();</code></pre></div>
+                        <div class="table-wrap"><table><thead><tr><th>API</th><th>Behavior</th></tr></thead><tbody><tr><td><code>new Server(values?)</code></td><td>Creates an instance with an isolated <code>Config</code>.</td></tr><tr><td><code>server.deploy(values?)</code></td><td>Merges supplied values before deployment.</td></tr><tr><td><code>new Config(values?)</code></td><td>Creates isolated configuration without deploying.</td></tr><tr><td><code>config.merge(values)</code></td><td>Safely merges and returns the same Config instance.</td></tr><tr><td><code>Config.defaults</code></td><td>Returns a fresh copy of all defaults.</td></tr><tr><td><code>Config.mimeTypes</code></td><td>Returns a fresh built-in MIME map.</td></tr></tbody></table></div>
+                        <div class="quick-grid"><div class="code-block"><div class="code-head"><span class="code-label">CommonJS subpaths</span><button type="button" data-copy-target="config-sub-cjs">Copy</button></div><pre><code id="config-sub-cjs">const Config=require('node-http-server/config');
+const mimeTypes=require('node-http-server/mime-types');</code></pre></div><div class="code-block"><div class="code-head"><span class="code-label">ESM subpaths</span><button type="button" data-copy-target="config-sub-esm">Copy</button></div><pre><code id="config-sub-esm">import Config from 'node-http-server/config';
+import mimeTypes from 'node-http-server/mime-types';</code></pre></div></div>
+                    </section>
+
+                    <section class="doc-section" id="network"><p class="kicker">Network, roots, and top-level state</p><h2>Separate binding from Host routing.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Key</th><th>Default</th><th>Purpose</th><th>Playground</th></tr></thead><tbody>
+                            <tr><td><code>host</code></td><td><code>'127.0.0.1'</code></td><td>Address passed to <code>listen()</code>.</td><td>Location and host routing</td></tr>
+                            <tr><td><code>port</code></td><td><code>8080</code></td><td>HTTP port; <code>0</code> requests an ephemeral port.</td><td>Location and host routing</td></tr>
+                            <tr><td><code>root</code></td><td><code>process.cwd()</code></td><td>Default static root.</td><td>Location and host routing</td></tr>
+                            <tr><td><code>domain</code></td><td><code>'0.0.0.0'</code></td><td>Legacy primary Host check; not a bind address.</td><td>Location and host routing</td></tr>
+                            <tr><td><code>domains</code></td><td><code>{}</code></td><td>Additional hostname-to-root mappings.</td><td>Additional domains JSON</td></tr>
+                            <tr><td><code>verbose</code></td><td><code>false</code></td><td>Sanitized operational console output.</td><td>HTTP behavior</td></tr>
+                            <tr><td><code>server</code></td><td>table below</td><td>Static HTTP behavior and Node timeouts.</td><td>HTTP behavior + Timeouts</td></tr>
+                            <tr><td><code>https</code></td><td>empty values</td><td>Certificate paths and secure listener mode.</td><td>HTTPS</td></tr>
+                            <tr><td><code>contentType</code></td><td>built-in map</td><td>MIME additions/overrides, or <code>false</code>.</td><td>File types and restrictions</td></tr>
+                            <tr><td><code>restrictedType</code></td><td><code>{}</code></td><td>Truthy extension keys return <code>403</code>.</td><td>File types and restrictions</td></tr>
+                            <tr><td><code>errors</code></td><td>built-in map</td><td>Error headers and status bodies.</td><td>Logging and errors</td></tr>
+                            <tr><td><code>log</code></td><td><code>false</code></td><td>NDJSON destination or logging off.</td><td>Logging and errors</td></tr>
+                            <tr><td><code>logBody</code></td><td><code>false</code></td><td>Include UTF-8 body in request records.</td><td>Logging and errors</td></tr>
+                            <tr><td><code>logFunction</code></td><td>built in</td><td>Custom request-record writer.</td><td>Module-only function stub</td></tr>
+                        </tbody></table></div>
+                        <div class="callout"><strong><code>host</code> versus <code>domain</code>:</strong> <code>host</code> chooses the network interface. <code>domain</code> and <code>domains</code> choose accepted Host values and static roots. A mismatch returns <code>421</code>.</div>
+                        <div class="callout-warning callout"><strong>Virtual-host requirement:</strong> wildcard <code>domain:'0.0.0.0'</code> or <code>domain:'*'</code> selects the primary root before <code>domains</code> is consulted. Set a nonwildcard primary domain when using the map.</div>
+                        <div class="code-block"><div class="code-head"><span class="code-label">ESM · virtual host roots</span><button type="button" data-copy-target="config-domains-example">Copy</button></div><pre><code id="config-domains-example">new Server({
+    root:'./www/default',
+    domain:'example.test',
+    domains:{
+        'docs.example.test':'./www/docs',
+        'app.example.test':'./www/app'
+    }
+}).deploy();</code></pre></div>
+                    </section>
+
+                    <section class="doc-section" id="server"><p class="kicker">Static server behavior</p><h2>The <code>server</code> object.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Key</th><th>Default</th><th>Purpose</th></tr></thead><tbody>
+                            <tr><td><code>index</code></td><td><code>'index.html'</code></td><td>File used for directory requests. There is no directory listing when it is absent.</td></tr>
+                            <tr><td><code>noCache</code></td><td><code>true</code></td><td>Sends no-cache/no-store/must-revalidate directives. <code>false</code> omits them; it does not add a cache lifetime.</td></tr>
+                            <tr><td><code>compression</code></td><td><code>false</code></td><td>Negotiates Brotli/gzip for accepted compressible static responses; ranges and manual <code>serve()</code> responses are not compressed.</td></tr>
+                            <tr><td><code>compressionThreshold</code></td><td><code>1024</code></td><td>Minimum uncompressed bytes before compression is considered.</td></tr>
+                            <tr><td><code>spaFallback</code></td><td><code>false</code></td><td><code>true</code> uses <code>index</code>; a string chooses another root-relative file.</td></tr>
+                            <tr><td><code>timeout</code></td><td><code>30000</code></td><td>Socket inactivity timeout in milliseconds.</td></tr>
+                            <tr><td><code>requestTimeout</code></td><td><code>300000</code></td><td>Whole-request timeout in milliseconds.</td></tr>
+                            <tr><td><code>headersTimeout</code></td><td><code>60000</code></td><td>Request-header timeout in milliseconds.</td></tr>
+                            <tr><td><code>keepAliveTimeout</code></td><td><code>5000</code></td><td>Keep-alive timeout in milliseconds.</td></tr>
+                            <tr><td><code>maxRequestBodyBytes</code></td><td><code>false</code></td><td>Maximum request bytes; false/0 is unlimited.</td></tr>
+                        </tbody></table></div>
+                        <div class="callout"><strong>SPA conditions:</strong> fallback applies only after an initial <code>404</code>, for an extensionless path whose request accepts HTML or <code>*/*</code>. Missing assets and non-HTML requests remain <code>404</code>.</div>
+                    </section>
+
+                    <section class="doc-section" id="limits"><p class="kicker">Limits and timeouts</p><h2>Every disable value is explicit.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Setting</th><th><code>false</code></th><th><code>0</code></th><th>Unit</th></tr></thead><tbody>
+                            <tr><td><code>server.timeout</code></td><td>Disabled</td><td>Disabled</td><td>milliseconds</td></tr><tr><td><code>server.requestTimeout</code></td><td>Disabled</td><td>Disabled</td><td>milliseconds</td></tr><tr><td><code>server.headersTimeout</code></td><td>Disabled</td><td>Disabled</td><td>milliseconds</td></tr><tr><td><code>server.keepAliveTimeout</code></td><td>Disabled</td><td>Disabled</td><td>milliseconds</td></tr><tr><td><code>server.maxRequestBodyBytes</code></td><td>Unlimited</td><td>Unlimited</td><td>bytes</td></tr><tr><td><code>contentType</code></td><td>Automatic map removed</td><td>Invalid map value</td><td>—</td></tr>
+                        </tbody></table></div>
+                        <div class="callout"><strong>Programmatic <code>null</code>:</strong> <code>false</code>, <code>null</code>, and numeric <code>0</code> disable timeouts and the body cap through the module API. The CLI accepts false/off/0, not null.</div>
+                        <div class="callout-warning callout"><strong>Operational choice:</strong> disabled values are supported, not recommended as a universal default. Set finite limits for the traffic and proxy chain you actually operate.</div>
+                    </section>
+
+                    <section class="doc-section" id="mime"><p class="kicker">File types and restrictions</p><h2>Serve, reject, or use the binary fallback.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Configuration</th><th>Result</th></tr></thead><tbody><tr><td>No entry for extension</td><td><code>application/octet-stream</code>.</td></tr><tr><td><code>contentType:{md:'text/markdown; charset=utf-8'}</code></td><td>Adds or overrides that extension.</td></tr><tr><td><code>contentType:{secret:false}</code></td><td>Requests for <code>.secret</code> return <code>415</code>.</td></tr><tr><td><code>contentType:false</code></td><td>Removes automatic mapping; served files use <code>application/octet-stream</code>.</td></tr><tr><td><code>restrictedType:{key:true}</code></td><td>Requests for <code>.key</code> return <code>403</code>.</td></tr></tbody></table></div>
+                        <div class="code-block"><div class="code-head"><span class="code-label">JavaScript · MIME and extension controls</span><button type="button" data-copy-target="config-mime-example">Copy</button></div><pre><code id="config-mime-example">new Server({
+    contentType:{
+        md:'text/markdown; charset=utf-8',
+        secret:false
+    },
+    restrictedType:{
+        key:true,
+        pem:true
+    }
+});</code></pre></div>
+                        <p>Extension keys do not include a dot. The built-in map is available through <code>Config.mimeTypes</code> or the <code>node-http-server/mime-types</code> package subpath. If an object is merged after <code>contentType:false</code>, the built-in defaults are restored first and then overlaid.</p>
+                    </section>
+
+                    <section class="doc-section" id="errors"><p class="kicker">Error responses</p><h2>Override headers or individual bodies.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Key</th><th>Default / shape</th><th>Use</th></tr></thead><tbody><tr><td><code>errors.headers</code></td><td><code>Content-Type: text/plain; charset=utf-8</code>, <code>X-Content-Type-Options: nosniff</code></td><td>Headers applied to built-in error responses.</td></tr><tr><td><code>errors[400]</code></td><td><code>'400 Bad Request'</code></td><td>Malformed request.</td></tr><tr><td><code>errors[403|404|405]</code></td><td>Status text</td><td>Denied, missing, or unsupported method.</td></tr><tr><td><code>errors[413|415|416|421|500]</code></td><td>Status text</td><td>Limit/type/range/Host/internal failures.</td></tr></tbody></table></div>
+                        <div class="code-block"><div class="code-head"><span class="code-label">JavaScript · custom error response</span><button type="button" data-copy-target="config-errors-example">Copy</button></div><pre><code id="config-errors-example">new Server({
+    errors:{
+        headers:{'Content-Type':'application/json'},
+        404:'{"error":"not found"}'
+    }
+});</code></pre></div>
+                    </section>
+
+                    <section class="doc-section" id="logging"><p class="kicker">Logging</p><h2>Append NDJSON or provide a writer.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Key</th><th>Default</th><th>Behavior</th></tr></thead><tbody><tr><td><code>log</code></td><td><code>false</code></td><td>File path enables one JSON record per request line.</td></tr><tr><td><code>logBody</code></td><td><code>false</code></td><td>Adds the UTF-8 request body when deliberately enabled.</td></tr><tr><td><code>logFunction</code></td><td>built-in append writer</td><td>Receives the record with <code>this</code> bound to Config; may return a Promise.</td></tr></tbody></table></div>
+                        <p>The built-in writer adds a timestamp without mutating its input and redacts common credential headers. Serialization/filesystem errors are captured. Protect log destinations and treat any stored request body as sensitive.</p>
+                        <div class="code-block"><div class="code-head"><span class="code-label">JavaScript · custom logger</span><button type="button" data-copy-target="config-log-example">Copy</button></div><pre><code id="config-log-example">new Server({
+    log:true,
+    logFunction(data){
+        return sendRecordSomewhere(data);
+    }
+});</code></pre></div>
+                    </section>
+
+                    <section class="doc-section" id="https"><p class="kicker">HTTPS</p><h2>Supply key and certificate paths together.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Key</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>https.ca</code></td><td><code>''</code></td><td>Optional CA certificate path.</td></tr><tr><td><code>https.privateKey</code></td><td><code>''</code></td><td>Private-key path.</td></tr><tr><td><code>https.certificate</code></td><td><code>''</code></td><td>Certificate path.</td></tr><tr><td><code>https.passphrase</code></td><td><code>false</code></td><td>Optional private-key passphrase.</td></tr><tr><td><code>https.port</code></td><td><code>443</code></td><td>HTTPS port.</td></tr><tr><td><code>https.only</code></td><td><code>false</code></td><td>Skip HTTP when HTTPS is configured.</td></tr></tbody></table></div>
+                        <div class="code-block"><div class="code-head"><span class="code-label">ESM · HTTPS only</span><button type="button" data-copy-target="config-https-example">Copy</button></div><pre><code id="config-https-example">const server=new Server({
+    host:'127.0.0.1',
+    https:{
+        privateKey:'/path/to/private.key',
+        certificate:'/path/to/certificate.pem',
+        port:8443,
+        only:true
+    }
+});
+
+server.deploy();</code></pre></div>
+                        <div class="callout-warning callout"><strong>Certificates:</strong> repository fixture keys were removed. Generate fresh local certificates, keep private keys out of source control, and never use copied v8 fixture keys; they are public and untrusted.</div>
+                    </section>
+
+                    <section class="doc-section" id="validation"><p class="kicker">Validation and merging</p><h2>Invalid configuration fails before serving.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Check</th><th>Failure</th></tr></thead><tbody><tr><td>Config is not a plain object</td><td><code>TypeError</code>.</td></tr><tr><td>Nested map is not a plain object</td><td><code>TypeError</code> naming the key.</td></tr><tr><td><code>__proto__</code>, <code>constructor</code>, or <code>prototype</code></td><td>Rejected as unsafe.</td></tr><tr><td>Port not an integer in 0–65535</td><td>Deployment throws.</td></tr><tr><td>Host empty</td><td>Deployment throws.</td></tr><tr><td>Root/domain root missing or not a directory</td><td>Deployment throws.</td></tr><tr><td>Negative timeout/limit/threshold</td><td>Deployment throws.</td></tr><tr><td>Only one of HTTPS key/certificate set</td><td>Deployment throws.</td></tr><tr><td><code>https.only:true</code> without key/certificate</td><td>Deployment throws.</td></tr></tbody></table></div>
+                        <p>Merge precedence is defaults, then constructor values, then later <code>deploy()</code>/<code>merge()</code> overlays. Known nested records shallow-overlay and omitted earlier values persist. Instances, <code>Config.defaults</code>, <code>Config.mimeTypes</code>, and user maps do not share mutable nested state. Unknown safe top-level keys are accepted but ignored by the server.</p>
+                        <div class="page-links"><a href="./playground.html">Open every control in the playground →</a><a href="./examples.html">Use task examples →</a><a href="./operations.html#failures">Map failures to fixes →</a></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>Configuration reference for v9. <span data-year></span></p><div><a href="./playground.html">Playground</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
+    </body>
+</html>

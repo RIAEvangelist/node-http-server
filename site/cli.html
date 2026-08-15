@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Task-oriented node-http-server CLI guide with every flag, default, output, and failure mode."><meta name="theme-color" content="#08110d">
+        <title>CLI — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/cli.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script>
+    </head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a>
+        <header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./cli.html" aria-current="page">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
+        <main id="main">
+            <header class="page-header page-header-compact"><p class="kicker">Command line</p><h1>Run the server from a terminal.</h1><p class="lead">Install, serve, expose, tune, and stop the CLI. Every supported input and exit path is documented here.</p></header>
+            <div class="doc-layout">
+                <aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#install">Install and run</a><a href="#tasks">Common tasks</a><a href="#options">All options</a><a href="#syntax">Input syntax</a><a href="#output">Output and exits</a><a href="#failures">Troubleshooting</a><a href="#limits">CLI boundary</a></aside>
+                <div class="doc-content">
+                    <section class="doc-section" id="install"><p class="kicker">Install and run</p><h2>Choose how the command is available.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Use</th><th>Command</th><th>What it does</th></tr></thead><tbody>
+                            <tr><td>Global command</td><td><code>npm install --global node-http-server</code></td><td>Adds <code>node-http-server</code> to the active npm environment.</td></tr>
+                            <tr><td>One-off run</td><td><code>npx node-http-server --root ./public</code></td><td>Runs the package command without relying on a global install.</td></tr>
+                            <tr><td>Repository script</td><td><code>npm start -- --root ./public</code></td><td>Runs this repository's CLI entry and forwards flags after <code>--</code>.</td></tr>
+                        </tbody></table></div>
+                        <div class="code-block"><div class="code-head"><span class="code-label">shell · local static root</span><button type="button" data-copy-target="cli-local">Copy</button></div><pre><code id="cli-local">node-http-server --root ./public --port 8080</code></pre></div>
+                        <div class="output-block"><span class="expected-label">Expected output</span><pre>node-http-server listening at http://127.0.0.1:8080</pre></div>
+                        <p>The printed URL uses the actual listener address and port. With <code>--port 0</code>, the operating system selects a free port and that assigned port appears in the output.</p>
+                    </section>
+
+                    <section class="doc-section" id="tasks"><p class="kicker">Common tasks</p><h2>Copy the command for the job.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Task</th><th>Command</th><th>Expected behavior</th></tr></thead><tbody>
+                            <tr><td>Serve current directory</td><td><code>node-http-server</code></td><td>Local HTTP on <code>127.0.0.1:8080</code>.</td></tr>
+                            <tr><td>Serve another directory</td><td><code>node-http-server --root ./public</code></td><td>Paths resolve from the current working directory.</td></tr>
+                            <tr><td>Pick a local port</td><td><code>node-http-server --port 9000</code></td><td>Local HTTP on port 9000.</td></tr>
+                            <tr><td>Pick a free port</td><td><code>node-http-server --port 0</code></td><td>Prints the operating-system-assigned port.</td></tr>
+                            <tr><td>Accept network traffic</td><td><code>node-http-server --host 0.0.0.0</code></td><td>Binds all IPv4 interfaces; firewall and network policy still apply.</td></tr>
+                            <tr><td>Require one Host value</td><td><code>node-http-server --domain example.test</code></td><td>Other Host values receive <code>421</code>; this does not set DNS or the bind address.</td></tr>
+                            <tr><td>Serve an SPA</td><td><code>node-http-server --root ./dist --spa --compression</code></td><td>Missing extensionless HTML routes use the index; eligible responses negotiate compression.</td></tr>
+                            <tr><td>Use another SPA file</td><td><code>node-http-server --spa=app.html</code></td><td>Uses <code>app.html</code> as the fallback.</td></tr>
+                            <tr><td>Limit bodies to 1 MiB</td><td><code>node-http-server --max-body 1048576</code></td><td>Oversized request bodies stop with <code>413</code>.</td></tr>
+                            <tr><td>Disable one timeout</td><td><code>node-http-server --request-timeout false</code></td><td><code>false</code>, <code>off</code>, and <code>0</code> disable numeric timeout/body controls.</td></tr>
+                            <tr><td>Allow client caching</td><td><code>node-http-server --cache</code></td><td>Turns off the default no-cache directives.</td></tr>
+                            <tr><td>Write request logs</td><td><code>node-http-server --log ./logs/requests.ndjson</code></td><td>Appends one JSON record per line; the parent directory must exist.</td></tr>
+                            <tr><td>Inspect activity</td><td><code>node-http-server --verbose</code></td><td>Prints normalized configuration and listener activity.</td></tr>
+                        </tbody></table></div>
+                        <div class="callout-warning callout"><strong>SPA filename syntax:</strong> use <code>--spa=app.html</code>. With <code>--spa app.html</code>, <code>app.html</code> becomes the positional root when no root is set, or becomes an unknown argument. <code>--spa=false</code> means a fallback file literally named <code>false</code>; it does not disable SPA fallback.</div>
+                    </section>
+
+                    <section class="doc-section" id="options"><p class="kicker">Complete option reference</p><h2>Every documented flag.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Option</th><th>Default</th><th>Sets</th><th>Accepted value / note</th></tr></thead><tbody>
+                            <tr><td><code>-p, --port &lt;port&gt;</code></td><td><code>8080</code></td><td><code>port</code></td><td>Nonnegative number; deployment requires an integer from 0–65535.</td></tr>
+                            <tr><td><code>-r, --root &lt;path&gt;</code></td><td>current directory</td><td><code>root</code></td><td>Existing directory, resolved from the working directory.</td></tr>
+                            <tr><td><code>--host &lt;address&gt;</code></td><td><code>127.0.0.1</code></td><td><code>host</code></td><td>Nonempty listen address.</td></tr>
+                            <tr><td><code>--domain &lt;hostname&gt;</code></td><td><code>0.0.0.0</code></td><td><code>domain</code></td><td>Primary accepted Host; not a network bind or DNS setting.</td></tr>
+                            <tr><td><code>--index &lt;file&gt;</code></td><td><code>index.html</code></td><td><code>server.index</code></td><td>Directory index filename; there is no directory listing when it is missing.</td></tr>
+                            <tr><td><code>--no-cache</code></td><td>on</td><td><code>server.noCache=true</code></td><td>Explicitly sends default no-cache directives.</td></tr>
+                            <tr><td><code>--cache</code></td><td>off</td><td><code>server.noCache=false</code></td><td>Omits the default no-cache header; it does not add a cache lifetime.</td></tr>
+                            <tr><td><code>--spa[=&lt;file&gt;]</code></td><td>off</td><td><code>server.spaFallback</code></td><td>No value uses the index; custom filename requires <code>=</code>.</td></tr>
+                            <tr><td><code>--compression</code></td><td>off</td><td><code>server.compression=true</code></td><td>Static eligible responses at least 1024 bytes; not byte ranges.</td></tr>
+                            <tr><td><code>--max-body &lt;bytes|false&gt;</code></td><td>unlimited</td><td><code>server.maxRequestBodyBytes</code></td><td>Nonnegative bytes; <code>false</code>, <code>off</code>, or <code>0</code> is unlimited.</td></tr>
+                            <tr><td><code>--timeout &lt;ms|false&gt;</code></td><td><code>30000</code></td><td><code>server.timeout</code></td><td>Socket inactivity milliseconds; false/off/0 disables.</td></tr>
+                            <tr><td><code>--request-timeout &lt;ms|false&gt;</code></td><td><code>300000</code></td><td><code>server.requestTimeout</code></td><td>Whole-request milliseconds; false/off/0 disables.</td></tr>
+                            <tr><td><code>--headers-timeout &lt;ms|false&gt;</code></td><td><code>60000</code></td><td><code>server.headersTimeout</code></td><td>Header milliseconds; false/off/0 disables.</td></tr>
+                            <tr><td><code>--keep-alive-timeout &lt;ms|false&gt;</code></td><td><code>5000</code></td><td><code>server.keepAliveTimeout</code></td><td>Keep-alive milliseconds; false/off/0 disables.</td></tr>
+                            <tr><td><code>--log &lt;path&gt;</code></td><td>off</td><td><code>log</code></td><td>NDJSON append destination.</td></tr>
+                            <tr><td><code>-v, --verbose</code></td><td>off</td><td><code>verbose=true</code></td><td>Prints operational details.</td></tr>
+                            <tr><td><code>-h, --help</code></td><td>—</td><td>help output</td><td>Parses all input first, then prints help and exits 0.</td></tr>
+                            <tr><td><code>--version</code></td><td>—</td><td>version output</td><td>Prints the package version and exits 0. Help wins when both are set.</td></tr>
+                        </tbody></table></div>
+                    </section>
+
+                    <section class="doc-section" id="syntax"><p class="kicker">Input syntax</p><h2>Modern flags and compatible input.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Form</th><th>Example</th><th>Parsing rule</th></tr></thead><tbody>
+                            <tr><td>Long option + value</td><td><code>--root ./public</code></td><td>The next token supplies a value for value-taking options.</td></tr>
+                            <tr><td>Long option + equals</td><td><code>--port=9000</code></td><td>Equivalent to the separated form.</td></tr>
+                            <tr><td>Short option</td><td><code>-p 9000</code></td><td><code>-p</code>, <code>-r</code>, <code>-v</code>, and <code>-h</code> are supported.</td></tr>
+                            <tr><td>Positional root</td><td><code>node-http-server ./public</code></td><td>The first bare token becomes <code>root</code>; later bare tokens fail.</td></tr>
+                            <tr><td>v8 key=value</td><td><code>root=./public port=9000 verbose=true</code></td><td>Compatibility form; sequential inputs are last-wins.</td></tr>
+                            <tr><td>Legacy camelCase aliases</td><td><code>requestTimeout=false</code></td><td><code>noCache</code>, <code>spaFallback</code>, <code>maxRequestBodyBytes</code>, <code>requestTimeout</code>, <code>headersTimeout</code>, and <code>keepAliveTimeout</code> map to modern options.</td></tr>
+                        </tbody></table></div>
+                        <div class="callout"><strong>Ordering:</strong> options are processed from left to right; the last value for the same setting wins. All arguments are validated before help or version output.</div>
+                        <div class="callout-warning callout"><strong>Parsing details:</strong> boolean words are lowercase <code>true</code>/<code>false</code>. A flag needs equals to turn it off—for example <code>--compression=false</code>, not <code>--compression false</code>. Short options cannot be bundled. If a value starts with <code>-</code>, use equals, such as <code>--root=-name</code>. <code>--cache=&lt;anything&gt;</code> still enables caching.</div>
+                    </section>
+
+                    <section class="doc-section" id="output"><p class="kicker">Output and process exits</p><h2>Use exit status as the contract.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Condition</th><th>Output</th><th>Exit status</th></tr></thead><tbody>
+                            <tr><td>Listener ready</td><td><code>node-http-server listening at http://ADDRESS:PORT</code></td><td>Process remains running.</td></tr>
+                            <tr><td>Help or version</td><td>Requested information on stdout.</td><td><code>0</code></td></tr>
+                            <tr><td>Argument parse error</td><td>Error plus <code>Run node-http-server --help for usage.</code></td><td><code>2</code></td></tr>
+                            <tr><td>Deploy/listener/close failure</td><td>Error message on stderr; sibling listeners close after listener failure.</td><td><code>1</code></td></tr>
+                            <tr><td>Request-level 4xx/5xx or log-write failure</td><td>The request completes; verbose mode reports asynchronous log failures.</td><td>Server keeps running.</td></tr>
+                            <tr><td><code>SIGINT</code> / Ctrl+C</td><td>Listeners close.</td><td><code>130</code></td></tr>
+                            <tr><td><code>SIGTERM</code></td><td>Listeners close.</td><td><code>0</code></td></tr>
+                        </tbody></table></div>
+                        <div class="code-block"><div class="code-head"><span class="code-label">shell · verify inputs without starting</span><button type="button" data-copy-target="cli-check">Copy</button></div><pre><code id="cli-check">node-http-server --help
+node-http-server --version</code></pre></div>
+                    </section>
+
+                    <section class="doc-section" id="failures"><p class="kicker">Troubleshooting</p><h2>Read the first failure literally.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Next check</th></tr></thead><tbody>
+                            <tr><td><code>EADDRINUSE</code></td><td>Another process owns the port.</td><td>Choose another <code>--port</code> or stop the conflicting process.</td></tr>
+                            <tr><td><code>EACCES</code></td><td>The address/port is not permitted.</td><td>Use an allowed unprivileged port and confirm host permissions.</td></tr>
+                            <tr><td><code>root must be a directory</code></td><td>The path is missing or is a file.</td><td>Resolve the root from the current working directory.</td></tr>
+                            <tr><td><code>421 Misdirected Request</code></td><td>The Host header does not match <code>domain</code>.</td><td>Fix the request Host or remove/change <code>--domain</code>.</td></tr>
+                            <tr><td>Remote machine cannot connect</td><td>Loopback bind, firewall, or wrong address.</td><td>Set <code>--host 0.0.0.0</code> deliberately, allow the port, then connect to the machine's network address—not <code>0.0.0.0</code>.</td></tr>
+                            <tr><td>SPA file not selected</td><td>The custom file was separated by a space.</td><td>Use <code>--spa=app.html</code>.</td></tr>
+                            <tr><td>Log errors appear later</td><td>Parent directory missing or write denied.</td><td>Create/protect the directory and use <code>--verbose</code> to surface asynchronous failures.</td></tr>
+                            <tr><td><code>Unknown option: config</code></td><td>The CLI has no JSON config loader.</td><td>Use the module API; a bare <code>config.json</code> is treated as the root path.</td></tr>
+                        </tbody></table></div>
+                    </section>
+
+                    <section class="doc-section" id="limits"><p class="kicker">CLI boundary</p><h2>Use the library for object configuration.</h2>
+                        <p>The CLI intentionally covers common static-server operations. It does not load configuration JSON or expose every nested object.</p>
+                        <div class="table-wrap"><table><thead><tr><th>Needs the module API</th><th>Configuration/API link</th></tr></thead><tbody>
+                            <tr><td>HTTPS keys and certificates</td><td><a href="./configuration.html#https"><code>https</code> configuration</a></td></tr>
+                            <tr><td>Multiple domain roots</td><td><a href="./configuration.html#network"><code>domains</code> mapping</a></td></tr>
+                            <tr><td>MIME overrides, rejected/restricted extensions</td><td><a href="./configuration.html#mime"><code>contentType</code> and <code>restrictedType</code></a></td></tr>
+                            <tr><td>Custom error bodies/headers</td><td><a href="./configuration.html#errors"><code>errors</code></a></td></tr>
+                            <tr><td>Compression threshold</td><td><a href="./configuration.html#server"><code>server.compressionThreshold</code></a></td></tr>
+                            <tr><td>Log bodies or custom logger functions</td><td><a href="./configuration.html#logging">Logging configuration</a></td></tr>
+                            <tr><td>Hooks, multiple instances, lifecycle control</td><td><a href="./api.html">Library API</a></td></tr>
+                        </tbody></table></div>
+                        <div class="page-links"><a href="./playground.html">Generate module and CLI snippets →</a><a href="./examples.html#cli">More CLI examples →</a><a href="./operations.html#exposure">Expose a listener safely →</a></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>CLI reference for v9. <span data-year></span></p><div><a href="./configuration.html">Config</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
+    </body>
+</html>

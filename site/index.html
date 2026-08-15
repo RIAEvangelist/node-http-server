@@ -3,214 +3,108 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="node-http-server is a small HTTP and HTTPS static server with zero runtime dependencies for modern Node.js.">
+        <meta name="description" content="Start node-http-server from the CLI, CommonJS, or ESM.">
         <meta name="theme-color" content="#08110d">
-        <meta property="og:type" content="website">
-        <meta property="og:title" content="node-http-server — small server, modern HTTP">
-        <meta property="og:description" content="Zero-runtime-dependency HTTP and HTTPS static serving for modern Node.js.">
-        <meta property="og:url" content="https://riaevangelist.github.io/node-http-server/">
+        <meta property="og:title" content="Start — node-http-server">
+        <meta property="og:description" content="A small HTTP and HTTPS static server with zero runtime dependencies.">
         <meta property="og:image" content="https://riaevangelist.github.io/node-http-server/assets/node-http-server-header.webp">
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="node-http-server — small server, modern HTTP">
-        <meta name="twitter:description" content="Zero-runtime-dependency HTTP and HTTPS static serving for modern Node.js.">
-        <meta name="twitter:image" content="https://riaevangelist.github.io/node-http-server/assets/node-http-server-header.webp">
-        <title>node-http-server — small server, modern HTTP</title>
+        <title>Start — node-http-server</title>
         <link rel="canonical" href="https://riaevangelist.github.io/node-http-server/">
         <link rel="stylesheet" href="./styles.css">
         <script src="./script.js" defer></script>
     </head>
     <body>
         <a class="skip-link" href="#main">Skip to content</a>
-        <div class="scroll-meter" aria-hidden="true"><span></span></div>
-
         <header class="site-header">
-            <a class="wordmark" href="./index.html" aria-label="node-http-server home">
-                <span class="wordmark-mark" aria-hidden="true">n</span>
-                <span>node-http-server</span>
-            </a>
-            <nav aria-label="Primary navigation">
-                <a href="./index.html" aria-current="page">Overview</a>
-                <a href="./guide.html">Guide</a>
-                <a href="./playground.html">Playground</a>
-                <a href="./resources.html">Resources</a>
-                <a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub <span aria-hidden="true">↗</span></a>
+            <a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a>
+            <nav aria-label="Documentation">
+                <a href="./index.html" aria-current="page">Start</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a>
             </nav>
         </header>
 
         <main id="main">
-            <section class="hero" id="top">
-                <figure class="hero-header-art">
-                    <img src="./assets/node-http-server-header.webp" alt="node-http-server — small server, modern HTTP" fetchpriority="high">
-                </figure>
-                <div class="hero-copy">
-                    <p class="eyebrow"><span>v9</span> Modern Node. No framework.</p>
-                    <h1>A small server that speaks <em>modern HTTP.</em></h1>
-                    <p class="hero-lede">Static files, HTTPS, ranges, cache validation, compression, and clean shutdown. Zero runtime dependencies. Localhost by default.</p>
-                    <div class="hero-actions">
-                        <a class="button button-primary" href="./playground.html">Build a config <span aria-hidden="true">→</span></a>
-                        <a class="button button-secondary" href="./guide.html">Read the guide <span aria-hidden="true">→</span></a>
-                    </div>
-                </div>
+            <header class="page-header">
+                <figure class="hero-art"><img src="./assets/node-http-server-header.webp" alt="node-http-server — small server, modern HTTP" fetchpriority="high"></figure>
+                <p class="kicker">Node.js 22.12+ · CommonJS + ESM · localhost first</p>
+                <h1>Start a static server.</h1>
+                <p class="lead">Serve files over HTTP or HTTPS with ranges, cache validation, optional compression, clean shutdown, and zero runtime dependencies.</p>
+                <div class="header-actions"><a class="button button-primary" href="#quick-start">Quick start</a><a class="button" href="./guide.html">Browse all docs</a></div>
+            </header>
 
-                <div class="request-card" aria-label="Example static file request">
-                    <div class="window-bar">
-                        <span></span><span></span><span></span>
-                        <p>localhost:8080</p>
-                    </div>
-                    <div class="request-line">
-                        <span class="method">GET</span>
-                        <code>/assets/app.js</code>
-                        <span class="status">200</span>
-                    </div>
-                    <ol class="response-path">
-                        <li><span>01</span><strong>Contain</strong><small>path stays inside root</small></li>
-                        <li><span>02</span><strong>Validate</strong><small>ETag · modified time</small></li>
-                        <li><span>03</span><strong>Stream</strong><small>range · compression</small></li>
-                    </ol>
-                    <div class="terminal-line"><span aria-hidden="true">›</span> ready on <strong>http://127.0.0.1:8080</strong><i></i></div>
-                </div>
-            </section>
+            <div class="doc-layout">
+                <aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#quick-start">Quick start</a><a href="#library-start">Library start</a><a href="#defaults">Defaults</a><a href="#tasks">Docs by task</a><a href="#status">Project status</a></aside>
+                <div class="doc-content">
+                    <section class="doc-section" id="quick-start">
+                        <p class="kicker">CLI quick start</p>
+                        <h2>Serve a folder locally.</h2>
+                        <p>Install the command globally, or use <code>npx</code>. The default listener is reachable only from this machine.</p>
+                        <div class="code-block"><div class="code-head"><span class="code-label">shell</span><button type="button" data-copy-target="start-cli">Copy</button></div><pre><code id="start-cli">npm install --global node-http-server
+node-http-server --root ./public</code></pre></div>
+                        <div class="output-block"><span class="expected-label">Expected output</span><pre>node-http-server listening at http://127.0.0.1:8080</pre></div>
+                        <div class="callout"><strong>No global install:</strong> run <code>npx node-http-server --root ./public</code>. See the <a href="./cli.html">CLI task guide</a> for flags, failures, exit behavior, and deployment examples.</div>
+                    </section>
 
-            <section class="proof" aria-label="Project facts">
-                <p><strong>0</strong><span>runtime dependencies</span></p>
-                <p><strong>2</strong><span>module systems</span></p>
-                <p><strong>22.12+</strong><span>Node.js</span></p>
-                <p><strong>GET + HEAD</strong><span>first-class</span></p>
-            </section>
+                    <section class="doc-section" id="library-start">
+                        <p class="kicker">Library quick start</p>
+                        <h2>Create an isolated server.</h2>
+                        <div class="quick-grid">
+                            <div class="code-block"><div class="code-head"><span class="code-label">CommonJS</span><button type="button" data-copy-target="start-cjs">Copy</button></div><pre><code id="start-cjs">const {Server}=require('node-http-server');
 
-            <section class="section" id="features">
-                <div class="section-heading reveal">
-                    <p class="eyebrow">Useful without getting heavy</p>
-                    <h2>The boring parts are handled.</h2>
-                    <p>Serve a folder quickly, then turn on only what the deployment needs.</p>
-                </div>
-                <div class="feature-grid">
-                    <article class="feature-card feature-card-wide reveal">
-                        <p class="feature-number">01 / HTTP</p>
-                        <h3>Files behave like files on the web.</h3>
-                        <p>Streaming responses, <code>HEAD</code>, byte ranges, ETags, and modified-time validation are built into the core.</p>
-                        <div class="header-stack" aria-label="Example response headers">
-                            <span>Accept-Ranges <b>bytes</b></span>
-                            <span>ETag <b>"92a-1da…"</b></span>
-                            <span>Last-Modified <b>Thu, 13 Aug</b></span>
+new Server({root:'./public'}).deploy();</code></pre></div>
+                            <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="start-esm">Copy</button></div><pre><code id="start-esm">import {Server} from 'node-http-server';
+
+new Server({root:'./public'}).deploy();</code></pre></div>
                         </div>
-                    </article>
+                        <p>The original default singleton remains available in both module systems. New applications should normally create a named <code>Server</code> instance so listener and configuration state stay isolated.</p>
+                        <div class="page-links"><a href="./api.html#imports">Import reference →</a><a href="./examples.html#shutdown">Multiple servers and shutdown →</a></div>
+                    </section>
 
-                    <article class="feature-card reveal">
-                        <p class="feature-number">02 / SAFE</p>
-                        <h3>Local until you say otherwise.</h3>
-                        <p>The default bind address is <code>127.0.0.1</code>. Path containment keeps requests inside the configured root.</p>
-                    </article>
-
-                    <article class="feature-card reveal">
-                        <p class="feature-number">03 / CONTROL</p>
-                        <h3>Limits are yours.</h3>
-                        <p>Request-body limits, timeouts, and compression are explicit, settable options. The body limit stays off until you opt in.</p>
-                    </article>
-
-                    <article class="feature-card reveal">
-                        <p class="feature-number">04 / APPS</p>
-                        <h3>Single-page apps included.</h3>
-                        <p>Turn on SPA fallback for client-side routes. Leave it off for a strict static file server.</p>
-                    </article>
-
-                    <article class="feature-card feature-card-dark reveal">
-                        <p class="feature-number">05 / LIFECYCLE</p>
-                        <h3>Run one. Run many. Close cleanly.</h3>
-                        <p>Create isolated <code>Server</code> instances for separate ports and roots. Await <code>close()</code> when the work is done.</p>
-                        <div class="port-row" aria-hidden="true">
-                            <span>:8080</span><i></i><span>:8081</span><i></i><span>:8443</span>
+                    <section class="doc-section" id="defaults">
+                        <p class="kicker">Starting behavior</p>
+                        <h2>Know the defaults before changing them.</h2>
+                        <div class="facts" aria-label="Default server facts">
+                            <div class="fact"><strong>127.0.0.1</strong><span>Listen address</span></div><div class="fact"><strong>8080</strong><span>HTTP port</span></div><div class="fact"><strong>index.html</strong><span>Directory index</span></div><div class="fact"><strong>current directory</strong><span>Static root</span></div>
                         </div>
-                    </article>
+                        <div class="table-wrap"><table><thead><tr><th>Behavior</th><th>Default</th><th>Change it</th></tr></thead><tbody>
+                            <tr><td>Request-body limit</td><td>Unlimited</td><td><a href="./configuration.html#limits"><code>server.maxRequestBodyBytes</code></a></td></tr>
+                            <tr><td>Compression</td><td>Off</td><td><a href="./configuration.html#server"><code>server.compression</code></a></td></tr>
+                            <tr><td>SPA fallback</td><td>Off</td><td><a href="./configuration.html#server"><code>server.spaFallback</code></a></td></tr>
+                            <tr><td>Automatic MIME types</td><td>Built-in map</td><td><a href="./configuration.html#mime"><code>contentType</code></a></td></tr>
+                            <tr><td>Request logging</td><td>Off</td><td><a href="./configuration.html#logging"><code>log</code></a></td></tr>
+                            <tr><td>HTTPS</td><td>Off</td><td><a href="./configuration.html#https"><code>https</code></a></td></tr>
+                        </tbody></table></div>
+                        <div class="callout-warning callout"><strong>Network exposure:</strong> set <code>host:'0.0.0.0'</code> or <code>--host 0.0.0.0</code> only when other machines should connect. Read <a href="./operations.html#exposure">Operations and security</a> first.</div>
+                    </section>
 
-                    <article class="feature-card reveal">
-                        <p class="feature-number">06 / EXTEND</p>
-                        <h3>Your hooks still work.</h3>
-                        <p>Intercept raw requests, parsed requests, serving, and completion without replacing the small core.</p>
-                    </article>
-                </div>
-            </section>
+                    <section class="doc-section" id="tasks">
+                        <p class="kicker">Documentation by task</p>
+                        <h2>Go directly to the job.</h2>
+                        <div class="task-grid">
+                            <a class="task-card" href="./cli.html"><strong>Run the command</strong><p>Install, flags, common tasks, expected output, and failure behavior.</p><span>CLI →</span></a>
+                            <a class="task-card" href="./api.html"><strong>Embed the server</strong><p>Imports, lifecycle, public methods, request data, and hooks.</p><span>Library API →</span></a>
+                            <a class="task-card" href="./configuration.html"><strong>Set exact behavior</strong><p>Every Config key, default, opt-out value, and validation rule.</p><span>Configuration →</span></a>
+                            <a class="task-card" href="./examples.html"><strong>Copy a working pattern</strong><p>SPA, HTTPS, domains, logging, hooks, limits, and shutdown.</p><span>Examples →</span></a>
+                            <a class="task-card" href="./playground.html"><strong>Generate a config</strong><p>Build CommonJS, ESM, CLI, or JSON without running a server.</p><span>Playground →</span></a>
+                            <a class="task-card" href="./testing.html"><strong>Test and measure</strong><p>Test commands, coverage gates, reports, badges, and CI artifacts.</p><span>Testing →</span></a>
+                            <a class="task-card" href="./operations.html"><strong>Operate or upgrade</strong><p>Exposure, status failures, logging, certificates, and v8 migration.</p><span>Operations →</span></a>
+                            <a class="task-card" href="./guide.html"><strong>Browse the docs hub</strong><p>A compact map of every page and the source documents.</p><span>Docs hub →</span></a>
+                        </div>
+                    </section>
 
-            <section class="section route-section" aria-labelledby="routes-heading">
-                <div class="section-heading reveal">
-                    <p class="eyebrow">Pick a path</p>
-                    <h2 id="routes-heading">One page for each job.</h2>
-                    <p>Read the contract, generate a config, or check the upgrade and security notes.</p>
+                    <section class="doc-section" id="status">
+                        <p class="kicker">Project status</p>
+                        <h2>Published facts and measured coverage.</h2>
+                        <div class="status-grid">
+                            <a class="status-card" href="https://github.com/RIAEvangelist/node-http-server/actions/workflows/ci.yml?query=branch%3Amain"><img src="https://github.com/RIAEvangelist/node-http-server/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status"><strong>CI</strong><span>Node 22.12 and 24 on main.</span></a>
+                            <a class="status-card" href="https://www.npmjs.com/package/node-http-server"><img src="https://img.shields.io/npm/v/node-http-server.svg" alt="npm version"><strong>npm</strong><span>Latest published package.</span></a>
+                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Flines.json" alt="Line coverage"><strong>Line coverage</strong><span>Ubuntu Node coverage report.</span></a>
+                            <a class="status-card" href="./testing.html"><img src="https://img.shields.io/badge/runtime_dependencies-0-2ea44f" alt="Zero runtime dependencies"><strong>Dependencies</strong><span>Zero runtime; one owner-maintained dev tool.</span></a>
+                        </div>
+                    </section>
                 </div>
-                <div class="route-grid reveal">
-                    <a class="route-card" href="./guide.html">
-                        <span>01</span>
-                        <strong>Guide</strong>
-                        <small>CommonJS, ESM, API, full configuration, CLI, and scripts.</small>
-                    </a>
-                    <a class="route-card" href="./playground.html">
-                        <span>02</span>
-                        <strong>Playground</strong>
-                        <small>Generate copyable CommonJS, ESM, CLI, and JSON snippets.</small>
-                    </a>
-                    <a class="route-card" href="./resources.html">
-                        <span>03</span>
-                        <strong>Resources</strong>
-                        <small>Migration, security boundaries, release notes, and project links.</small>
-                    </a>
-                </div>
-            </section>
-
-            <section class="section status-section" id="status">
-                <div class="section-heading reveal">
-                    <p class="eyebrow">Badge information</p>
-                    <h2>What each badge reports.</h2>
-                    <p>Live package and workflow signals, with no mystery percentages.</p>
-                </div>
-
-                <div class="badge-grid reveal">
-                    <a href="https://github.com/RIAEvangelist/node-http-server/actions/workflows/ci.yml?query=branch%3Amain">
-                        <img src="https://github.com/RIAEvangelist/node-http-server/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status">
-                        <strong>CI</strong><span>Node 22.12 and 24 tests on main.</span>
-                    </a>
-                    <a href="https://www.npmjs.com/package/node-http-server">
-                        <img src="https://img.shields.io/npm/v/node-http-server.svg" alt="npm version">
-                        <strong>npm version</strong><span>The latest published release.</span>
-                    </a>
-                    <a href="https://www.npmjs.com/package/node-http-server">
-                        <img src="https://img.shields.io/npm/dm/node-http-server.svg" alt="Monthly npm downloads">
-                        <strong>npm downloads</strong><span>Monthly installs reported by npm.</span>
-                    </a>
-                    <a href="https://github.com/RIAEvangelist/node-http-server/blob/main/licence">
-                        <img src="https://img.shields.io/github/license/RIAEvangelist/node-http-server.svg" alt="MIT license">
-                        <strong>License</strong><span>The repository's published license.</span>
-                    </a>
-                    <a href="https://github.com/RIAEvangelist/node-http-server/blob/main/package.json">
-                        <img src="https://img.shields.io/node/v/node-http-server.svg" alt="Supported Node.js version">
-                        <strong>Node.js</strong><span>The runtime range published to npm.</span>
-                    </a>
-                    <a href="https://github.com/RIAEvangelist/node-http-server/blob/main/package.json">
-                        <img src="https://img.shields.io/badge/runtime_dependencies-0-2ea44f" alt="Zero runtime dependencies">
-                        <strong>Dependencies</strong><span>Zero runtime packages. The sole direct dev tool is the owner-maintained vanilla-test.</span>
-                    </a>
-                    <a href="./coverage/node/">
-                        <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Flines.json" alt="Line coverage">
-                        <strong>Line coverage</strong><span>The measured Node-only line coverage from the canonical coverage run.</span>
-                    </a>
-                    <a href="./coverage/node/">
-                        <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Ffunctions.json" alt="Function coverage">
-                        <strong>Function coverage</strong><span>The measured Node-only function coverage from the same run.</span>
-                    </a>
-                    <a href="./coverage/node/">
-                        <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Fbranches.json" alt="Branch coverage">
-                        <strong>Branch coverage</strong><span>The measured Node-only branch coverage from the same run.</span>
-                    </a>
-                </div>
-            </section>
+            </div>
         </main>
 
-        <footer>
-            <a class="wordmark" href="./index.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a>
-            <p>Small on purpose. MIT licensed. <span data-year></span></p>
-            <div>
-                <a href="https://www.npmjs.com/package/node-http-server">npm</a>
-                <a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a>
-            </div>
-        </footer>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>Small on purpose. MIT licensed. <span data-year></span></p><div><a href="https://www.npmjs.com/package/node-http-server">npm</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
     </body>
 </html>
