@@ -42,6 +42,9 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Validate static documentation
+        run: npm run test:site
+
   coverage:
     name: vanilla-test coverage / Node 24
     runs-on: ubuntu-latest
@@ -126,8 +129,8 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Validate site JavaScript
-        run: node --check site/script.js
+      - name: Validate static documentation
+        run: npm run test:site
 
       - name: Download canonical coverage report
         uses: actions/download-artifact@v8
@@ -149,7 +152,13 @@ jobs:
 
           test -f _site/index.html
           test -f _site/guide.html
+          test -f _site/cli.html
+          test -f _site/api.html
+          test -f _site/configuration.html
+          test -f _site/examples.html
           test -f _site/playground.html
+          test -f _site/testing.html
+          test -f _site/operations.html
           test -f _site/resources.html
           test -f _site/styles.css
           test -f _site/script.js
@@ -184,5 +193,6 @@ jobs:
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
 
 
