@@ -1,0 +1,11 @@
+/.github/
+/coverage/
+/site/
+/test/
+/scripts/
+/example/
+/docs/
+/local-certs/
+/.coverage-shared/
+/.coverage-details/
+*.tgz

@@ -1,81 +1,72 @@
-const util = require( 'util' );
+'use strict';
 
-//import the `node-http-server` module
-//` const server=require(‘node-http-server’); `
-const server=require('../../server/Server.js');
-
-//I am using request for simplicty sake here, you can too.
-const proxy=require('request');
-const config=new server.Config;
+const https=require('node:https'),
+    server=require('../../server/Server.js'),
+    config=new server.Config;
 
 config.verbose=true;
 config.port=8000;
-config.https.privateKey = `${__dirname}/../../local-certs/private/server.key`;
-config.https.certificate= `${__dirname}/../../local-certs/client.crt`;
-config.https.ca= `${__dirname}/../../local-certs/private/rootCA.pem`;
+config.https.privateKey=`${__dirname}/../../local-certs/private/server.key`;
+config.https.certificate=`${__dirname}/../../local-certs/client.crt`;
+config.https.ca=`${__dirname}/../../local-certs/private/rootCA.pem`;
+config.https.port=4433;
 
-config.https.port       = 4433;
-
-//lets ignore ssl issues and make a giant security hole since we are proxying https too...
-//be careful when proxying ssl. you should actually set your ca and certs properly.
-//this is just an example
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+server.onRequest=gotRequest;
+server.deploy(config);
 
 function gotRequest(request,response,serve){
-    //google proxy!
-    //handle things fast
-    let encoding='binary';
+    const target=new URL(request.uri.path,'https://www.google.com');
 
-    proxy(
+    https.get(
+        target,
         {
-            url: `${request.uri.protocol}://www.google.com${request.uri.path}${request.uri.search}`,
-            encoding:encoding
+            headers:{
+                'User-Agent':'node-http-server example proxy'
+            },
+            rejectUnauthorized:true
         },
-        function (error, proxiedResponse, proxiedBody) {
-            if (error) {
-                request.statusCode=500;
-                serve(request,response,JSON.stringify(error));
-                return;
-            }
+        function(proxiedResponse){
+            const chunks=[];
 
-            if(!proxiedResponse.headers['content-type']&&proxiedResponse.headers['Content-Type']){
-                proxiedResponse.headers['content-type']=proxiedResponse.headers['Content-Type'];
-            }
+            proxiedResponse.on('data',chunk=>chunks.push(chunk));
+            proxiedResponse.on(
+                'end',
+                function(){
+                    const contentType=String(proxiedResponse.headers['content-type'] || 'application/octet-stream');
+                    let proxiedBody=Buffer.concat(chunks);
 
-            if(!proxiedResponse.headers['content-type']){
-                proxiedResponse.headers['content-type']='';
-            }
+                    response.statusCode=proxiedResponse.statusCode;
+                    response.setHeader('Content-Type',contentType);
 
-            if(proxiedResponse.headers['content-type'].indexOf('text/html')>-1){
-                const position=proxiedBody.match(/<body([^>]*)>/i);
+                    if(contentType.includes('text/html')){
+                        const html=proxiedBody.toString('utf8');
+                        proxiedBody=html.replace(
+                            /<body([^>]*)>/i,
+                            `$&
+                            <style>
+                                .proxyBanner{
+                                    background:rgb(200,220,240);
+                                    box-shadow:0 0 .5em rgba(0,0,0,.7);
+                                    font-size:2em;
+                                    line-height:5em;
+                                    text-align:center;
+                                }
+                            </style>
+                            <section class="proxyBanner">Welcome to Google!</section>`
+                        );
+                    }
 
-                if(position&&position.index){
-                    proxiedBody=proxiedBody.slice(0, position.index+position[0].length) + `
-                        <style>
-                            .proxyBanner{
-                                height:5em;
-                                background:rgb(200,220,240);
-                                font-size:2em;
-                                line-height:5em;
-                                box-shadow:0 0 .5em rgba(0,0,0,.7);
-                                text-align:center;
-                            }
-                        </style>
-                        <section class='proxyBanner'>Welcome to Google!</section>
-                    `+ proxiedBody.slice(position.index+position[0].length)
+                    serve(request,response,proxiedBody);
                 }
-            }
-
-            response.headers=proxiedResponse.headers;
-
-            serve(request,response,proxiedBody);
-
-            return;
+            );
+        }
+    ).on(
+        'error',
+        function(err){
+            response.statusCode=502;
+            serve(request,response,`Proxy request failed: ${err.message}`);
         }
     );
 
     return true;
 }
-
-server.deploy(config);
-server.onRawRequest=gotRequest;

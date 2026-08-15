@@ -1,2 +1,14 @@
 *~
-node_modules
+*.log
+*.tgz
+.DS_Store
+node_modules/
+coverage/
+.coverage-shared/
+.coverage-details/
+local-certs/private/*
+!local-certs/private/openssl.cnf
+local-certs/*.crt
+local-certs/*.pem
+local-certs/*.pub
+!local-certs/readme.md

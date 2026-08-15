@@ -1,9 +1,11 @@
-## Node HTTP and HTTPS Server examples
+## Node HTTP and HTTPS server examples
 
-All of the http example servers spin up on port 8000 so you can only run one at a time.
+| Example group | What it demonstrates | Default ports |
+|---|---|---|
+| [Basic servers](https://github.com/RIAEvangelist/node-http-server/tree/main/example/basic) | Static roots, logging, domains, clustering, and HTTPS | HTTP `8000`; HTTPS `4433` |
+| [Advanced servers](https://github.com/RIAEvangelist/node-http-server/tree/main/example/advanced) | Hooks, templates, dynamic responses, and benchmarks | HTTP `8000`; HTTPS `4433` |
+| [Proxy examples](https://github.com/RIAEvangelist/node-http-server/tree/main/example/proxy) | Small request-forwarding examples built with Node APIs | Varies by example |
 
-And All of the https examples 4433 so you can only run one at a time, it is also worth noting that many of the https examples spin up both an http AND an https server. So both 8000 and 4433 will be used. This is for demonstration purposes and you can specify only to spin up a secure server with ` config.https.only=true ` or by setting it in your config object;
+Run only one example that uses a given port at a time. Some HTTPS examples start both HTTP and HTTPS listeners. Set `config.https.only=true` when the secure listener should run alone.
 
-The servers in the [basic server folder](https://github.com/RIAEvangelist/node-http-server/tree/master/example/basic) are just static file servers, and the servers in the [advanced server folder](https://github.com/RIAEvangelist/node-http-server/tree/master/example) are dynamic server side rendering examples.
-
-You can see detailed code documentation of the examples on the [node-http-server docs](http://riaevangelist.github.io/node-http-server/) under the examples list.
+See the [node-http-server documentation and playground](https://riaevangelist.github.io/node-http-server/) for current API, configuration, CLI, and copyable examples.

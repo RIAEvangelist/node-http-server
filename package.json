@@ -1,53 +1,74 @@
 {
   "name": "node-http-server",
-  "version": "8.1.6",
-  "description": "A very simple and fast http server for node, bash, and spawnable from C, Python etc. It is lightweight and great for embedded solutions as well as everyday development or public facing apps.",
-  "main": "server/Server.js",
-  "directories": {
-    "example": "example",
-    "doc": "docs",
-    "lib": "server"
+  "version": "9.0.0",
+  "description": "A lightweight, secure, zero-runtime-dependency HTTP and HTTPS static server for Node.js.",
+  "type": "commonjs",
+  "main": "./server/Server.js",
+  "module": "./server/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./server/index.mjs",
+      "require": "./server/Server.js"
+    },
+    "./config": {
+      "import": "./server/Config.mjs",
+      "require": "./server/Config.js"
+    },
+    "./mime-types": {
+      "import": "./server/MimeTypes.mjs",
+      "require": "./server/MimeTypes.js"
+    },
+    "./package.json": "./package.json"
   },
+  "files": [
+    "assets/node-http-server-header.webp",
+    "bin/",
+    "server/",
+    "CHANGELOG.md",
+    "MIGRATION.md",
+    "README.md",
+    "SECURITY.md",
+    "licence"
+  ],
   "engines": {
-    "node": ">=6.5.0"
+    "node": ">=22.12.0"
   },
   "bin": {
     "node-http-server": "bin/nhs.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./bin/nhs.js",
+    "test": "node --test test/*.test.js",
+    "coverage": "node ./scripts/coverage.js",
+    "test:package": "node ./scripts/package-smoke.js",
+    "verify": "npm test && npm run coverage && npm run test:package",
     "basic": "node ./example/basic/basicApp.js",
     "https": "node ./example/basic/https-ONLY-basicApp.js",
     "both": "node ./example/basic/https-basicApp.js",
     "template": "node ./example/advanced/basicTemplate.js",
-    "cluster": "node ./example/basic/cluster-basicApp.js",
-    "docs": "docco-plus ./README.md ./example/* ./example/**/* ./server/* ./bin/* ./local-certs/* "
+    "cluster": "node ./example/basic/cluster-basicApp.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/RIAEvangelist/node-http-server.git"
+    "url": "git+https://github.com/RIAEvangelist/node-http-server.git"
   },
-  "keywords": [
-    "http",
-    "server",
-    "node",
-    "embedded",
-    "fast",
-    "bash",
-    "c",
-    "python",
-    "light",
-    "lightweight"
-  ],
-  "author": "Brandon Nozaki Miller",
-  "license": "MIT",
+  "homepage": "https://riaevangelist.github.io/node-http-server/",
   "bugs": {
     "url": "https://github.com/RIAEvangelist/node-http-server/issues"
   },
-  "homepage": "https://github.com/RIAEvangelist/node-http-server",
-  "devDependencies": {
-    "docco-plus": "2.0.2",
-    "request": "*"
-  },
-  "dependencies": {}
+  "funding": "https://github.com/sponsors/RIAEvangelist",
+  "keywords": [
+    "http",
+    "https",
+    "server",
+    "static-server",
+    "node",
+    "embedded",
+    "lightweight",
+    "commonjs",
+    "esm"
+  ],
+  "author": "Brandon Nozaki Miller",
+  "license": "MIT",
+  "sideEffects": false
 }

@@ -6,7 +6,7 @@ const server=require('../../server/Server.js');
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 
-if (cluster.isMaster) {
+if (cluster.isPrimary) {
   console.log(`Master ${process.pid} is running`);
 
   // Fork node-http-server cluster workers.

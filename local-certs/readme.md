@@ -1,49 +1,29 @@
-# Using TLS and SSL for Secure server
+# Local TLS certificates
 
-### document in progress
-Still working on this. If you look at the examples and can help, please jump right in.
+Private keys are intentionally not stored in this repository or published with the npm package. Generate disposable development certificates locally and never reuse them in production.
 
-### Simple Self Signed Certificates
+Run these commands from the repository root.
+
+## Simple self-signed certificate
 
 ```sh
-
-#generate you server key
-openssl genrsa -out server.key 2048
-
-#generate the server public key or client cert
-openssl req -new -x509 -key server.key -out server.pub -days 365 -config openssl.cnf
-
+openssl genrsa -out local-certs/private/server.key 2048
+openssl req -new -x509 -key local-certs/private/server.key -out local-certs/server.pub -days 30 -config local-certs/private/openssl.cnf
 ```
 
-### Creating Your Own Certificate Authority And Signing Your Cert With it.
+This creates the paths used by most HTTPS examples:
+
+- `local-certs/private/server.key`
+- `local-certs/server.pub`
+
+## Local certificate authority
+
 ```sh
-
-#generate the CA key
-openssl genrsa -out rootCA.key 2048
-
-#self sign the CA key
-openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 1024 -out rootCA.pem
-
-#generate you server key
-openssl genrsa -out server.key 2048
-
-#create your certificate signing request
-openssl req -new -key server.key -out server.csr
-
-#generate the server public key or client cert
-openssl x509 -req -in server.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out client.crt -days 500 -sha256
-
-
+openssl genrsa -out local-certs/private/rootCA.key 2048
+openssl req -x509 -new -nodes -key local-certs/private/rootCA.key -sha256 -days 30 -out local-certs/private/rootCA.pem
+openssl genrsa -out local-certs/private/server.key 2048
+openssl req -new -key local-certs/private/server.key -out local-certs/private/server.csr -config local-certs/private/openssl.cnf
+openssl x509 -req -in local-certs/private/server.csr -CA local-certs/private/rootCA.pem -CAkey local-certs/private/rootCA.key -CAcreateserial -out local-certs/client.crt -days 30 -sha256 -extfile local-certs/private/openssl.cnf -extensions v3_req
 ```
 
-
-***need to add info on openssl.cnf edits**
-
-
-#### using the local certs
-This should **ONLY** be done on your local machine. Both the public and private certs are available here on git hub, so its not a good idea to use them over the network.
-
-#### talk about security
-- keep private keys private, don't share
-
-#### talk about using hostname not ip for best security validation of certs
+The repository ignores all generated key and certificate material. Treat generated private keys as secrets even when they are only for localhost.
