@@ -43,7 +43,7 @@ jobs:
         run: npm test
 
   coverage:
-    name: Node-native V8 coverage / Node 24
+    name: vanilla-test coverage / Node 24
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -63,11 +63,14 @@ jobs:
       - name: Run coverage gate
         run: npm run coverage
 
+      - name: Verify measured coverage badges are current
+        run: git diff --exit-code -- badges
+
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: node-native-v8-coverage
+          name: vanilla-test-node-coverage
           path: coverage/
           if-no-files-found: warn
           retention-days: 14
@@ -118,8 +121,19 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7
 
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
       - name: Validate site JavaScript
         run: node --check site/script.js
+
+      - name: Download canonical coverage report
+        uses: actions/download-artifact@v8
+        with:
+          name: vanilla-test-node-coverage
+          path: _coverage
 
       - name: Assemble static site
         shell: bash
@@ -128,12 +142,22 @@ jobs:
           cp --recursive site/. _site/
           mkdir -p _site/assets
           cp assets/node-http-server-header.webp _site/assets/
+          mkdir -p _site/coverage
+          cp --recursive _coverage/node _site/coverage/node
+          cp --recursive _coverage/badges _site/badges
           touch _site/.nojekyll
 
           test -f _site/index.html
+          test -f _site/guide.html
+          test -f _site/playground.html
+          test -f _site/resources.html
           test -f _site/styles.css
           test -f _site/script.js
           test -f _site/assets/node-http-server-header.webp
+          test -f _site/coverage/node/index.html
+          test -f _site/badges/lines.json
+          test -f _site/badges/functions.json
+          test -f _site/badges/branches.json
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6
@@ -160,4 +184,5 @@ jobs:
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
 
