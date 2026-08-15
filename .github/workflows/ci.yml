@@ -46,7 +46,7 @@ jobs:
         run: npm run test:site
 
   coverage:
-    name: vanilla-test coverage / Node 24
+    name: vanilla-test coverage / Node 24.18.0
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -54,10 +54,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7
 
-      - name: Set up Node.js 24
+      - name: Set up Node.js 24.18.0
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version: '24.18.0'
           cache: npm
 
       - name: Install dependencies
@@ -76,6 +76,7 @@ jobs:
           name: vanilla-test-node-coverage
           path: coverage/
           if-no-files-found: warn
+          include-hidden-files: true
           retention-days: 14
 
   package-smoke:
@@ -193,6 +194,7 @@ jobs:
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
 
 
 
