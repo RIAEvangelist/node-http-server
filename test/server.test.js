@@ -517,7 +517,7 @@ test('requests expose parsed URI/query data and malformed wire requests get 400'
         };
     });
     const inspected = await request(server, {
-        path:'/inspect?a=1&a=2&b=3',
+        path:'/inspect?a=1&a=2&a=3&b=3',
         headers:{Host:'[::1]:1234'}
     });
     const malformedWire = await rawRequest(server, 'BROKEN REQUEST\r\n\r\n');
@@ -527,7 +527,7 @@ test('requests expose parsed URI/query data and malformed wire requests get 400'
     });
 
     assert.equal(inspected.text, 'inspected');
-    assert.deepEqual(uri.query.a, ['1', '2']);
+    assert.deepEqual(uri.query.a, ['1', '2', '3']);
     assert.equal(uri.query.b, '3');
     assert.equal(uri.hostname, '::1');
     assert.equal(uri.port, 1234);
@@ -1188,7 +1188,16 @@ test('default request logging is parseable NDJSON and redacts credentials', asyn
 test('custom logging can include bodies and contains async logger failures', async function(t){
     const root = temporaryDirectory(t);
     const failure = new Error('logger rejected');
+    const originalError = console.error;
+    const errors = [];
     let entry;
+
+    console.error = function(){
+        errors.push(Array.from(arguments));
+    };
+    t.after(function(){
+        console.error = originalError;
+    });
 
     writeFiles(root, {'index.html':'ok'});
 
@@ -1207,6 +1216,7 @@ test('custom logging can include bodies and contains async logger failures', asy
             return true;
         };
     });
+    server.config.verbose = true;
     const response = await request(server, {
         method:'POST',
         body:'request body'
@@ -1225,8 +1235,13 @@ test('custom logging can include bodies and contains async logger failures', asy
             throw syncFailure;
         }
     });
+    syncResult.server.config.verbose = true;
     const syncResponse = await request(syncResult.server);
 
     assert.equal(syncResponse.text, 'ok');
     assert.equal(syncResult.server.lastError, syncFailure);
+    assert.deepEqual(errors, [
+        ['Unable to write request log', 'logger rejected'],
+        ['Unable to write request log', 'logger threw']
+    ]);
 });

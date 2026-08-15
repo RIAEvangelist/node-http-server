@@ -13,14 +13,5 @@
       "server/*.mjs"
     ]
   },
-  "chrome": {
-    "include": [
-      "server/*.js",
-      "server/*.mjs"
-    ],
-    "imports": {},
-    "headless": true,
-    "executablePath": null
-  },
   "timeoutMs": 120000
 }

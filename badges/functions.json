@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
   "label": "function coverage",
-  "message": "100%",
-  "color": "brightgreen"
+  "message": "98.21%",
+  "color": "green"
 }

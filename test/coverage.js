@@ -15,16 +15,22 @@ const files=fs.readdirSync(__dirname)
 
 module.exports=function run(){
     return new Promise(function(resolve,reject){
+        let output='';
         const tests=childProcess.spawn(
             process.execPath,
-            ['--test'].concat(files),
+            ['--test','--test-reporter=tap'].concat(files),
             {
                 cwd:path.resolve(__dirname,'..'),
-                stdio:'inherit',
+                stdio:['ignore','pipe','inherit'],
                 windowsHide:true
             }
         );
 
+        tests.stdout.setEncoding('utf8');
+        tests.stdout.on('data',function(chunk){
+            output+=chunk;
+            process.stdout.write(chunk);
+        });
         tests.once('error',reject);
         tests.once('close',function(code,signal){
             if(signal){
@@ -32,11 +38,58 @@ module.exports=function run(){
                 return;
             }
 
-            const failureCount=code===0 ? 0 : 1;
+            let result;
+            try{
+                result=parseTap(output);
+            }catch(error){
+                reject(error);
+                return;
+            }
+
+            if((code===0)!==(result.failureCount===0)){
+                reject(new Error('Node test exit status did not match its TAP summary.'));
+                return;
+            }
+
             resolve(Object.freeze({
-                ok:failureCount===0,
-                failureCount
+                ok:result.failureCount===0,
+                failureCount:result.failureCount,
+                total:result.total,
+                passed:Object.freeze(result.passed),
+                failed:Object.freeze(result.failed)
             }));
         });
     });
 };
+
+function parseTap(output){
+    const total=summaryCount(output,'tests'),
+        failureCount=summaryCount(output,'fail'),
+        passed=[],
+        failed=[],
+        result=/^(ok|not ok) \d+ - (.+)\r?$/gm;
+    let match;
+
+    while((match=result.exec(output))){
+        let description=match[2],
+            directive=description.match(/\s+#\s+(SKIP|TODO)\b/i);
+
+        if(directive){
+            description=description.slice(0,directive.index)+' ['+directive[1].toLowerCase()+']';
+        }
+
+        (match[1]==='ok' ? passed : failed).push(description);
+    }
+
+    return {total,failureCount,passed,failed};
+}
+
+function summaryCount(output,label){
+    const match=output.match(new RegExp('^# '+label+' (\\d+)\\r?$','m'));
+
+    if(!match){
+        throw new Error('Node TAP output is missing its '+label+' summary.');
+    }
+
+    return Number(match[1]);
+}

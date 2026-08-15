@@ -16,7 +16,7 @@
                         </tbody></table></div>
                         <div class="code-block"><div class="code-head"><span class="code-label">shell · full verification</span><button type="button" data-copy-target="test-verify">Copy</button></div><pre><code id="test-verify">npm ci
 npm run verify</code></pre></div>
-                        <div class="callout"><strong>Dependencies:</strong> published installs have zero runtime dependencies. The exact owner-maintained <code>vanilla-test@2.0.0</code> release is the sole direct development dependency and coverage tool.</div>
+                        <div class="callout"><strong>Dependencies:</strong> published installs have zero runtime dependencies. The exact owner-maintained <code>vanilla-test@2.1.0</code> release is the sole direct development dependency and native V8 coverage tool.</div>
                     </section>
 
                     <section class="doc-section" id="areas"><p class="kicker">Current suite</p><h2>32 tests cover seven engineering areas.</h2>
@@ -35,28 +35,30 @@ npm run verify</code></pre></div>
                     </section>
 
                     <section class="doc-section" id="coverage"><p class="kicker">Coverage configuration</p><h2>Node-only coverage through a small adapter.</h2>
-                        <p><code>vanilla-test.config.json</code> runs <code>test/coverage.js</code> and includes <code>server/*.js</code> plus <code>server/*.mjs</code>. The dependency-free adapter discovers sorted <code>*.test.js</code> files, starts Node's native test runner, and returns <code>{ok,failureCount}</code> to vanilla-test. The configuration timeout is 120 seconds.</p>
-                        <div class="table-wrap"><table><thead><tr><th>Metric</th><th>Per-file gate</th><th>Current Ubuntu CI badge</th></tr></thead><tbody>
-                            <tr><td>Statements</td><td>90%</td><td>Measured in the report; statements track the same executable source set.</td></tr>
-                            <tr><td>Lines</td><td>90%</td><td><strong>96.09%</strong></td></tr>
-                            <tr><td>Functions</td><td>90%</td><td><strong>100%</strong></td></tr>
-                            <tr><td>Branches</td><td>85%</td><td><strong>91.21%</strong></td></tr>
+                        <p><code>vanilla-test.config.json</code> runs <code>test/coverage.js</code> and includes <code>server/*.js</code> plus <code>server/*.mjs</code>. The dependency-free adapter discovers sorted <code>*.test.js</code> files, starts Node's native TAP reporter, and returns status, counts, and descriptions for all 32 tests. The configuration timeout is 120 seconds.</p>
+                        <div class="table-wrap"><table><thead><tr><th>Native V8 metric</th><th>Per-file gate</th><th>Ubuntu Node 24.18.0</th></tr></thead><tbody>
+                            <tr><td>Executable ranges (statements)</td><td>90%</td><td><strong>91.46%</strong> · report only</td></tr>
+                            <tr><td>Executable lines</td><td>90%</td><td><strong>92.72%</strong></td></tr>
+                            <tr><td>Function root ranges</td><td>90%</td><td><strong>98.21%</strong></td></tr>
+                            <tr><td>Nested block ranges (branches)</td><td>85%</td><td><strong>89.54%</strong></td></tr>
                         </tbody></table></div>
                         <div class="status-grid">
-                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Flines.json" alt="Line coverage 96.09 percent"><strong>Line coverage</strong><span>Generated from Ubuntu Node coverage.</span></a>
-                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Ffunctions.json" alt="Function coverage 100 percent"><strong>Function coverage</strong><span>Generated from the same run.</span></a>
-                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Fbranches.json" alt="Branch coverage 91.21 percent"><strong>Branch coverage</strong><span>Generated from the same run.</span></a>
+                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Flines.json" alt="Line coverage 92.72 percent"><strong>Line coverage</strong><span>Generated from Ubuntu Node coverage.</span></a>
+                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Ffunctions.json" alt="Function coverage 98.21 percent"><strong>Function coverage</strong><span>Generated from the same run.</span></a>
+                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Fbranches.json" alt="Branch coverage 89.54 percent"><strong>Branch coverage</strong><span>Generated from the same run.</span></a>
                         </div>
-                        <div class="callout"><strong>Node only:</strong> vanilla-test configuration contains a Chrome block because the tool validates both targets, but <code>coverage node</code> does not launch Chrome. Coverage uses c8 with all shipped files, check-coverage, and per-file gates.</div>
-                        <div class="callout-error callout"><strong>Gate behavior:</strong> a covered total can look healthy while one file falls below a threshold. Treat the per-file failure and highlighted source line as the work item.</div>
+                        <div class="callout"><strong>Node only:</strong> vanilla-test 2.1 validates only the selected target, so this project omits Chrome configuration entirely. Its project-owned reporter measures native V8 ranges from the shipped files without c8, source instrumentation, transpilation, or browser tooling.</div>
+                        <div class="callout"><strong>Metric change:</strong> 2.1 measures V8 executable, function, and nested block ranges directly. These percentages are intentionally not compared with the former c8/Istanbul totals.</div>
+                        <div class="callout-error callout"><strong>Gate behavior:</strong> a covered total can look healthy while one file falls below a threshold. Treat the failing per-file metric and its LCOV records as the work item.</div>
                     </section>
 
                     <section class="doc-section" id="reports"><p class="kicker">Generated evidence</p><h2>Know which artifact answers which question.</h2>
                         <div class="table-wrap"><table><thead><tr><th>Path</th><th>Purpose</th><th>Committed?</th></tr></thead><tbody>
                             <tr><td><code>coverage/node/index.html</code></td><td>Primary browsable Node report published on Pages.</td><td>No; CI artifact/Pages output.</td></tr>
-                            <tr><td><code>coverage/node/lcov-report/index.html</code></td><td>Detailed per-file HTML coverage view.</td><td>No.</td></tr>
                             <tr><td><code>coverage/node/lcov.info</code></td><td>LCOV interchange report.</td><td>No.</td></tr>
                             <tr><td><code>coverage/node/coverage-summary.json</code></td><td>Machine-readable totals used by the badge adapter.</td><td>No.</td></tr>
+                            <tr><td><code>coverage/node/test-results.json</code></td><td>ANSI-free suite status, counts, and passed/failed test descriptions.</td><td>No.</td></tr>
+                            <tr><td><code>coverage/node/.vanilla-test-coverage.json</code></td><td>Ownership marker required before the report directory can be replaced safely.</td><td>No.</td></tr>
                             <tr><td><code>coverage/badges/{lines,functions,branches}.json</code></td><td>Badge endpoints bundled with the coverage artifact and Pages site.</td><td>No.</td></tr>
                             <tr><td><code>badges/{lines,functions,branches}.json</code></td><td>Deterministic raw-GitHub Shields endpoints used by README/site badges.</td><td>Yes.</td></tr>
                         </tbody></table></div>
@@ -66,8 +68,8 @@ npm run verify</code></pre></div>
 
                     <section class="doc-section" id="platforms"><p class="kicker">Platform variance</p><h2>Windows covers one extra filesystem guard.</h2>
                         <div class="table-wrap"><table><thead><tr><th>Environment</th><th>Lines</th><th>Functions</th><th>Branches</th><th>Why</th></tr></thead><tbody>
-                            <tr><td>Ubuntu CI / published badges</td><td>96.09%</td><td>100%</td><td>91.21%</td><td>The Windows alternate-data-stream test is skipped.</td></tr>
-                            <tr><td>Windows Node 24 verification</td><td>96.21%</td><td>100%</td><td>91.46%</td><td>The Windows ADS guard/test executes and covers its platform branch.</td></tr>
+                            <tr><td>Ubuntu Node 24.18.0 / published badges</td><td>92.72%</td><td>98.21%</td><td>89.54%</td><td>The Windows alternate-data-stream test is skipped.</td></tr>
+                            <tr><td>Windows Node 24.18.0 verification</td><td>92.94%</td><td>98.21%</td><td>89.84%</td><td>The Windows ADS guard/test executes and covers its platform branch.</td></tr>
                         </tbody></table></div>
                         <div class="callout-warning callout"><strong>Do not commit Windows badge drift:</strong> a local Windows coverage run may refresh root badge JSON to the slightly higher platform values. The committed raw endpoints must represent Ubuntu CI so the synchronization gate remains deterministic.</div>
                     </section>
@@ -75,7 +77,7 @@ npm run verify</code></pre></div>
                     <section class="doc-section" id="ci"><p class="kicker">GitHub Actions</p><h2>Tests, evidence, package smoke, then Pages.</h2>
                         <div class="table-wrap"><table><thead><tr><th>Job</th><th>Runtime</th><th>Work</th><th>Artifact/output</th></tr></thead><tbody>
                             <tr><td>Test matrix</td><td>Node 22.12.0 and 24 on Ubuntu</td><td><code>npm ci</code>, <code>npm test</code>, <code>npm run test:site</code>.</td><td>Required before Pages.</td></tr>
-                            <tr><td>Coverage</td><td>Node 24 on Ubuntu</td><td><code>npm run coverage</code> plus root badge sync gate.</td><td><code>vanilla-test-node-coverage</code>, retained 14 days.</td></tr>
+                            <tr><td>Coverage</td><td>Node 24.18.0 on Ubuntu</td><td><code>npm run coverage</code> plus root badge sync gate.</td><td>Complete <code>vanilla-test-node-coverage</code> report, including its ownership marker, retained 14 days.</td></tr>
                             <tr><td>Package smoke</td><td>Node 24 on Ubuntu</td><td>Asserts zero runtime deps/exact dev tool, checks packed exclusions, installs in a temporary consumer, exercises CJS/ESM/subpaths/two servers/CLI, cleans up, then makes a separate artifact pack.</td><td><code>node-http-server-v9-package</code>, retained 14 days.</td></tr>
                             <tr><td>Pages assembly</td><td>Node 24 on Ubuntu</td><td>Runs the full static-doc checker, downloads canonical coverage, and assembles docs/report/badges.</td><td>GitHub Pages artifact.</td></tr>
                             <tr><td>Pages deploy</td><td>Ubuntu</td><td>Deploys only from <code>main</code> after required jobs.</td><td>Published project site.</td></tr>

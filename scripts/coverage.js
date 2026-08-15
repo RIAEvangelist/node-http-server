@@ -5,6 +5,7 @@ const fs=require('node:fs'),
 
 const root=path.resolve(__dirname,'..'),
     summaryFile=path.join(root,'coverage','node','coverage-summary.json'),
+    testResultsFile=path.join(root,'coverage','node','test-results.json'),
     badgeDirectories=Object.freeze([
         path.join(root,'badges'),
         path.join(root,'coverage','badges')
@@ -15,7 +16,7 @@ const root=path.resolve(__dirname,'..'),
         branches:'branch coverage'
     });
 
-if(!inside(root,summaryFile) || badgeDirectories.some(function(directory){
+if(!inside(root,summaryFile) || !inside(root,testResultsFile) || badgeDirectories.some(function(directory){
     return !inside(root,directory);
 })){
     throw new Error('Coverage files must stay inside the project root.');
@@ -30,6 +31,20 @@ try{
 
 if(!summary || typeof summary!='object' || !summary.total){
     throw new TypeError('vanilla-test coverage summary must contain total metrics.');
+}
+
+let testResults;
+try{
+    testResults=JSON.parse(fs.readFileSync(testResultsFile,'utf8'));
+}catch(error){
+    throw new Error('Unable to read vanilla-test test results.',{cause:error});
+}
+
+if(!testResults || typeof testResults!='object' || testResults.runtime!='node' || testResults.ok!==true ||
+    !Number.isSafeInteger(testResults.total) || testResults.total<1 || testResults.failureCount!==0 ||
+    testResults.passedCount!==testResults.total || !Array.isArray(testResults.passed) ||
+    testResults.passed.length!==testResults.total || !Array.isArray(testResults.failed) || testResults.failed.length){
+    throw new TypeError('vanilla-test test results must contain the complete passing Node suite.');
 }
 
 for(const directory of badgeDirectories){
@@ -56,7 +71,7 @@ for(const metric of Object.keys(metrics)){
     results.push(metric+' '+message);
 }
 
-process.stdout.write('Coverage badges: '+results.join(', ')+'\n');
+process.stdout.write('Coverage badges: '+results.join(', ')+'; '+testResults.total+' test results\n');
 
 function inside(directory,target){
     const relative=path.relative(directory,target);

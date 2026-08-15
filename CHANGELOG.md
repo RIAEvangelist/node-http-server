@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+### Changed
+
+- Upgraded the sole direct development dependency to `vanilla-test@2.1.0`, using its project-owned native V8 reporter, complete test-result artifact, and Node-only coverage configuration without c8, Playwright, Monocart, or Istanbul tooling.
+
 ## [9.0.0] - 2026-08-14
 
 ### Added
