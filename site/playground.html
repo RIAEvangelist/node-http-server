@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Generate CommonJS, ESM, CLI, and JSON configuration snippets for node-http-server in the browser.">
+        <meta name="theme-color" content="#08110d">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="Configuration playground — node-http-server">
+        <meta property="og:description" content="Configure node-http-server and generate copyable CommonJS, ESM, CLI, and JSON snippets.">
+        <meta property="og:url" content="https://riaevangelist.github.io/node-http-server/playground.html">
+        <meta property="og:image" content="https://riaevangelist.github.io/node-http-server/assets/node-http-server-header.webp">
+        <meta name="twitter:card" content="summary_large_image">
+        <title>Configuration playground — node-http-server</title>
+        <link rel="canonical" href="https://riaevangelist.github.io/node-http-server/playground.html">
+        <link rel="stylesheet" href="./styles.css">
+        <script src="./script.js" defer></script>
+    </head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a>
+        <div class="scroll-meter" aria-hidden="true"><span></span></div>
+
+        <header class="site-header">
+            <a class="wordmark" href="./index.html" aria-label="node-http-server home">
+                <span class="wordmark-mark" aria-hidden="true">n</span>
+                <span>node-http-server</span>
+            </a>
+            <nav aria-label="Primary navigation">
+                <a href="./index.html">Overview</a>
+                <a href="./guide.html">Guide</a>
+                <a href="./playground.html" aria-current="page">Playground</a>
+                <a href="./resources.html">Resources</a>
+                <a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub <span aria-hidden="true">↗</span></a>
+            </nav>
+        </header>
+
+        <main id="main" class="page-main">
+            <section class="page-hero reveal">
+                <p class="eyebrow">CommonJS + ESM + CLI + JSON</p>
+                <h1>Build the config <em>you need.</em></h1>
+                <p>Set the server options below. The matching snippets update immediately.</p>
+                <div class="page-jumps" aria-label="Playground links">
+                    <a href="#generator">Generator</a>
+                    <a href="./guide.html#configuration">Full reference</a>
+                    <a href="./resources.html#security">Security</a>
+                </div>
+            </section>
+
+            <section class="compact-section playground-section" id="generator" aria-labelledby="generator-heading">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">Configuration generator</p>
+                    <h2 id="generator-heading">Choose. Copy. Run locally.</h2>
+                    <p>The module snippets cover the full serializable Config surface. The CLI output includes only options the CLI accepts.</p>
+                </div>
+
+                <div class="browser-note reveal" role="note">
+                    <strong>This simulates configuration. It does not run a server.</strong>
+                    <span>Everything stays in this browser page. GitHub Pages cannot launch Node.js, read your files, validate certificate contents, or start a local listener. Copy a snippet and run it on your own machine.</span>
+                </div>
+
+                <div class="playground-grid reveal">
+                    <form class="configurator" id="config-form">
+                        <div class="configurator-heading">
+                            <div>
+                                <p class="feature-number">FULL CONFIG SURFACE</p>
+                                <h3>Configuration</h3>
+                            </div>
+                            <button type="reset">Reset defaults</button>
+                        </div>
+
+                        <fieldset>
+                            <legend>Location and host routing</legend>
+                            <div class="field-grid">
+                                <label>
+                                    <span>Root directory</span>
+                                    <input id="config-root" name="root" type="text" value="./public" spellcheck="false">
+                                </label>
+                                <label>
+                                    <span>Listen address</span>
+                                    <input id="config-host" name="host" type="text" value="127.0.0.1" spellcheck="false">
+                                </label>
+                                <label>
+                                    <span>HTTP port</span>
+                                    <input id="config-port" name="port" type="number" min="0" max="65535" step="1" value="8080">
+                                </label>
+                                <label>
+                                    <span>Primary Host check</span>
+                                    <input id="config-domain" name="domain" type="text" value="0.0.0.0" spellcheck="false">
+                                </label>
+                                <label>
+                                    <span>Index file</span>
+                                    <input id="config-index" name="index" type="text" value="index.html" spellcheck="false">
+                                </label>
+                                <label class="field-wide">
+                                    <span>Additional domains <small>JSON hostname-to-root object</small></span>
+                                    <textarea id="config-domains" name="domains" rows="3" spellcheck="false" aria-describedby="json-help">{}</textarea>
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>HTTP behavior</legend>
+                            <div class="switch-list">
+                                <label class="switch-row">
+                                    <span><strong>No-cache headers</strong><small>Default is on</small></span>
+                                    <input id="config-no-cache" name="noCache" type="checkbox" checked>
+                                </label>
+                                <label class="switch-row">
+                                    <span><strong>Compression</strong><small>Brotli or gzip</small></span>
+                                    <input id="config-compression" name="compression" type="checkbox">
+                                </label>
+                                <label class="switch-row">
+                                    <span><strong>Verbose output</strong><small>Operational details</small></span>
+                                    <input id="config-verbose" name="verbose" type="checkbox">
+                                </label>
+                            </div>
+
+                            <div class="option-with-value">
+                                <label class="switch-row">
+                                    <span><strong>SPA fallback</strong><small>Extensionless HTML routes</small></span>
+                                    <input id="config-spa" name="spa" type="checkbox">
+                                </label>
+                                <label>
+                                    <span>Fallback file <small>Blank uses the index</small></span>
+                                    <input id="config-spa-file" name="spaFile" type="text" placeholder="index.html" disabled spellcheck="false">
+                                </label>
+                            </div>
+
+                            <div class="option-with-value">
+                                <label class="switch-row">
+                                    <span><strong>Request-body limit</strong><small>Off means unlimited</small></span>
+                                    <input id="config-body-limit" name="bodyLimit" type="checkbox">
+                                </label>
+                                <label>
+                                    <span>Maximum bytes</span>
+                                    <input id="config-max-body" name="maxBody" type="number" min="0" step="1" value="1048576" disabled>
+                                </label>
+                            </div>
+
+                            <div class="option-with-value">
+                                <span class="static-option"><strong>Compression threshold</strong><small>Minimum uncompressed bytes</small></span>
+                                <label>
+                                    <span>Threshold bytes</span>
+                                    <input id="config-compression-threshold" name="compressionThreshold" type="number" min="0" step="1" value="1024">
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Timeouts <small>milliseconds</small></legend>
+                            <div class="timeout-grid">
+                                <div class="timeout-field">
+                                    <label for="config-timeout">Socket inactivity</label>
+                                    <input id="config-timeout" type="number" min="0" step="1" value="30000">
+                                    <label class="disable-check"><input id="disable-timeout" type="checkbox"> Off</label>
+                                </div>
+                                <div class="timeout-field">
+                                    <label for="config-request-timeout">Complete request</label>
+                                    <input id="config-request-timeout" type="number" min="0" step="1" value="300000">
+                                    <label class="disable-check"><input id="disable-request-timeout" type="checkbox"> Off</label>
+                                </div>
+                                <div class="timeout-field">
+                                    <label for="config-headers-timeout">Request headers</label>
+                                    <input id="config-headers-timeout" type="number" min="0" step="1" value="60000">
+                                    <label class="disable-check"><input id="disable-headers-timeout" type="checkbox"> Off</label>
+                                </div>
+                                <div class="timeout-field">
+                                    <label for="config-keep-alive-timeout">Keep alive</label>
+                                    <input id="config-keep-alive-timeout" type="number" min="0" step="1" value="5000">
+                                    <label class="disable-check"><input id="disable-keep-alive-timeout" type="checkbox"> Off</label>
+                                </div>
+                            </div>
+                            <p class="form-help"><code>false</code> or <code>0</code> disables a timeout. The generated snippets use <code>false</code> when Off is checked.</p>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>File types and restrictions</legend>
+                            <div class="field-grid">
+                                <label>
+                                    <span>Automatic MIME types</span>
+                                    <select id="config-content-type" name="contentType">
+                                        <option value="auto">Use built-in map</option>
+                                        <option value="false">Off — binary fallback</option>
+                                    </select>
+                                </label>
+                                <label class="field-wide">
+                                    <span>MIME overrides <small>JSON extension-to-type object; false returns 415</small></span>
+                                    <textarea id="config-mime-overrides" name="mimeOverrides" rows="4" spellcheck="false" aria-describedby="mime-help json-help">{
+    "webmanifest": "application/manifest+json"
+}</textarea>
+                                </label>
+                                <label class="field-wide">
+                                    <span>Restricted extensions <small>Truthy JSON entries return 403</small></span>
+                                    <textarea id="config-restricted-types" name="restrictedTypes" rows="3" spellcheck="false" aria-describedby="mime-help json-help">{}</textarea>
+                                </label>
+                            </div>
+                            <p class="form-help" id="mime-help">Use extension keys without a dot. <code>contentType:false</code> removes automatic MIME selection; served files use <code>application/octet-stream</code>. One MIME entry set to <code>false</code> rejects that extension with <code>415</code>.</p>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Logging and errors</legend>
+                            <div class="field-grid">
+                                <label>
+                                    <span>NDJSON log path</span>
+                                    <input id="config-log" name="log" type="text" placeholder="Off — or ./requests.ndjson" spellcheck="false">
+                                </label>
+                                <label class="switch-row switch-field">
+                                    <span><strong>Include body in logs</strong><small>Request bodies are sensitive</small></span>
+                                    <input id="config-log-body" name="logBody" type="checkbox">
+                                </label>
+                                <label class="switch-row switch-field field-wide">
+                                    <span><strong>Custom log function stub</strong><small>Module output only; replace the placeholder body</small></span>
+                                    <input id="config-custom-logger" name="customLogger" type="checkbox">
+                                </label>
+                                <label class="field-wide">
+                                    <span>Error headers <small>JSON header object</small></span>
+                                    <textarea id="config-error-headers" name="errorHeaders" rows="3" spellcheck="false" aria-describedby="json-help">{}</textarea>
+                                </label>
+                                <label class="field-wide">
+                                    <span>Error bodies <small>JSON status-to-text object</small></span>
+                                    <textarea id="config-error-bodies" name="errorBodies" rows="3" spellcheck="false" aria-describedby="json-help">{}</textarea>
+                                </label>
+                            </div>
+                            <p class="form-help" id="json-help">These fields accept plain JSON objects. Invalid objects are ignored and marked below.</p>
+                            <p class="form-validation" id="config-validation" aria-live="polite">JSON fields are valid.</p>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>HTTPS</legend>
+                            <label class="switch-row standalone-switch">
+                                <span><strong>Configure HTTPS</strong><small>Both key and certificate are required to listen</small></span>
+                                <input id="config-https" name="httpsEnabled" type="checkbox">
+                            </label>
+                            <div class="field-grid https-fields" id="https-fields" aria-disabled="true">
+                                <label>
+                                    <span>Private-key path</span>
+                                    <input id="config-https-key" name="httpsKey" type="text" placeholder="./local-certs/private/server.key" disabled spellcheck="false">
+                                </label>
+                                <label>
+                                    <span>Certificate path</span>
+                                    <input id="config-https-certificate" name="httpsCertificate" type="text" placeholder="./local-certs/server.crt" disabled spellcheck="false">
+                                </label>
+                                <label>
+                                    <span>CA path <small>optional</small></span>
+                                    <input id="config-https-ca" name="httpsCa" type="text" disabled spellcheck="false">
+                                </label>
+                                <label>
+                                    <span>Passphrase <small>optional</small></span>
+                                    <input id="config-https-passphrase" name="httpsPassphrase" type="text" disabled autocomplete="off" spellcheck="false">
+                                </label>
+                                <label>
+                                    <span>HTTPS port</span>
+                                    <input id="config-https-port" name="httpsPort" type="number" min="0" max="65535" step="1" value="443" disabled>
+                                </label>
+                                <label class="switch-row switch-field">
+                                    <span><strong>HTTPS only</strong><small>Skip the HTTP listener</small></span>
+                                    <input id="config-https-only" name="httpsOnly" type="checkbox" disabled>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </form>
+
+                    <div class="snippet-card">
+                        <div class="code-tabs" role="tablist" aria-label="Generated configuration formats">
+                            <button id="tab-cjs" role="tab" aria-selected="true" aria-controls="generated-panel" tabindex="0" data-output-tab="cjs">CommonJS</button>
+                            <button id="tab-esm" role="tab" aria-selected="false" aria-controls="generated-panel" tabindex="-1" data-output-tab="esm">ESM</button>
+                            <button id="tab-cli" role="tab" aria-selected="false" aria-controls="generated-panel" tabindex="-1" data-output-tab="cli">CLI</button>
+                            <button id="tab-json" role="tab" aria-selected="false" aria-controls="generated-panel" tabindex="-1" data-output-tab="json">JSON</button>
+                            <button class="copy-button" type="button" data-copy-output aria-label="Copy generated snippet">Copy</button>
+                        </div>
+                        <div class="generated-panel" id="generated-panel" role="tabpanel" aria-live="polite" aria-labelledby="tab-cjs">
+                            <pre><code id="snippet-output">const {Server}=require('node-http-server');
+
+const server=new Server({
+    host:'127.0.0.1',
+    port:8080,
+    root:'./public'
+});
+
+server.deploy();</code></pre>
+                        </div>
+                        <div class="snippet-meta">
+                            <span id="snippet-format">CommonJS module</span>
+                            <span id="snippet-warning">Ready to copy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="install-line reveal">
+                    <code>npm install node-http-server</code>
+                    <button type="button" data-copy-text="npm install node-http-server">Copy install command</button>
+                </div>
+            </section>
+
+            <section class="page-cta reveal">
+                <div><p class="eyebrow">Exact defaults and behavior</p><h2>Keep the reference nearby.</h2></div>
+                <a class="button button-secondary" href="./guide.html#configuration">Open configuration tables <span aria-hidden="true">→</span></a>
+            </section>
+        </main>
+
+        <footer>
+            <a class="wordmark" href="./index.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a>
+            <p>Small on purpose. MIT licensed. <span data-year></span></p>
+            <div>
+                <a href="https://www.npmjs.com/package/node-http-server">npm</a>
+                <a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a>
+            </div>
+        </footer>
+    </body>
+</html>

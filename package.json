@@ -39,7 +39,7 @@
   "scripts": {
     "start": "node ./bin/nhs.js",
     "test": "node --test test/*.test.js",
-    "coverage": "node ./scripts/coverage.js",
+    "coverage": "vanilla-test coverage node && node ./scripts/coverage.js",
     "test:package": "node ./scripts/package-smoke.js",
     "verify": "npm test && npm run coverage && npm run test:package",
     "basic": "node ./example/basic/basicApp.js",
@@ -70,5 +70,8 @@
   ],
   "author": "Brandon Nozaki Miller",
   "license": "MIT",
-  "sideEffects": false
+  "sideEffects": false,
+  "devDependencies": {
+    "vanilla-test": "2.0.0"
+  }
 }

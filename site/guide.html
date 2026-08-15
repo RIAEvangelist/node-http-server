@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Developer guide and complete API, configuration, CLI, and npm script reference for node-http-server.">
+        <meta name="theme-color" content="#08110d">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="Developer guide — node-http-server">
+        <meta property="og:description" content="CommonJS, ESM, API, configuration, CLI, and npm scripts for node-http-server.">
+        <meta property="og:url" content="https://riaevangelist.github.io/node-http-server/guide.html">
+        <meta property="og:image" content="https://riaevangelist.github.io/node-http-server/assets/node-http-server-header.webp">
+        <meta name="twitter:card" content="summary_large_image">
+        <title>Developer guide — node-http-server</title>
+        <link rel="canonical" href="https://riaevangelist.github.io/node-http-server/guide.html">
+        <link rel="stylesheet" href="./styles.css">
+        <script src="./script.js" defer></script>
+    </head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a>
+        <div class="scroll-meter" aria-hidden="true"><span></span></div>
+
+        <header class="site-header">
+            <a class="wordmark" href="./index.html" aria-label="node-http-server home">
+                <span class="wordmark-mark" aria-hidden="true">n</span>
+                <span>node-http-server</span>
+            </a>
+            <nav aria-label="Primary navigation">
+                <a href="./index.html">Overview</a>
+                <a href="./guide.html" aria-current="page">Guide</a>
+                <a href="./playground.html">Playground</a>
+                <a href="./resources.html">Resources</a>
+                <a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub <span aria-hidden="true">↗</span></a>
+            </nav>
+        </header>
+
+        <main id="main" class="page-main">
+            <section class="page-hero reveal">
+                <p class="eyebrow">Developer guide</p>
+                <h1>Small API. <em>Explicit options.</em></h1>
+                <p>Start with CommonJS, ESM, or the CLI. Open only the reference table you need.</p>
+                <div class="page-jumps" aria-label="Guide sections">
+                    <a href="#start">Start</a>
+                    <a href="#api">API</a>
+                    <a href="#configuration">Configuration</a>
+                    <a href="#cli">CLI</a>
+                    <a href="#scripts">Scripts</a>
+                </div>
+            </section>
+
+            <section class="compact-section" id="start" aria-labelledby="start-heading">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">Install and start</p>
+                    <h2 id="start-heading">Use either module system.</h2>
+                    <p>Node.js 22.12 or newer is required. Both examples create an isolated server instance.</p>
+                </div>
+                <div class="example-grid reveal">
+                    <article class="example-card">
+                        <div><span>CommonJS</span><button type="button" data-copy-text="const {Server}=require('node-http-server');&#10;&#10;const server=new Server({root:'./public'});&#10;server.deploy();">Copy</button></div>
+                        <pre><code>const {Server}=require('node-http-server');
+
+const server=new Server({root:'./public'});
+server.deploy();</code></pre>
+                    </article>
+                    <article class="example-card">
+                        <div><span>ESM</span><button type="button" data-copy-text="import {Server} from 'node-http-server';&#10;&#10;const server=new Server({root:'./public'});&#10;server.deploy();">Copy</button></div>
+                        <pre><code>import {Server} from 'node-http-server';
+
+const server=new Server({root:'./public'});
+server.deploy();</code></pre>
+                    </article>
+                </div>
+                <div class="install-line reveal">
+                    <code>npm install node-http-server</code>
+                    <button type="button" data-copy-text="npm install node-http-server">Copy install command</button>
+                </div>
+            </section>
+
+            <section class="compact-section reference-section" aria-labelledby="reference-heading">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">Complete reference</p>
+                    <h2 id="reference-heading">The contract, in tables.</h2>
+                    <p>Defaults are explicit. Optional behavior stays optional.</p>
+                </div>
+
+                <div class="reference-stack reveal">
+                    <details id="api" open>
+                        <summary><span>API</span><small>Lifecycle, exports, hooks, and public members</small></summary>
+                        <div class="table-scroll">
+                            <table>
+                                <thead><tr><th>Member</th><th>Returns</th><th>Purpose</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>deploy(config?, callback?)</code></td><td><code>Server</code></td><td>Start HTTP and optional HTTPS listeners.</td></tr>
+                                    <tr><td><code>close(callback?)</code></td><td><code>Promise&lt;void&gt;</code></td><td>Close every listener owned by this instance; the instance can deploy again.</td></tr>
+                                    <tr><td><code>address()</code></td><td>address or <code>null</code></td><td>Read the first active listener address.</td></tr>
+                                    <tr><td><code>serve(request,response,body,encoding)</code></td><td><code>Promise</code></td><td>Complete a manual response through hooks.</td></tr>
+                                    <tr><td><code>serveFile(filename,request,response)</code></td><td><code>Promise&lt;boolean&gt;</code></td><td>Serve a deliberate file from custom code.</td></tr>
+                                    <tr><td><code>onRawRequest(request,response,serve)</code></td><td>truthy takeover</td><td>Intercept before parsing; receives the public safe serve path.</td></tr>
+                                    <tr><td><code>onRequest(request,response,serve)</code></td><td>truthy takeover</td><td>Intercept after parsing; receives the public safe serve path. <code>request.body</code> is text and <code>bodyBuffer</code> is a Buffer.</td></tr>
+                                    <tr><td><code>beforeServe(request,response,bodyRef,encodingRef,complete)</code></td><td>truthy takeover</td><td>Modify buffered output; completion is one-shot and does not re-enter the hook.</td></tr>
+                                    <tr><td><code>afterServe(request,response)</code></td><td>void/Promise</td><td>Observe completed responses.</td></tr>
+                                    <tr><td><code>config</code></td><td><code>Config</code></td><td>The instance's isolated configuration.</td></tr>
+                                    <tr><td><code>server</code> / <code>secureServer</code></td><td>Node server or <code>null</code></td><td>Active HTTP and HTTPS listeners.</td></tr>
+                                    <tr><td>default export</td><td><code>Server</code> singleton</td><td>The original shared server from both CommonJS and ESM.</td></tr>
+                                    <tr><td>named exports</td><td>constructors</td><td><code>Server</code>, <code>Config</code>, and <code>RefString</code>.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="reference-note">Listener failures keep Node's native event contract. Attach <code>server.server.once('error', handler)</code> after <code>deploy()</code> when your application handles bind errors. <code>lastError</code> records request, hook, stream, and log failures.</p>
+                    </details>
+
+                    <details id="configuration">
+                        <summary><span>Top-level configuration</span><small>Network, roots, logging, MIME, and TLS</small></summary>
+                        <div class="table-scroll">
+                            <table>
+                                <thead><tr><th>Key</th><th>Default</th><th>Purpose</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>host</code></td><td><code>'127.0.0.1'</code></td><td>Listen address. Use another interface only for deliberate network exposure.</td></tr>
+                                    <tr><td><code>port</code></td><td><code>8080</code></td><td>HTTP port.</td></tr>
+                                    <tr><td><code>root</code></td><td>current directory</td><td>Default static root.</td></tr>
+                                    <tr><td><code>domain</code></td><td><code>'0.0.0.0'</code></td><td>Primary Host check; not the listen address.</td></tr>
+                                    <tr><td><code>domains</code></td><td><code>{}</code></td><td>Hostname-to-root mappings.</td></tr>
+                                    <tr><td><code>verbose</code></td><td><code>false</code></td><td>Operational console output.</td></tr>
+                                    <tr><td><code>log</code></td><td><code>false</code></td><td>NDJSON log path.</td></tr>
+                                    <tr><td><code>logBody</code></td><td><code>false</code></td><td>Include the UTF-8 body in log records.</td></tr>
+                                    <tr><td><code>logFunction</code></td><td>built in</td><td>Request-record writer; replace with a function for another destination.</td></tr>
+                                    <tr><td><code>contentType</code></td><td>built-in map</td><td>Add/override extension keys, use one <code>false</code> entry for <code>415</code>, or set the whole map to <code>false</code>.</td></tr>
+                                    <tr><td><code>restrictedType</code></td><td><code>{}</code></td><td>Truthy extension keys return <code>403</code>.</td></tr>
+                                    <tr><td><code>errors</code></td><td>built in</td><td>Error headers and bodies for <code>400</code>, <code>403</code>, <code>404</code>, <code>405</code>, <code>413</code>, <code>415</code>, <code>416</code>, <code>421</code>, and <code>500</code>.</td></tr>
+                                    <tr><td><code>https</code></td><td>disabled</td><td>TLS paths, port, passphrase, and HTTPS-only mode.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="reference-note">Extension keys do not include the dot: <code>{webmanifest:'application/manifest+json', secret:true}</code>. Unknown extensions and every file under <code>contentType:false</code> use <code>application/octet-stream</code>.</p>
+                    </details>
+
+                    <details>
+                        <summary><span>Server configuration</span><small>Files, caching, limits, and timeouts</small></summary>
+                        <div class="table-scroll">
+                            <table>
+                                <thead><tr><th>Key</th><th>Default</th><th>Purpose</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>index</code></td><td><code>'index.html'</code></td><td>Directory index file.</td></tr>
+                                    <tr><td><code>noCache</code></td><td><code>true</code></td><td>Send no-cache directives.</td></tr>
+                                    <tr><td><code>timeout</code></td><td><code>30000</code></td><td>Socket inactivity timeout in ms.</td></tr>
+                                    <tr><td><code>requestTimeout</code></td><td><code>300000</code></td><td>Complete-request timeout in ms.</td></tr>
+                                    <tr><td><code>headersTimeout</code></td><td><code>60000</code></td><td>Header timeout in ms.</td></tr>
+                                    <tr><td><code>keepAliveTimeout</code></td><td><code>5000</code></td><td>Keep-alive timeout in ms.</td></tr>
+                                    <tr><td><code>maxRequestBodyBytes</code></td><td><code>false</code></td><td>Body limit in bytes; <code>false</code>/<code>0</code> is unlimited.</td></tr>
+                                    <tr><td><code>compression</code></td><td><code>false</code></td><td>Negotiate Brotli or gzip.</td></tr>
+                                    <tr><td><code>compressionThreshold</code></td><td><code>1024</code></td><td>Minimum uncompressed bytes.</td></tr>
+                                    <tr><td><code>spaFallback</code></td><td><code>false</code></td><td><code>true</code> uses the index; a string selects a file.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="reference-note"><code>false</code> or <code>0</code> disables each timeout. These values are milliseconds.</p>
+                    </details>
+
+                    <details>
+                        <summary><span>HTTPS configuration</span><small>Certificate paths and listener mode</small></summary>
+                        <div class="table-scroll">
+                            <table>
+                                <thead><tr><th>Key</th><th>Default</th><th>Purpose</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>ca</code></td><td><code>''</code></td><td>Optional CA certificate path.</td></tr>
+                                    <tr><td><code>privateKey</code></td><td><code>''</code></td><td>Private-key path.</td></tr>
+                                    <tr><td><code>certificate</code></td><td><code>''</code></td><td>Certificate path.</td></tr>
+                                    <tr><td><code>passphrase</code></td><td><code>false</code></td><td>Optional private-key passphrase.</td></tr>
+                                    <tr><td><code>port</code></td><td><code>443</code></td><td>HTTPS port.</td></tr>
+                                    <tr><td><code>only</code></td><td><code>false</code></td><td>Skip the HTTP listener.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+
+                    <details>
+                        <summary><span>Static HTTP behavior</span><small>Methods, caching, ranges, compression, and SPA fallback</small></summary>
+                        <div class="table-scroll">
+                            <table>
+                                <thead><tr><th>Input</th><th>Result</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>GET</code></td><td>Streams the selected file unless a custom <code>beforeServe</code> hook needs buffering.</td></tr>
+                                    <tr><td><code>HEAD</code></td><td>Mirrors full GET status and headers without a body; Range is ignored.</td></tr>
+                                    <tr><td>Other method</td><td><code>405</code> with an <code>Allow</code> header.</td></tr>
+                                    <tr><td>Matching ETag/date validator</td><td><code>304</code> without a body.</td></tr>
+                                    <tr><td>One satisfiable GET byte range</td><td><code>206</code> and the selected bytes.</td></tr>
+                                    <tr><td>Valid but unsatisfiable byte range</td><td><code>416</code>.</td></tr>
+                                    <tr><td>Malformed, unsupported, or multi-range</td><td>Range is ignored; a full <code>200</code> response is sent.</td></tr>
+                                    <tr><td>Compression enabled and eligible</td><td>Negotiates Brotli or gzip above the threshold; ranged/binary responses remain uncompressed.</td></tr>
+                                    <tr><td>SPA fallback enabled</td><td>Missing extensionless HTML routes use the selected fallback.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+
+                    <details id="cli">
+                        <summary><span>CLI</span><small>Modern flags and compatible key=value input</small></summary>
+                        <div class="table-scroll">
+                            <table>
+                                <thead><tr><th>Option</th><th>Purpose</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>-p, --port &lt;port&gt;</code></td><td>HTTP port.</td></tr>
+                                    <tr><td><code>-r, --root &lt;path&gt;</code></td><td>Static root.</td></tr>
+                                    <tr><td><code>--host &lt;address&gt;</code></td><td>Listen address.</td></tr>
+                                    <tr><td><code>--domain &lt;hostname&gt;</code></td><td>Expected primary Host.</td></tr>
+                                    <tr><td><code>--index &lt;file&gt;</code></td><td>Directory index.</td></tr>
+                                    <tr><td><code>--no-cache</code> / <code>--cache</code></td><td>Control client caching.</td></tr>
+                                    <tr><td><code>--spa[=&lt;file&gt;]</code></td><td>Enable SPA fallback.</td></tr>
+                                    <tr><td><code>--compression</code></td><td>Enable Brotli/gzip.</td></tr>
+                                    <tr><td><code>--max-body &lt;bytes|false&gt;</code></td><td>Set or disable the body limit.</td></tr>
+                                    <tr><td><code>--timeout &lt;ms|false&gt;</code></td><td>Set or disable socket inactivity.</td></tr>
+                                    <tr><td><code>--request-timeout &lt;ms|false&gt;</code></td><td>Set or disable the request timeout.</td></tr>
+                                    <tr><td><code>--headers-timeout &lt;ms|false&gt;</code></td><td>Set or disable the header timeout.</td></tr>
+                                    <tr><td><code>--keep-alive-timeout &lt;ms|false&gt;</code></td><td>Set or disable keep-alive.</td></tr>
+                                    <tr><td><code>--log &lt;path&gt;</code></td><td>Append NDJSON logs.</td></tr>
+                                    <tr><td><code>-v, --verbose</code></td><td>Print operational details.</td></tr>
+                                    <tr><td><code>-h, --help</code> / <code>--version</code></td><td>Print command information.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="reference-note">Legacy <code>key=value</code> input remains accepted. Object maps, custom errors, MIME overrides, HTTPS, and custom functions need the module API.</p>
+                    </details>
+
+                    <details id="scripts">
+                        <summary><span>npm scripts</span><small>Development and verification commands</small></summary>
+                        <div class="table-scroll">
+                            <table>
+                                <thead><tr><th>Script</th><th>Purpose</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>npm start</code></td><td>Serve the current directory.</td></tr>
+                                    <tr><td><code>npm test</code></td><td>Run the Node test suite.</td></tr>
+                                    <tr><td><code>npm run coverage</code></td><td>Run Node-native V8 coverage and its gates.</td></tr>
+                                    <tr><td><code>npm run test:package</code></td><td>Smoke-test the packed npm artifact.</td></tr>
+                                    <tr><td><code>npm run verify</code></td><td>Run tests, coverage, and package smoke.</td></tr>
+                                    <tr><td><code>npm run basic</code></td><td>Run the basic HTTP example.</td></tr>
+                                    <tr><td><code>npm run https</code></td><td>Run HTTPS-only; local certificates are required.</td></tr>
+                                    <tr><td><code>npm run both</code></td><td>Run HTTP and HTTPS together; local certificates are required.</td></tr>
+                                    <tr><td><code>npm run template</code></td><td>Run the template example.</td></tr>
+                                    <tr><td><code>npm run cluster</code></td><td>Run the cluster example.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <section class="page-cta reveal">
+                <div><p class="eyebrow">Need the object?</p><h2>Generate it in the browser.</h2></div>
+                <a class="button button-primary" href="./playground.html">Open playground <span aria-hidden="true">→</span></a>
+            </section>
+        </main>
+
+        <footer>
+            <a class="wordmark" href="./index.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a>
+            <p>Small on purpose. MIT licensed. <span data-year></span></p>
+            <div>
+                <a href="https://www.npmjs.com/package/node-http-server">npm</a>
+                <a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a>
+            </div>
+        </footer>
+    </body>
+</html>

@@ -137,10 +137,16 @@ test('the default logger returns serialization and filesystem errors', async fun
 });
 
 test('ESM exposes the same default singleton and named constructors', async function(){
-    const module = await import('../server/index.mjs');
+    const module = await import('../server/index.mjs'),
+        configModule = await import('../server/Config.mjs'),
+        mimeModule = await import('../server/MimeTypes.mjs');
 
     assert.equal(module.default, server);
     assert.equal(module.Server, server.Server);
     assert.equal(module.Config, server.Config);
     assert.equal(module.RefString, server.RefString);
+    assert.equal(configModule.default, server.Config);
+    assert.equal(configModule.Config, server.Config);
+    assert.equal(mimeModule.default.webp, 'image/webp');
+    assert.equal(mimeModule.contentTypes, mimeModule.default);
 });

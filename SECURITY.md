@@ -78,7 +78,7 @@ Enabling compression for dynamic responses that mix secrets with attacker-contro
 
 ## MIME and downloads
 
-The dependency-free MIME map is a convenience, not a content scanner. A file's extension controls its automatic type. Validate uploaded content before it reaches the public root and set `Content-Disposition` in a hook when content should download instead of render.
+The built-in MIME map is a convenience, not a content scanner. A file's extension controls its automatic type. Validate uploaded content before it reaches the public root and set `Content-Disposition` in a hook when content should download instead of render.
 
 Set `contentType:false` when automatic types are unwanted. The server then uses `application/octet-stream` unless a hook supplies a type.
 

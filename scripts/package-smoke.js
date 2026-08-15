@@ -15,7 +15,11 @@ const adjacentNpm = path.join(path.dirname(process.execPath), 'node_modules', 'n
 const npmCli = process.env.npm_execpath || (fs.existsSync(adjacentNpm) && adjacentNpm);
 
 assert.deepEqual(manifest.dependencies || {}, {}, 'runtime dependencies must stay empty');
-assert.deepEqual(manifest.devDependencies || {}, {}, 'development dependencies must stay empty');
+assert.deepEqual(
+    manifest.devDependencies || {},
+    {'vanilla-test':'2.0.0'},
+    'vanilla-test must stay the only direct development dependency'
+);
 
 function run(command, args, options = {}){
     const result = spawnSync(command, args, {

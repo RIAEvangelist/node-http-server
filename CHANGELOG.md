@@ -12,11 +12,11 @@ All notable changes to this project are documented here.
 - Optional Brotli/gzip compression, configurable compression threshold, and optional SPA fallback.
 - Configurable request-body limits plus socket, request, header, and keep-alive timeouts. Every limit or timeout can be disabled explicitly.
 - `request.bodyBuffer` alongside the compatible UTF-8 `request.body` string.
-- A dependency-free modern MIME map with safe binary fallback and `contentType:false` opt-out.
+- A built-in modern MIME map with safe binary fallback and `contentType:false` opt-out.
 - Localhost-first `host` configuration, decoded-path containment, malformed-request handling, and virtual-host validation.
 - Structured NDJSON request logging with isolated records and surfaced logging errors.
 - Modern CLI flags while retaining the v8 `key=value` form.
-- Node.js 22.12 and Node.js 24 CI, dependency-free Node-native V8 coverage, packed-package smoke tests, and GitHub Pages deployment.
+- Node.js 22.12 and Node.js 24 CI, Node-only V8 coverage through the owner-maintained `vanilla-test`, packed-package smoke tests, and GitHub Pages deployment.
 - Migration, security, configuration, CLI, and lifecycle documentation.
 
 ### Changed

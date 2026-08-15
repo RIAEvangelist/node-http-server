@@ -158,6 +158,13 @@ footer {
     color: var(--ink);
 }
 
+.site-header nav a[aria-current="page"] {
+    background: rgba(124, 242, 154, .1);
+    border-radius: .4rem;
+    color: var(--green);
+    padding: .55rem .65rem;
+}
+
 .site-header .nav-github {
     border: 1px solid var(--line-strong);
     border-radius: 999px;
@@ -199,6 +206,47 @@ footer {
     display: block;
     height: auto;
     width: 100%;
+}
+
+.page-hero {
+    border-bottom: 1px solid var(--line);
+    padding: clamp(4.5rem, 10vw, 8rem) 0 clamp(3.5rem, 7vw, 5.5rem);
+}
+
+.page-hero h1 {
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    max-width: 12ch;
+}
+
+.page-hero > p:not(.eyebrow) {
+    color: var(--muted);
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    line-height: 1.7;
+    margin: 1.8rem 0 0;
+    max-width: 42rem;
+}
+
+.page-jumps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .55rem;
+    margin-top: 2rem;
+}
+
+.page-jumps a {
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: .75rem;
+    font-weight: 750;
+    padding: .6rem .85rem;
+    text-decoration: none;
+}
+
+.page-jumps a:hover,
+.page-jumps a:focus-visible {
+    border-color: var(--green);
+    color: var(--green);
 }
 
 .eyebrow {
@@ -451,6 +499,15 @@ h1 em {
     padding: clamp(6rem, 11vw, 10rem) 0;
 }
 
+.compact-section {
+    padding: clamp(4rem, 8vw, 6.5rem) 0;
+}
+
+.compact-section + .compact-section,
+.route-section {
+    border-top: 1px solid var(--line);
+}
+
 .section-heading {
     max-width: 42rem;
 }
@@ -550,6 +607,102 @@ h1 em {
 
 .feature-card-dark code {
     color: var(--night);
+}
+
+.route-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 3rem;
+}
+
+.route-card {
+    background: rgba(13, 26, 19, .72);
+    border: 1px solid var(--line);
+    border-radius: .8rem;
+    display: grid;
+    gap: 1rem;
+    min-height: 14rem;
+    padding: 1.4rem;
+    text-decoration: none;
+    transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.route-card:hover,
+.route-card:focus-visible {
+    border-color: var(--green);
+    transform: translateY(-2px);
+}
+
+.route-card > span {
+    color: var(--green);
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: .68rem;
+}
+
+.route-card strong {
+    align-self: end;
+    font-size: 1.45rem;
+    letter-spacing: -.035em;
+}
+
+.route-card small {
+    color: var(--muted);
+    font-size: .78rem;
+    line-height: 1.55;
+}
+
+.example-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 3rem;
+}
+
+.example-card {
+    background: #050b08;
+    border: 1px solid var(--line-strong);
+    border-radius: .8rem;
+    overflow: hidden;
+}
+
+.example-card > div {
+    align-items: center;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    padding: .8rem 1rem;
+}
+
+.example-card > div span {
+    color: var(--green);
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: .7rem;
+    font-weight: 800;
+}
+
+.example-card button {
+    background: transparent;
+    border: 0;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: .7rem;
+    font-weight: 750;
+}
+
+.example-card button:hover,
+.example-card button:focus-visible {
+    color: var(--green);
+}
+
+.example-card pre {
+    color: var(--ink);
+    font-size: .75rem;
+    line-height: 1.75;
+    margin: 0;
+    overflow-x: auto;
+    padding: 1.25rem;
 }
 
 .header-stack {
@@ -721,6 +874,10 @@ h1 em {
     gap: .4rem;
 }
 
+.field-wide {
+    grid-column: 1 / -1;
+}
+
 .configurator label > span,
 .timeout-field > label:first-child {
     color: var(--muted);
@@ -736,7 +893,8 @@ h1 em {
 
 .configurator input[type="text"],
 .configurator input[type="number"],
-.configurator select {
+.configurator select,
+.configurator textarea {
     background: #07100c;
     border: 1px solid var(--line-strong);
     border-radius: .4rem;
@@ -749,17 +907,25 @@ h1 em {
     width: 100%;
 }
 
+.configurator textarea {
+    line-height: 1.55;
+    resize: vertical;
+}
+
 .configurator input:focus,
-.configurator select:focus {
+.configurator select:focus,
+.configurator textarea:focus {
     border-color: var(--green);
     box-shadow: 0 0 0 2px rgba(124, 242, 154, .1);
 }
 
-.configurator input:invalid {
+.configurator input:invalid,
+.configurator [aria-invalid="true"] {
     border-color: #ff8f8f;
 }
 
-.configurator input:disabled {
+.configurator input:disabled,
+.configurator textarea:disabled {
     cursor: not-allowed;
     opacity: .38;
 }
@@ -797,6 +963,36 @@ h1 em {
     flex: 0 0 auto;
     height: 1.05rem;
     width: 1.05rem;
+}
+
+.switch-field,
+.standalone-switch {
+    background: rgba(255, 255, 255, .018);
+    border: 1px solid var(--line);
+    border-radius: .45rem;
+}
+
+.standalone-switch {
+    margin-bottom: 1rem;
+}
+
+.static-option {
+    display: grid;
+    gap: .25rem;
+    padding: .75rem;
+}
+
+.static-option strong {
+    font-size: .75rem;
+}
+
+.static-option small {
+    color: var(--quiet);
+    font-size: .66rem;
+}
+
+.https-fields[aria-disabled="true"] {
+    opacity: .58;
 }
 
 .option-with-value {
@@ -843,6 +1039,17 @@ h1 em {
 
 .form-help code {
     color: var(--mint);
+}
+
+.form-validation {
+    color: var(--green);
+    font-size: .68rem;
+    line-height: 1.55;
+    margin: .7rem 0 0;
+}
+
+.form-validation[data-warning="true"] {
+    color: #ff9b9b;
 }
 
 .snippet-card {
@@ -1269,6 +1476,73 @@ h1 em {
     font-size: .75rem;
 }
 
+.resource-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 3rem;
+}
+
+.resource-card {
+    background: rgba(13, 26, 19, .72);
+    border: 1px solid var(--line);
+    border-radius: .8rem;
+    min-height: 14rem;
+    padding: 1.4rem;
+}
+
+.resource-card > span {
+    color: var(--green);
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: .68rem;
+}
+
+.resource-card h3 {
+    font-size: 1.35rem;
+    letter-spacing: -.035em;
+    margin: 2.8rem 0 .7rem;
+}
+
+.resource-card p {
+    color: var(--muted);
+    font-size: .78rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.resource-card code {
+    color: var(--mint);
+}
+
+.resource-card-warning {
+    border-color: rgba(255, 209, 102, .35);
+}
+
+.resource-card-warning > span,
+.resource-card-warning h3 {
+    color: var(--amber);
+}
+
+.page-cta {
+    align-items: center;
+    border-top: 1px solid var(--line);
+    display: flex;
+    gap: 2rem;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding: clamp(3rem, 7vw, 5rem) 0;
+}
+
+.page-cta .eyebrow {
+    margin-bottom: .65rem;
+}
+
+.page-cta h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    letter-spacing: -.05em;
+    margin: 0;
+}
+
 footer {
     align-items: center;
     border-top: 1px solid var(--line);
@@ -1371,6 +1645,11 @@ footer > div a {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .route-grid,
+    .resource-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .docs-band {
         gap: 2rem;
     }
@@ -1383,13 +1662,37 @@ footer > div a {
         width: calc(100% - 2rem);
     }
 
-    .site-header nav a:not(.nav-github) {
-        display: none;
+    .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: .85rem;
+        padding: 1rem 0;
+    }
+
+    .site-header nav {
+        gap: .35rem;
+        max-width: 100%;
+        overflow-x: auto;
+        padding-bottom: .2rem;
+        width: 100%;
+    }
+
+    .site-header nav a {
+        padding: .55rem .6rem;
+        white-space: nowrap;
+    }
+
+    .site-header .nav-github {
+        padding: .55rem .75rem;
     }
 
     .hero {
         min-height: auto;
         padding: 4.5rem 0 6rem;
+    }
+
+    .page-hero {
+        padding-top: 3.5rem;
     }
 
     h1 {
@@ -1427,7 +1730,10 @@ footer > div a {
     .switch-list,
     .option-with-value,
     .timeout-grid,
-    .badge-grid {
+    .badge-grid,
+    .route-grid,
+    .resource-grid,
+    .example-grid {
         grid-template-columns: 1fr;
     }
 
@@ -1473,6 +1779,11 @@ footer > div a {
         align-items: start;
         flex-direction: column;
         gap: .4rem;
+    }
+
+    .page-cta {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
     footer {

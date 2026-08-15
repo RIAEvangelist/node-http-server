@@ -7,14 +7,16 @@
 [![npm downloads](https://img.shields.io/npm/dm/node-http-server.svg)](https://www.npmjs.com/package/node-http-server)
 [![license](https://img.shields.io/github/license/RIAEvangelist/node-http-server.svg)](https://github.com/RIAEvangelist/node-http-server/blob/main/licence)
 [![supported Node.js version](https://img.shields.io/node/v/node-http-server.svg)](https://github.com/RIAEvangelist/node-http-server/blob/main/package.json)
-[![npm dependencies](https://img.shields.io/badge/npm_dependencies-0-2ea44f)](https://github.com/RIAEvangelist/node-http-server/blob/main/package.json)
-[![coverage](https://img.shields.io/github/actions/workflow/status/RIAEvangelist/node-http-server/ci.yml?branch=main&label=coverage)](https://github.com/RIAEvangelist/node-http-server/actions/workflows/ci.yml?query=branch%3Amain+job%3Acoverage)
+[![runtime dependencies](https://img.shields.io/badge/runtime_dependencies-0-2ea44f)](https://github.com/RIAEvangelist/node-http-server/blob/main/package.json)
+[![line coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Flines.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
+[![function coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Ffunctions.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
+[![branch coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Fbranches.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
 
-[Visit the node-http-server site](https://riaevangelist.github.io/node-http-server/)
+[Overview](https://riaevangelist.github.io/node-http-server/) · [Developer guide](https://riaevangelist.github.io/node-http-server/guide.html) · [Configuration playground](https://riaevangelist.github.io/node-http-server/playground.html) · [Migration and security](https://riaevangelist.github.io/node-http-server/resources.html)
 
 [![Sponsor RIAEvangelist to help development of node-http-server](https://img.shields.io/static/v1?label=Sponsor%20Me%20On%20GitHub&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/RIAEvangelist)
 
-A small HTTP and HTTPS static server for Node.js. It has zero npm dependencies, works from CommonJS and ESM, and binds to localhost by default.
+A small HTTP and HTTPS static server for Node.js. It has zero runtime dependencies, works from CommonJS and ESM, and binds to localhost by default. The sole direct development dependency is the owner-maintained `vanilla-test@2.0.0`, used for coverage.
 
 Version 9 adds streaming files, clean multi-server lifecycle, modern cache and range behavior, optional compression and SPA fallback, configurable request limits, and strict root containment without turning the package into a framework.
 
@@ -424,13 +426,13 @@ The built-in logger adds a timestamp without mutating the supplied record, redac
 
 ## Development
 
-Install the exact workspace state once with `npm ci`. The project has no runtime or development packages.
+Install the exact workspace state once with `npm ci`. Published installs have zero runtime dependencies. The exact `vanilla-test@2.0.0` release is the sole direct development dependency and runs the Node-only coverage workflow.
 
 | Script | Purpose |
 |---|---|
 | `npm start` | Serve the current directory with the CLI |
 | `npm test` | Run the Node test suite |
-| `npm run coverage` | Run Node-native V8 coverage gates and write `coverage/` reports |
+| `npm run coverage` | Run `vanilla-test` Node coverage gates, write `coverage/node/`, and refresh measured badge JSON |
 | `npm run test:package` | Pack, install, and smoke-test the publishable package |
 | `npm run verify` | Run tests, coverage, and the package smoke test |
 | `npm run basic` | Run the basic HTTP example |
@@ -439,7 +441,7 @@ Install the exact workspace state once with `npm ci`. The project has no runtime
 | `npm run template` | Run the template example |
 | `npm run cluster` | Run the cluster example |
 
-GitHub Actions tests Node.js 22.12 and Node.js 24, runs the coverage gate, smoke-tests the packed npm artifact, uploads the coverage report, and publishes the static project site from `main`.
+GitHub Actions tests Node.js 22.12 and Node.js 24, runs the Node-only `vanilla-test` coverage gate, smoke-tests the packed npm artifact, uploads the report and measured badges, and publishes them with the static project site from `main`.
 
 When upgrading from v8, read [MIGRATION.md](MIGRATION.md). Release details are in [CHANGELOG.md](CHANGELOG.md).
 

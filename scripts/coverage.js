@@ -1,121 +1,106 @@
 'use strict';
 
-const childProcess=require('node:child_process'),
-    fs=require('node:fs'),
+const fs=require('node:fs'),
     path=require('node:path');
 
 const root=path.resolve(__dirname,'..'),
-    outputDirectory=path.join(root,'coverage'),
-    rawDirectory=path.join(outputDirectory,'v8'),
-    lcovFile=path.join(outputDirectory,'lcov.info');
+    summaryFile=path.join(root,'coverage','node','coverage-summary.json'),
+    badgeDirectories=Object.freeze([
+        path.join(root,'badges'),
+        path.join(root,'coverage','badges')
+    ]),
+    metrics=Object.freeze({
+        lines:'line coverage',
+        functions:'function coverage',
+        branches:'branch coverage'
+    });
 
-if(path.relative(root,outputDirectory).startsWith('..')){
-    throw new Error('Coverage output must stay inside the project root.');
+if(!inside(root,summaryFile) || badgeDirectories.some(function(directory){
+    return !inside(root,directory);
+})){
+    throw new Error('Coverage files must stay inside the project root.');
 }
 
-fs.rmSync(outputDirectory,{recursive:true,force:true});
-fs.mkdirSync(rawDirectory,{recursive:true});
+let summary;
+try{
+    summary=JSON.parse(fs.readFileSync(summaryFile,'utf8'));
+}catch(error){
+    throw new Error('Unable to read vanilla-test coverage summary.',{cause:error});
+}
 
-const result=childProcess.spawnSync(
-    process.execPath,
-    [
-        '--test',
-        '--experimental-test-coverage',
-        '--test-coverage-include=server/*.js',
-        '--test-coverage-lines=90',
-        '--test-coverage-functions=90',
-        '--test-coverage-branches=85',
-        '--test-reporter=spec',
-        '--test-reporter=lcov',
-        '--test-reporter-destination=stdout',
-        `--test-reporter-destination=${lcovFile}`,
-        'test/*.test.js'
-    ],
-    {
-        cwd:root,
-        env:{...process.env,NODE_V8_COVERAGE:rawDirectory},
-        stdio:'inherit'
+if(!summary || typeof summary!='object' || !summary.total){
+    throw new TypeError('vanilla-test coverage summary must contain total metrics.');
+}
+
+for(const directory of badgeDirectories){
+    fs.mkdirSync(directory,{recursive:true});
+}
+
+const results=[];
+for(const metric of Object.keys(metrics)){
+    const percent=coveragePercent(summary.total[metric],metric),
+        message=formatPercent(percent)+'%',
+        badge={
+            schemaVersion:1,
+            label:metrics[metric],
+            message,
+            color:coverageColor(percent)
+        };
+
+    for(const directory of badgeDirectories){
+        fs.writeFileSync(
+            path.join(directory,metric+'.json'),
+            JSON.stringify(badge,null,2)+'\n'
+        );
     }
-);
-
-if(result.error){
-    throw result.error;
+    results.push(metric+' '+message);
 }
 
-if(fs.existsSync(lcovFile)){
-    const summary=summarizeLcov(fs.readFileSync(lcovFile,'utf8'));
-    fs.writeFileSync(
-        path.join(outputDirectory,'summary.json'),
-        `${JSON.stringify(summary,null,2)}\n`
-    );
-    fs.writeFileSync(
-        path.join(outputDirectory,'index.html'),
-        coveragePage(summary)
-    );
+process.stdout.write('Coverage badges: '+results.join(', ')+'\n');
+
+function inside(directory,target){
+    const relative=path.relative(directory,target);
+    return relative==='' || (!relative.startsWith('..'+path.sep) && relative!='..' && !path.isAbsolute(relative));
 }
 
-process.exitCode=result.status===null ? 1 : result.status;
-
-function summarizeLcov(source){
-    const totals={
-        lines:{found:0,hit:0},
-        functions:{found:0,hit:0},
-        branches:{found:0,hit:0}
-    };
-
-    for(const line of source.split(/\r?\n/)){
-        addTotal(totals.lines,line,'LF:','found');
-        addTotal(totals.lines,line,'LH:','hit');
-        addTotal(totals.functions,line,'FNF:','found');
-        addTotal(totals.functions,line,'FNH:','hit');
-        addTotal(totals.branches,line,'BRF:','found');
-        addTotal(totals.branches,line,'BRH:','hit');
+function coveragePercent(record,metric){
+    if(!record || typeof record!='object'){
+        throw new TypeError('Coverage summary is missing '+metric+'.');
     }
 
-    for(const key of Object.keys(totals)){
-        const value=totals[key];
-        value.percent=value.found ? Number((value.hit/value.found*100).toFixed(2)) : 100;
+    if(!Number.isSafeInteger(record.total) || record.total<0 ||
+        !Number.isSafeInteger(record.covered) || record.covered<0 ||
+        record.covered>record.total){
+        throw new TypeError('Coverage summary contains invalid '+metric+' totals.');
     }
 
-    return {
-        generatedAt:new Date().toISOString(),
-        provider:'Node.js native V8 coverage',
-        thresholds:{lines:90,functions:90,branches:85},
-        ...totals
-    };
-}
-
-function addTotal(total,line,prefix,key){
-    if(line.startsWith(prefix)){
-        total[key]+=Number(line.slice(prefix.length));
+    if(typeof record.pct!='number' || !Number.isFinite(record.pct) ||
+        record.pct<0 || record.pct>100){
+        throw new TypeError('Coverage summary contains an invalid '+metric+' percentage.');
     }
+
+    return record.pct;
 }
 
-function coveragePage(summary){
-    const rows=['lines','functions','branches'].map(
-        key=>`<tr><th>${key}</th><td>${summary[key].hit} / ${summary[key].found}</td><td>${summary[key].percent}%</td><td>${summary.thresholds[key]}%</td></tr>`
-    ).join('');
+function formatPercent(percent){
+    return percent.toFixed(2).replace(/\.?0+$/,'');
+}
 
-    return `<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>node-http-server coverage</title>
-    <style>
-        :root{color-scheme:dark;background:#08131d;color:#e8f4f2;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
-        body{max-width:760px;margin:0 auto;padding:8vw 24px}h1{font-size:clamp(2rem,7vw,4rem);margin:0 0 .4em;color:#6ee7c7}
-        p{color:#a8c3c0}table{width:100%;border-collapse:collapse;margin-top:2rem;background:#102532;border:1px solid #274454}
-        th,td{text-align:left;padding:14px;border-bottom:1px solid #274454}th{text-transform:capitalize;color:#6ee7c7}
-        code{color:#f6c177}
-    </style>
-</head>
-<body>
-    <h1>V8 coverage</h1>
-    <p>Collected directly by Node.js. No coverage package is installed.</p>
-    <table><thead><tr><th>scope</th><th>covered</th><th>result</th><th>gate</th></tr></thead><tbody>${rows}</tbody></table>
-    <p>Generated <code>${summary.generatedAt}</code></p>
-</body>
-</html>
-`;
+function coverageColor(percent){
+    if(percent===100){
+        return 'brightgreen';
+    }
+    if(percent>=90){
+        return 'green';
+    }
+    if(percent>=80){
+        return 'yellowgreen';
+    }
+    if(percent>=70){
+        return 'yellow';
+    }
+    if(percent>=60){
+        return 'orange';
+    }
+    return 'red';
 }
