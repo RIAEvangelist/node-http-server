@@ -27,6 +27,7 @@ const fields={
     errorHeaders:document.querySelector('#config-error-headers'),
     errorBodies:document.querySelector('#config-error-bodies'),
     noCache:document.querySelector('#config-no-cache'),
+    allowDotfiles:document.querySelector('#config-allow-dotfiles'),
     compression:document.querySelector('#config-compression'),
     compressionThreshold:document.querySelector('#config-compression-threshold'),
     verbose:document.querySelector('#config-verbose'),
@@ -118,6 +119,7 @@ function currentConfig(){
         server:{
             index:fields.index.value.trim() || 'index.html',
             noCache:fields.noCache.checked,
+            allowDotfiles:fields.allowDotfiles.checked,
             timeout:fields.disableTimeout.checked ? false : numberValue(fields.timeout,30000),
             requestTimeout:fields.disableRequestTimeout.checked ? false : numberValue(fields.requestTimeout,300000),
             headersTimeout:fields.disableHeadersTimeout.checked ? false : numberValue(fields.headersTimeout,60000),
@@ -256,6 +258,10 @@ function cliSnippet(config){
 
     if(server.spaFallback){
         parts.push(server.spaFallback===true ? '--spa' : `--spa=${shellValue(server.spaFallback)}`);
+    }
+
+    if(server.allowDotfiles){
+        parts.push('--allow-dotfiles');
     }
 
     if(server.compression){

@@ -124,11 +124,12 @@ try{
             "assert.equal(mimeTypes.webp,'image/webp');",
             "const root=fs.mkdtempSync(path.join(os.tmpdir(),'nhs-installed-'));",
             "fs.writeFileSync(path.join(root,'index.html'),'installed');",
+            "fs.writeFileSync(path.join(root,'.gitignore'),'hidden');",
             "const first=new moduleApi.Server({root,port:0});",
-            "const second=new moduleApi.Server({root,port:0});",
+            "const second=new moduleApi.Server({root,port:0,server:{allowDotfiles:true}});",
             "function listening(server){return server.server.listening?Promise.resolve():new Promise((resolve,reject)=>{server.server.once('listening',resolve);server.server.once('error',reject);});}",
-            "function get(server){return new Promise((resolve,reject)=>{http.get({hostname:'127.0.0.1',port:server.server.address().port,path:'/'},response=>{const chunks=[];response.on('data',chunk=>chunks.push(chunk));response.on('end',()=>resolve({status:response.statusCode,body:Buffer.concat(chunks).toString()}));}).on('error',reject);});}",
-            "(async()=>{try{assert.equal(first.deploy(),first);assert.equal(second.deploy(),second);await Promise.all([listening(first),listening(second)]);assert.notEqual(first.server.address().port,second.server.address().port);const response=await get(first);assert.deepEqual(response,{status:200,body:'installed'});await Promise.all([first.close(),second.close()]);}finally{fs.rmSync(root,{recursive:true,force:true});}})().catch(error=>{console.error(error);process.exitCode=1;});"
+            "function get(server,requestPath='/'){return new Promise((resolve,reject)=>{http.get({hostname:'127.0.0.1',port:server.server.address().port,path:requestPath},response=>{const chunks=[];response.on('data',chunk=>chunks.push(chunk));response.on('end',()=>resolve({status:response.statusCode,body:Buffer.concat(chunks).toString()}));}).on('error',reject);});}",
+            "(async()=>{try{assert.equal(first.deploy(),first);assert.equal(second.deploy(),second);await Promise.all([listening(first),listening(second)]);assert.notEqual(first.server.address().port,second.server.address().port);const response=await get(first);assert.deepEqual(response,{status:200,body:'installed'});assert.equal((await get(first,'/.gitignore')).status,403);assert.deepEqual(await get(second,'/.gitignore'),{status:200,body:'hidden'});await Promise.all([first.close(),second.close()]);}finally{fs.rmSync(root,{recursive:true,force:true});}})().catch(error=>{console.error(error);process.exitCode=1;});"
         ].join('')
     ], {cwd:installed});
 
@@ -154,6 +155,7 @@ try{
 
     assert.match(cliHelp, /--max-body/);
     assert.match(cliHelp, /--timeout/);
+    assert.match(cliHelp, /--allow-dotfiles/);
     assert.equal(cliVersion.trim(), manifest.version);
 
     process.stdout.write('Package smoke test passed: ' + details.filename + '\n');

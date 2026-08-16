@@ -15,6 +15,7 @@ const server=new Server({
     root:'./public',
     server:{
         noCache:false,
+        allowDotfiles:false,
         compression:true,
         maxRequestBodyBytes:1048576
     }
@@ -60,6 +61,7 @@ import mimeTypes from 'node-http-server/mime-types';</code></pre></div></div>
                         <div class="table-wrap"><table><thead><tr><th>Key</th><th>Default</th><th>Purpose</th></tr></thead><tbody>
                             <tr><td><code>index</code></td><td><code>'index.html'</code></td><td>File used for directory requests. There is no directory listing when it is absent.</td></tr>
                             <tr><td><code>noCache</code></td><td><code>true</code></td><td>Sends no-cache/no-store/must-revalidate directives. <code>false</code> omits them; it does not add a cache lifetime.</td></tr>
+                            <tr><td><code>allowDotfiles</code></td><td><code>false</code></td><td>Only literal <code>true</code> allows dot-prefixed path segments. The default returns <code>403</code> before lookup or SPA fallback.</td></tr>
                             <tr><td><code>compression</code></td><td><code>false</code></td><td>Negotiates Brotli/gzip for accepted compressible static responses; ranges and manual <code>serve()</code> responses are not compressed.</td></tr>
                             <tr><td><code>compressionThreshold</code></td><td><code>1024</code></td><td>Minimum uncompressed bytes before compression is considered.</td></tr>
                             <tr><td><code>spaFallback</code></td><td><code>false</code></td><td><code>true</code> uses <code>index</code>; a string chooses another root-relative file.</td></tr>
@@ -70,6 +72,7 @@ import mimeTypes from 'node-http-server/mime-types';</code></pre></div></div>
                             <tr><td><code>maxRequestBodyBytes</code></td><td><code>false</code></td><td>Maximum request bytes; false/0 is unlimited.</td></tr>
                         </tbody></table></div>
                         <div class="callout"><strong>SPA conditions:</strong> fallback applies only after an initial <code>404</code>, for an extensionless path whose request accepts HTML or <code>*/*</code>. Missing assets and non-HTML requests remain <code>404</code>.</div>
+                        <div class="callout-warning callout"><strong>Dotfile opt-in:</strong> <code>allowDotfiles:true</code> exposes every dot-prefixed segment in the selected root, including <code>/.git</code>, <code>/.env</code>, and <code>/.well-known</code>. Use a dedicated audited root.</div>
                     </section>
 
                     <section class="doc-section" id="limits"><p class="kicker">Limits and timeouts</p><h2>Every disable value is explicit.</h2>
@@ -81,7 +84,7 @@ import mimeTypes from 'node-http-server/mime-types';</code></pre></div></div>
                     </section>
 
                     <section class="doc-section" id="mime"><p class="kicker">File types and restrictions</p><h2>Serve, reject, or use the binary fallback.</h2>
-                        <div class="table-wrap"><table><thead><tr><th>Configuration</th><th>Result</th></tr></thead><tbody><tr><td>No entry for extension</td><td><code>application/octet-stream</code>.</td></tr><tr><td><code>contentType:{md:'text/markdown; charset=utf-8'}</code></td><td>Adds or overrides that extension.</td></tr><tr><td><code>contentType:{secret:false}</code></td><td>Requests for <code>.secret</code> return <code>415</code>.</td></tr><tr><td><code>contentType:false</code></td><td>Removes automatic mapping; served files use <code>application/octet-stream</code>.</td></tr><tr><td><code>restrictedType:{key:true}</code></td><td>Requests for <code>.key</code> return <code>403</code>.</td></tr></tbody></table></div>
+                        <div class="table-wrap"><table><thead><tr><th>Configuration</th><th>Result</th></tr></thead><tbody><tr><td>No entry for extension</td><td><code>application/octet-stream</code>.</td></tr><tr><td><code>contentType:{md:'text/markdown; charset=utf-8'}</code></td><td>Adds or overrides that extension.</td></tr><tr><td><code>contentType:{secret:false}</code></td><td>Filenames ending in <code>.secret</code> return <code>415</code> after path policy checks.</td></tr><tr><td><code>contentType:false</code></td><td>Removes automatic mapping; served files use <code>application/octet-stream</code>.</td></tr><tr><td><code>restrictedType:{key:true}</code></td><td>Filenames ending in <code>.key</code> return <code>403</code> after path policy checks.</td></tr></tbody></table></div>
                         <div class="code-block"><div class="code-head"><span class="code-label">JavaScript · MIME and extension controls</span><button type="button" data-copy-target="config-mime-example">Copy</button></div><pre><code id="config-mime-example">new Server({
     contentType:{
         md:'text/markdown; charset=utf-8',

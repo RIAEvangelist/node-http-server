@@ -4,7 +4,6 @@ const assert = require('node:assert/strict');
 const childProcess = require('node:child_process');
 const http = require('node:http');
 const path = require('node:path');
-const { once } = require('node:events');
 const { test } = require('node:test');
 const {
     temporaryDirectory,
@@ -18,27 +17,56 @@ test('CLI documents options, reports its version, and rejects invalid input', fu
     const version = run(['--version']);
     const unknown = run(['--unknown'], false);
     const invalidTimeout = run(['--timeout', 'invalid'], false);
+    const invalidDotfiles = run(['--allow-dotfiles=maybe'], false);
 
     assert.equal(help.status, 0);
     assert.match(help.stdout, /--max-body <bytes\|false>/);
     assert.match(help.stdout, /--timeout <ms\|false>/);
     assert.match(help.stdout, /--keep-alive-timeout <ms\|false>/);
+    assert.match(help.stdout, /--allow-dotfiles/);
     assert.equal(version.status, 0);
     assert.equal(version.stdout.trim(), require('../package.json').version);
     assert.equal(unknown.status, 2);
     assert.match(unknown.stderr, /Unknown option/);
     assert.equal(invalidTimeout.status, 2);
     assert.match(invalidTimeout.stderr, /timeout must be a non-negative number/);
+    assert.equal(invalidDotfiles.status, 2);
+    assert.match(invalidDotfiles.stderr, /allow-dotfiles must be true or false/);
 });
 
-test('CLI serves a configured root on an ephemeral localhost port', async function(t){
+test('CLI serves a configured root and requires an explicit dotfile opt-in', async function(t){
     const root = temporaryDirectory(t);
 
-    writeFiles(root, {'index.html':'served by CLI'});
+    writeFiles(root, {
+        'index.html':'served by CLI',
+        '.well-known/token':'allowed by CLI opt-in'
+    });
+
+    const blocked = await startCli(t, root);
+    const response = await get(blocked.port);
+    const hidden = await get(blocked.port, '/.well-known/token');
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.body, 'served by CLI');
+    assert.equal(hidden.statusCode, 403);
+
+    await stopCli(blocked.child);
+
+    const allowed = await startCli(t, root, ['--allow-dotfiles']);
+    const allowedHidden = await get(allowed.port, '/.well-known/token');
+
+    assert.equal(allowedHidden.statusCode, 200);
+    assert.equal(allowedHidden.body, 'allowed by CLI opt-in');
+
+    await stopCli(allowed.child);
+});
+
+async function startCli(t,root,args=[]){
+    const childArgs=[cli, '--root', root, '--port', '0', '--timeout', 'false'].concat(args);
 
     const child = childProcess.spawn(
         process.execPath,
-        [cli, '--root', root, '--port', '0', '--timeout', 'false'],
+        childArgs,
         {
             cwd:root,
             stdio:['ignore', 'pipe', 'pipe']
@@ -53,23 +81,44 @@ test('CLI serves a configured root on an ephemeral localhost port', async functi
     child.stderr.on('data', chunk=>{
         errors += chunk;
     });
-    t.after(function(){
-        if(child.exitCode===null){
-            child.kill();
-        }
+    t.after(async function(){
+        await stopCli(child);
     });
 
-    const port = await waitForPort(child,()=>output,()=>errors);
-    const response = await get(port);
+    return {
+        child:child,
+        port:await waitForPort(child,()=>output,()=>errors)
+    };
+}
 
-    assert.equal(response.statusCode, 200);
-    assert.equal(response.body, 'served by CLI');
-
-    child.kill('SIGTERM');
-    if(child.exitCode===null){
-        await once(child, 'exit');
+async function stopCli(child){
+    if(child.exitCode!==null){
+        return;
     }
-});
+
+    await new Promise(function(resolve){
+        let settled=false;
+        const finish=function(){
+            if(settled){
+                return;
+            }
+            settled=true;
+            clearTimeout(timeout);
+            resolve();
+        };
+        const timeout=setTimeout(function(){
+            if(child.exitCode===null){
+                child.kill('SIGKILL');
+            }
+            finish();
+        }, 1000);
+
+        child.once('exit', finish);
+        if(!child.kill('SIGTERM')){
+            finish();
+        }
+    });
+}
 
 function run(args,success=true){
     const result = childProcess.spawnSync(process.execPath, [cli].concat(args), {
@@ -112,10 +161,10 @@ function waitForPort(child,getOutput,getErrors){
     });
 }
 
-function get(port){
+function get(port,requestPath='/'){
     return new Promise(function(resolve,reject){
         http.get(
-            {hostname:'127.0.0.1',port,path:'/'},
+            {hostname:'127.0.0.1',port,path:requestPath},
             function(response){
                 const chunks=[];
                 response.on('data',chunk=>chunks.push(chunk));

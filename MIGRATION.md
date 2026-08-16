@@ -84,6 +84,7 @@ The optional deploy callback still receives the server instance. When HTTP and H
 | `Config` reads every process argument | Only the CLI parses arguments; programmatic `Config` is deterministic |
 | Shallow nested assignment | Known nested objects merge into isolated defaults |
 | Unknown extension returns `415` | Unknown extension uses `application/octet-stream` |
+| Dotfiles are served | Dot-prefixed path segments return `403` unless `server.allowDotfiles:true` |
 | Shared or mutable default objects | Every `Config` and `Server` owns a deep copy |
 | No request-body limit | `server.maxRequestBodyBytes` is opt-in and set in bytes |
 | No clean listener lifecycle | `await server.close()` |
@@ -98,6 +99,7 @@ The current server defaults are:
     server:{
         index:'index.html',
         noCache:true,
+        allowDotfiles:false,
         timeout:30000,
         requestTimeout:300000,
         headersTimeout:60000,
@@ -192,5 +194,6 @@ Run `node-http-server --help` for the complete option list. CLI parsing no longe
 7. Update tests for `HEAD`, `405`, binary fallback, ranges, and conditional responses.
 8. Keep custom CLI parsing outside `Config`.
 9. Delete copied v8 certificate fixtures and replace them with newly managed credentials.
+10. Keep dotfiles blocked, or explicitly audit the complete root before setting `server.allowDotfiles:true` / `--allow-dotfiles`.
 
 See the [README](README.md) for the complete configuration and API contract and [SECURITY.md](SECURITY.md) for deployment guidance.

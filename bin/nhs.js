@@ -18,6 +18,7 @@ Options:
       --index <file>                Directory index (default: index.html)
       --no-cache                    Disable client caching
       --cache                       Allow client caching
+      --allow-dotfiles              Allow dotfiles (blocked by default)
       --spa[=<file>]                Enable SPA history fallback
       --compression                 Enable Brotli/gzip responses
       --max-body <bytes|false>      Request-body limit; false or 0 disables
@@ -89,7 +90,8 @@ function parseArgs(input){
         maxRequestBodyBytes:'max-body',
         requestTimeout:'request-timeout',
         headersTimeout:'headers-timeout',
-        keepAliveTimeout:'keep-alive-timeout'
+        keepAliveTimeout:'keep-alive-timeout',
+        allowDotfiles:'allow-dotfiles'
     };
     const valueOptions=new Set([
         'port',
@@ -178,6 +180,9 @@ function assignOption(config,key,value){
             return;
         case 'compression':
             config.server.compression=value===undefined ? true : booleanValue(value,key);
+            return;
+        case 'allow-dotfiles':
+            config.server.allowDotfiles=value===undefined ? true : booleanValue(value,key);
             return;
         case 'max-body':
             config.server.maxRequestBodyBytes=optionalNumber(value,key);

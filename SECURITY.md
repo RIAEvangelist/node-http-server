@@ -18,6 +18,7 @@ Version 9 starts from these boundaries:
 
 - The default listen address is `127.0.0.1`.
 - Static requests are decoded and resolved inside the selected root.
+- Dot-prefixed path segments are blocked before filesystem lookup and SPA fallback unless literal `server.allowDotfiles:true` is configured.
 - Malformed URL escapes, traversal attempts, absolute-path injection, and filesystem escapes are rejected.
 - Virtual-host lookup does not change the listen interface.
 - The static fallback accepts `GET` and `HEAD`; other methods receive `405` unless a hook handles them.
@@ -48,6 +49,7 @@ new Server({
 Also:
 
 - Use a dedicated public root. Never point `root` at a home directory, repository containing secrets, credentials, private keys, or an upload directory.
+- Keep `server.allowDotfiles:false` unless every hidden path in every configured root is intended to be public. Enabling it permits all dot-prefixed segments, including `/.git`, `/.env`, and `/.well-known`.
 - Treat `domains` roots with the same care as the default root.
 - Put authentication and authorization in a reviewed hook or, preferably, a dedicated front-end service.
 - Terminate TLS with maintained infrastructure or protect the configured key and certificate files with narrow filesystem permissions.
@@ -65,6 +67,8 @@ Generate a fresh development certificate for local testing. Use certificates and
 ## Hooks and dynamic responses
 
 Returning a truthy value from `onRawRequest`, `onRequest`, or `beforeServe` transfers response ownership to that hook. Code in the hook is responsible for validation, headers, completion, and error handling.
+
+The automatic dotfile policy applies to built-in static routing. `serveFile()` remains a deliberate trusted-file API, so never construct its filename from raw request input.
 
 Review hook code for:
 

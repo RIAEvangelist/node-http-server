@@ -3,12 +3,12 @@
     <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="node-http-server test suite, vanilla-test Node coverage, reports, thresholds, badges, and CI artifacts."><meta name="theme-color" content="#08110d"><title>Testing &amp; coverage — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/testing.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script></head>
     <body>
         <a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html" aria-current="page">Testing</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
-        <main id="main"><header class="page-header page-header-compact"><p class="kicker">Tests + measured Node coverage</p><h1>Verify behavior before shipping.</h1><p class="lead">Run the 32-test suite, enforce per-file coverage, smoke-test the packed artifact, and keep published badge evidence synchronized.</p></header>
-            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#commands">Commands</a><a href="#areas">32 test areas</a><a href="#coverage">Coverage setup</a><a href="#reports">Reports and badges</a><a href="#platforms">Platform variance</a><a href="#ci">CI and artifacts</a><a href="#add-test">Add a test</a><a href="#debug">Debug a miss</a></aside>
+        <main id="main"><header class="page-header page-header-compact"><p class="kicker">Tests + measured Node coverage</p><h1>Verify behavior before shipping.</h1><p class="lead">Run the 33-test suite, enforce per-file coverage, smoke-test the packed artifact, and keep published badge evidence synchronized.</p></header>
+            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#commands">Commands</a><a href="#areas">33 test areas</a><a href="#coverage">Coverage setup</a><a href="#reports">Reports and badges</a><a href="#platforms">Platform variance</a><a href="#ci">CI and artifacts</a><a href="#add-test">Add a test</a><a href="#debug">Debug a miss</a></aside>
                 <div class="doc-content">
                     <section class="doc-section" id="commands"><p class="kicker">Verification commands</p><h2>Use the smallest command that answers the question.</h2>
                         <div class="table-wrap"><table><thead><tr><th>Command</th><th>Use it for</th><th>Expected result</th></tr></thead><tbody>
-                            <tr><td><code>npm test</code></td><td>Fast behavior check.</td><td>Node runs <code>test/*.test.js</code>; 32 cases total. Ubuntu reports 31 pass + 1 Windows-only skip; Windows reports 32 pass.</td></tr>
+                            <tr><td><code>npm test</code></td><td>Fast behavior check.</td><td>Node runs <code>test/*.test.js</code>; 33 cases total. Ubuntu reports 32 pass + 1 Windows-only skip; Windows reports 33 pass.</td></tr>
                             <tr><td><code>npm run test:site</code></td><td>Static documentation contract.</td><td>Checks every page, local link/fragment, unique ID, label/ARIA target, image alt, current nav state, CSS delimiters, and site JavaScript syntax with Node built-ins only.</td></tr>
                             <tr><td><code>npm run coverage</code></td><td>Coverage and badge evidence.</td><td><code>vanilla-test coverage node</code> runs the suite, gates coverage, writes <code>coverage/node/</code>, then refreshes badge JSON.</td></tr>
                             <tr><td><code>npm run test:package</code></td><td>Published-package contract.</td><td>Packs to an OS temporary directory, installs the tarball in an isolated consumer, verifies package contents, imports CommonJS/ESM/subpaths, runs the CLI, then cleans up.</td></tr>
@@ -19,33 +19,33 @@ npm run verify</code></pre></div>
                         <div class="callout"><strong>Dependencies:</strong> published installs have zero runtime dependencies. The exact owner-maintained <code>vanilla-test@2.1.0</code> release is the sole direct development dependency and native V8 coverage tool.</div>
                     </section>
 
-                    <section class="doc-section" id="areas"><p class="kicker">Current suite</p><h2>32 tests cover seven engineering areas.</h2>
-                        <p>The top-level files own 2 CLI cases, 7 Config/export/logger cases, and 23 Server cases. The behavior groups below total the same 32 cases.</p>
+                    <section class="doc-section" id="areas"><p class="kicker">Current suite</p><h2>33 tests cover seven engineering areas.</h2>
+                        <p>The top-level files own 2 CLI cases, 7 Config/export/logger cases, and 24 Server cases. The behavior groups below total the same 33 cases.</p>
                         <div class="table-wrap"><table><thead><tr><th>Area</th><th>Tests</th><th>Covered behavior</th></tr></thead><tbody>
-                            <tr><td>CLI</td><td>2</td><td>Help/version/invalid input and serving a configured root on an ephemeral port.</td></tr>
+                            <tr><td>CLI</td><td>2</td><td>Help/version/invalid input plus default dotfile denial and explicit CLI opt-in on an ephemeral port.</td></tr>
                             <tr><td>Exports and Config</td><td>7</td><td>CommonJS, ESM, defaults, isolated merging, MIME opt-out, prototype-key rejection, and default logger errors.</td></tr>
                             <tr><td>Lifecycle and HTTPS</td><td>4</td><td>Multiple listeners, validation, close/redeploy/callbacks, and secure listener wiring without stored key fixtures.</td></tr>
-                            <tr><td>Static HTTP</td><td>8</td><td>GET/HEAD, MIME/restrictions, ranges/conditionals, containment/ADS, request parsing, Host roots, SPA, and compression.</td></tr>
+                            <tr><td>Static HTTP</td><td>9</td><td>GET/HEAD, MIME/restrictions, ranges/conditionals, containment/ADS, dotfile policy, request parsing, Host roots, SPA, and compression.</td></tr>
                             <tr><td>Bodies, hooks, and timeouts</td><td>5</td><td>String/Buffer bodies, body cap, hook takeover/mutation, public serve methods, contained hook failure, and disableable timeouts.</td></tr>
                             <tr><td>Streams and filesystem safety</td><td>4</td><td>Sanitized stream failure, aborted download cleanup, filesystem failure mapping, and symlink containment.</td></tr>
                             <tr><td>Request logging</td><td>2</td><td>Parseable redacted NDJSON plus body/custom/async-failure behavior.</td></tr>
-                            <tr><td><strong>Total</strong></td><td><strong>32</strong></td><td>Current Node test suite.</td></tr>
+                            <tr><td><strong>Total</strong></td><td><strong>33</strong></td><td>Current Node test suite.</td></tr>
                         </tbody></table></div>
                         <div class="page-links"><a href="./examples.html">Choose an example to extend →</a><a href="https://github.com/RIAEvangelist/node-http-server/tree/main/test">Browse test source →</a></div>
                     </section>
 
                     <section class="doc-section" id="coverage"><p class="kicker">Coverage configuration</p><h2>Node-only coverage through a small adapter.</h2>
-                        <p><code>vanilla-test.config.json</code> runs <code>test/coverage.js</code> and includes <code>server/*.js</code> plus <code>server/*.mjs</code>. The dependency-free adapter discovers sorted <code>*.test.js</code> files, starts Node's native TAP reporter, and returns status, counts, and descriptions for all 32 tests. The configuration timeout is 120 seconds.</p>
+                        <p><code>vanilla-test.config.json</code> runs <code>test/coverage.js</code> and includes <code>server/*.js</code> plus <code>server/*.mjs</code>. The dependency-free adapter discovers sorted <code>*.test.js</code> files, starts Node's native TAP reporter, and returns status, counts, and descriptions for all 33 tests. The configuration timeout is 120 seconds.</p>
                         <div class="table-wrap"><table><thead><tr><th>Native V8 metric</th><th>Per-file gate</th><th>Ubuntu Node 24.18.0</th></tr></thead><tbody>
-                            <tr><td>Executable ranges (statements)</td><td>90%</td><td><strong>91.46%</strong> · report only</td></tr>
-                            <tr><td>Executable lines</td><td>90%</td><td><strong>92.72%</strong></td></tr>
-                            <tr><td>Function root ranges</td><td>90%</td><td><strong>98.21%</strong></td></tr>
-                            <tr><td>Nested block ranges (branches)</td><td>85%</td><td><strong>89.54%</strong></td></tr>
+                            <tr><td>Executable ranges (statements)</td><td>90%</td><td><strong>91.77%</strong> · report only</td></tr>
+                            <tr><td>Executable lines</td><td>90%</td><td><strong>92.83%</strong></td></tr>
+                            <tr><td>Function root ranges</td><td>90%</td><td><strong>98.24%</strong></td></tr>
+                            <tr><td>Nested block ranges (branches)</td><td>85%</td><td><strong>89.97%</strong></td></tr>
                         </tbody></table></div>
                         <div class="status-grid">
-                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Flines.json" alt="Line coverage 92.72 percent"><strong>Line coverage</strong><span>Generated from Ubuntu Node coverage.</span></a>
-                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Ffunctions.json" alt="Function coverage 98.21 percent"><strong>Function coverage</strong><span>Generated from the same run.</span></a>
-                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Fbranches.json" alt="Branch coverage 89.54 percent"><strong>Branch coverage</strong><span>Generated from the same run.</span></a>
+                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Flines.json" alt="Line coverage 92.83 percent"><strong>Line coverage</strong><span>Generated from Ubuntu Node coverage.</span></a>
+                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Ffunctions.json" alt="Function coverage 98.24 percent"><strong>Function coverage</strong><span>Generated from the same run.</span></a>
+                            <a class="status-card" href="./coverage/node/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Fbranches.json" alt="Branch coverage 89.97 percent"><strong>Branch coverage</strong><span>Generated from the same run.</span></a>
                         </div>
                         <div class="callout"><strong>Node only:</strong> vanilla-test 2.1 validates only the selected target, so this project omits Chrome configuration entirely. Its project-owned reporter measures native V8 ranges from the shipped files without c8, source instrumentation, transpilation, or browser tooling.</div>
                         <div class="callout"><strong>Metric change:</strong> 2.1 measures V8 executable, function, and nested block ranges directly. These percentages are intentionally not compared with the former c8/Istanbul totals.</div>
@@ -68,8 +68,8 @@ npm run verify</code></pre></div>
 
                     <section class="doc-section" id="platforms"><p class="kicker">Platform variance</p><h2>Windows covers one extra filesystem guard.</h2>
                         <div class="table-wrap"><table><thead><tr><th>Environment</th><th>Lines</th><th>Functions</th><th>Branches</th><th>Why</th></tr></thead><tbody>
-                            <tr><td>Ubuntu Node 24.18.0 / published badges</td><td>92.72%</td><td>98.21%</td><td>89.54%</td><td>The Windows alternate-data-stream test is skipped.</td></tr>
-                            <tr><td>Windows Node 24.18.0 verification</td><td>92.94%</td><td>98.21%</td><td>89.84%</td><td>The Windows ADS guard/test executes and covers its platform branch.</td></tr>
+                            <tr><td>Ubuntu Node 24.18.0 / published badges</td><td>92.83%</td><td>98.24%</td><td>89.97%</td><td>The Windows alternate-data-stream test is skipped.</td></tr>
+                            <tr><td>Windows Node 24.18.0 verification</td><td>93.05%</td><td>98.24%</td><td>90.15%</td><td>The Windows ADS guard/test executes and covers its platform branch.</td></tr>
                         </tbody></table></div>
                         <div class="callout-warning callout"><strong>Do not commit Windows badge drift:</strong> a local Windows coverage run may refresh root badge JSON to the slightly higher platform values. The committed raw endpoints must represent Ubuntu CI so the synchronization gate remains deterministic.</div>
                     </section>

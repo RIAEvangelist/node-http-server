@@ -16,6 +16,9 @@ node-http-server ./dist --port 0
 # SPA plus eligible Brotli/gzip responses
 node-http-server --root ./dist --spa --compression
 
+# Deliberate /.well-known content; every dotfile becomes eligible for static serving
+node-http-server --root ./public --allow-dotfiles
+
 # LAN-facing — review firewall/auth/TLS first
 node-http-server --root ./dist --host 0.0.0.0 --port 8080</code></pre></div>
                         <div class="output-block"><span class="expected-label">Expected startup</span><pre>node-http-server listening at http://127.0.0.1:8080</pre></div>

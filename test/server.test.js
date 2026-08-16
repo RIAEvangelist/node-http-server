@@ -100,6 +100,10 @@ test('deploy rejects invalid configuration and duplicate deployment', async func
         /compressionThreshold must be a non-negative number/
     );
     assert.throws(
+        ()=>new Server({root, server:{allowDotfiles:'true'}}).deploy(),
+        /allowDotfiles must be true or false/
+    );
+    assert.throws(
         ()=>new Server({root, https:{port:'invalid'}}).deploy(),
         /https\.port must be an integer/
     );
@@ -540,8 +544,8 @@ test('domain routing selects roots and rejects unknown hosts', async function(t)
     const baseRoot = temporaryDirectory(t, 'node-http-server-domain-');
     const alternateRoot = temporaryDirectory(t, 'node-http-server-alt-domain-');
 
-    writeFiles(baseRoot, {'index.html':'primary'});
-    writeFiles(alternateRoot, {'index.html':'alternate'});
+    writeFiles(baseRoot, {'index.html':'primary', '.git/HEAD':'primary hidden'});
+    writeFiles(alternateRoot, {'index.html':'alternate', '.env':'alternate hidden'});
 
     const {server} = await start(t, Server, {
         root:baseRoot,
@@ -551,10 +555,14 @@ test('domain routing selects roots and rejects unknown hosts', async function(t)
     });
     const primary = await request(server, {headers:{Host:'primary.test'}});
     const alternate = await request(server, {headers:{Host:'alternate.test'}});
+    const primaryHidden = await request(server, {path:'/.git/HEAD', headers:{Host:'primary.test'}});
+    const alternateHidden = await request(server, {path:'/.env', headers:{Host:'alternate.test'}});
     const unknown = await request(server, {headers:{Host:'unknown.test'}});
 
     assert.equal(primary.text, 'primary');
     assert.equal(alternate.text, 'alternate');
+    assert.equal(primaryHidden.statusCode, 403);
+    assert.equal(alternateHidden.statusCode, 403);
     assert.equal(unknown.statusCode, 421);
 });
 
@@ -785,7 +793,8 @@ test('public serveFile and serve methods preserve their legacy overloads', async
     writeFiles(root, {
         'index.html':'index',
         'direct.txt':'direct',
-        'directory/index.html':'directory index'
+        'directory/index.html':'directory index',
+        '.well-known/trusted.txt':'trusted dotfile'
     });
     fs.mkdirSync(path.join(root, 'missing-index'));
 
@@ -806,6 +815,10 @@ test('public serveFile and serve methods preserve their legacy overloads', async
 
             if(request.url === '/directory'){
                 return server.serveFile(path.join(root, 'directory'), request, response).then(()=>true);
+            }
+
+            if(request.url === '/trusted-dotfile'){
+                return server.serveFile(path.join(root, '.well-known', 'trusted.txt'), request, response).then(()=>true);
             }
 
             if(request.url === '/missing-index'){
@@ -843,6 +856,7 @@ test('public serveFile and serve methods preserve their legacy overloads', async
 
     assert.equal((await request(server, {path:'/direct'})).text, 'direct');
     assert.equal((await request(server, {path:'/directory'})).text, 'directory index');
+    assert.equal((await request(server, {path:'/trusted-dotfile'})).text, 'trusted dotfile');
     assert.equal((await request(server, {path:'/known-missing'})).statusCode, 404);
     assert.equal((await request(server, {path:'/missing'})).statusCode, 404);
     assert.equal((await request(server, {path:'/missing-index'})).statusCode, 404);
@@ -854,7 +868,7 @@ test('public serveFile and serve methods preserve their legacy overloads', async
 
     assert.equal(head.statusCode, 200);
     assert.equal(head.body.length, 0);
-    assert.equal(afterCount, 8);
+    assert.equal(afterCount, 9);
 });
 
 test('hook failures are contained after a response and in afterServe', async function(t){
@@ -1244,4 +1258,96 @@ test('custom logging can include bodies and contains async logger failures', asy
         ['Unable to write request log', 'logger rejected'],
         ['Unable to write request log', 'logger threw']
     ]);
+});
+
+test('dotfiles are blocked by default and require an explicit opt-in', async function(t){
+    const workspace = temporaryDirectory(t);
+    const root = path.join(workspace, '.served-root');
+    const hiddenDirectory = path.join(root, '.private');
+    const visibleAlias = path.join(root, 'visible-alias');
+    let aliasCreated = false;
+
+    writeFiles(root, {
+        'index.html':'spa shell',
+        'app.config':'visible configuration',
+        '.gitignore':'private ignore rules',
+        '..secret':'private double-dot file',
+        '.git/HEAD':'private git head',
+        'nested/.env':'private environment',
+        '.well-known/acme-token':'private token',
+        '.private/secret.txt':'private symlink target',
+        'hidden-index/.index.html':'private index',
+        '.fallback.html':'private fallback'
+    });
+
+    try{
+        fs.symlinkSync(hiddenDirectory, visibleAlias, process.platform=='win32' ? 'junction' : 'dir');
+        aliasCreated = true;
+    }catch(error){
+        t.diagnostic('filesystem does not permit dotfile symlink coverage: ' + error.code);
+    }
+
+    const {server} = await start(t, Server, {
+        root,
+        port:0,
+        server:{spaFallback:true}
+    });
+    const blockedPaths = [
+        '/.gitignore',
+        '/..secret',
+        '/.git/HEAD',
+        '/nested/.env',
+        '/%2egit/HEAD',
+        '/%2Egit%2FHEAD',
+        '/.git%5cHEAD',
+        '/.well-known/acme-token',
+        '/.missing?value=1'
+    ];
+
+    for(const requestPath of blockedPaths){
+        const response = await request(server, {path:requestPath});
+
+        assert.equal(response.statusCode, 403, requestPath);
+        assert.doesNotMatch(response.text, /private|spa shell/, requestPath);
+    }
+
+    const hiddenHead = await request(server, {path:'/.git/HEAD', method:'HEAD'});
+    const visible = await request(server, {path:'/app.config'});
+    const spa = await request(server, {path:'/dashboard', headers:{Accept:'text/html'}});
+
+    assert.equal(hiddenHead.statusCode, 403);
+    assert.equal(hiddenHead.body.length, 0);
+    assert.equal(visible.statusCode, 200);
+    assert.equal(visible.text, 'visible configuration');
+    assert.equal(spa.statusCode, 200);
+    assert.equal(spa.text, 'spa shell');
+
+    if(aliasCreated){
+        const alias = await request(server, {path:'/visible-alias/secret.txt'});
+
+        assert.equal(alias.statusCode, 403);
+        assert.doesNotMatch(alias.text, /private symlink target/);
+    }
+
+    const hiddenIndex = await start(t, Server, {
+        root:path.join(root, 'hidden-index'),
+        port:0,
+        server:{index:'.index.html'}
+    });
+    const hiddenFallback = await start(t, Server, {
+        root,
+        port:0,
+        server:{spaFallback:'.fallback.html'}
+    });
+    const allowed = await start(t, Server, {
+        root,
+        port:0,
+        server:{allowDotfiles:true}
+    });
+
+    assert.equal((await request(hiddenIndex.server)).statusCode, 403);
+    assert.equal((await request(hiddenFallback.server, {path:'/route'})).statusCode, 403);
+    assert.equal((await request(allowed.server, {path:'/.gitignore'})).text, 'private ignore rules');
+    assert.equal((await request(allowed.server, {path:'/.git/HEAD'})).text, 'private git head');
+    assert.equal((await request(allowed.server, {path:'/.well-known/acme-token'})).text, 'private token');
 });

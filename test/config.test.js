@@ -24,16 +24,19 @@ test('Config defaults are modern, merged, and deeply isolated', function(){
     assert.equal(first.host, '127.0.0.1');
     assert.equal(first.server.timeout, 1234);
     assert.equal(first.server.index, 'index.html');
+    assert.equal(first.server.allowDotfiles, false);
     assert.equal(first.contentType.thing, 'application/x-thing');
     assert.equal(first.contentType.html, 'text/html; charset=utf-8');
     assert.equal(first.errors.headers['X-Test'], 'yes');
 
     first.server.index = 'changed.html';
+    first.server.allowDotfiles = true;
     first.contentType.html = 'changed/type';
     first.errors.headers.Test = 'changed';
     first.domains['two.test'] = 'two';
 
     assert.equal(second.server.index, 'index.html');
+    assert.equal(second.server.allowDotfiles, false);
     assert.notEqual(second.contentType.html, 'changed/type');
     assert.equal(second.errors.headers.Test, undefined);
     assert.equal(second.domains['two.test'], undefined);

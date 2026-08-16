@@ -530,12 +530,12 @@ async function serveRequestFile(request,response){
     }
 
     let filename=resolveInsideRoot(root,request.url);
-    let result=await inspectFile.call(this,rootReal,filename);
+    let result=await inspectFile.call(this,root,rootReal,filename);
 
     if(result.status==404 && shouldUseSpaFallback.call(this,request)){
         const fallback=this.config.server.spaFallback===true ? this.config.server.index : this.config.server.spaFallback;
         filename=resolveInsideRoot(root,`/${fallback}`);
-        result=await inspectFile.call(this,rootReal,filename);
+        result=await inspectFile.call(this,root,rootReal,filename);
     }
 
     if(result.status){
@@ -557,7 +557,11 @@ function resolveInsideRoot(root,requestPath){
     return filename;
 }
 
-async function inspectFile(rootReal,filename){
+async function inspectFile(root,rootReal,filename){
+    if(this.config.server.allowDotfiles!==true && containsDotfile(root,filename)){
+        return {status:403};
+    }
+
     let stat;
     try{
         stat=await fsp.stat(filename);
@@ -573,6 +577,9 @@ async function inspectFile(rootReal,filename){
 
     if(stat.isDirectory()){
         filename=path.join(filename,this.config.server.index);
+        if(this.config.server.allowDotfiles!==true && containsDotfile(root,filename)){
+            return {status:403};
+        }
         try{
             stat=await fsp.stat(filename);
         }catch(err){
@@ -601,6 +608,10 @@ async function inspectFile(rootReal,filename){
         return {status:403};
     }
 
+    if(this.config.server.allowDotfiles!==true && containsDotfile(rootReal,realFilename)){
+        return {status:403};
+    }
+
     return {
         filename:realFilename,
         stat:stat
@@ -610,6 +621,14 @@ async function inspectFile(rootReal,filename){
 function isInside(root,filename){
     const relative=path.relative(root,filename);
     return relative==='' || (!relative.startsWith(`..${path.sep}`) && relative!='..' && !path.isAbsolute(relative));
+}
+
+function containsDotfile(root,filename){
+    const relative=path.relative(root,filename);
+
+    return relative.split(/[\\/]/).some(
+        segment=>segment.length>1 && segment!='..' && segment[0]=='.'
+    );
 }
 
 function shouldUseSpaFallback(request){
@@ -1157,6 +1176,10 @@ function validateConfig(config){
     validateNonNegative(config.server.keepAliveTimeout,'server.keepAliveTimeout');
     validateNonNegative(config.server.maxRequestBodyBytes,'server.maxRequestBodyBytes',true);
     validateNonNegative(config.server.compressionThreshold,'server.compressionThreshold');
+
+    if(typeof config.server.allowDotfiles!='boolean'){
+        throw new TypeError('server.allowDotfiles must be true or false');
+    }
 }
 
 function validatePort(value,name){
@@ -1189,6 +1212,7 @@ function sanitizedConfig(config){
         server:{
             index:config.server.index,
             noCache:config.server.noCache,
+            allowDotfiles:config.server.allowDotfiles,
             timeout:config.server.timeout,
             requestTimeout:config.server.requestTimeout,
             headersTimeout:config.server.headersTimeout,

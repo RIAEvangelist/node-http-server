@@ -40,6 +40,7 @@ const defaultConfigs=deepFreeze({
     server      : {
         index               : 'index.html',
         noCache             : true,
+        allowDotfiles       : false,
         timeout             : 30000,
         requestTimeout      : 300000,
         headersTimeout      : 60000,

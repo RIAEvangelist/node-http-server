@@ -83,11 +83,15 @@
 
                         <fieldset>
                             <legend>HTTP behavior</legend>
-                            <p class="field-doc">Keys: <code>server.noCache</code>, <code>compression</code>, <code>compressionThreshold</code>, <code>spaFallback</code>, <code>maxRequestBodyBytes</code>, and top-level <code>verbose</code>. <a href="./configuration.html#server">Behavior details →</a></p>
+                            <p class="field-doc">Keys: <code>server.noCache</code>, <code>server.allowDotfiles</code>, <code>server.compression</code>, <code>server.compressionThreshold</code>, <code>server.spaFallback</code>, <code>server.maxRequestBodyBytes</code>, and top-level <code>verbose</code>. <a href="./configuration.html#server">Behavior details →</a></p>
                             <div class="switch-list">
                                 <label class="switch-row">
                                     <span><strong>No-cache headers</strong><small>Default is on</small></span>
                                     <input id="config-no-cache" name="noCache" type="checkbox" checked>
+                                </label>
+                                <label class="switch-row">
+                                    <span><strong>Allow dotfiles</strong><small>Security opt-in; default is blocked</small></span>
+                                    <input id="config-allow-dotfiles" name="allowDotfiles" type="checkbox">
                                 </label>
                                 <label class="switch-row">
                                     <span><strong>Compression</strong><small>Brotli or gzip</small></span>

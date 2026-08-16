@@ -36,6 +36,7 @@
                             <tr><td>Limit bodies to 1 MiB</td><td><code>node-http-server --max-body 1048576</code></td><td>Oversized request bodies stop with <code>413</code>.</td></tr>
                             <tr><td>Disable one timeout</td><td><code>node-http-server --request-timeout false</code></td><td><code>false</code>, <code>off</code>, and <code>0</code> disable numeric timeout/body controls.</td></tr>
                             <tr><td>Allow client caching</td><td><code>node-http-server --cache</code></td><td>Turns off the default no-cache directives.</td></tr>
+                            <tr><td>Serve intentional dotfiles</td><td><code>node-http-server --root ./public --allow-dotfiles</code></td><td>Allows every dot-prefixed segment in that root, including <code>/.well-known</code>; audit the root first.</td></tr>
                             <tr><td>Write request logs</td><td><code>node-http-server --log ./logs/requests.ndjson</code></td><td>Appends one JSON record per line; the parent directory must exist.</td></tr>
                             <tr><td>Inspect activity</td><td><code>node-http-server --verbose</code></td><td>Prints normalized configuration and listener activity.</td></tr>
                         </tbody></table></div>
@@ -51,6 +52,7 @@
                             <tr><td><code>--index &lt;file&gt;</code></td><td><code>index.html</code></td><td><code>server.index</code></td><td>Directory index filename; there is no directory listing when it is missing.</td></tr>
                             <tr><td><code>--no-cache</code></td><td>on</td><td><code>server.noCache=true</code></td><td>Explicitly sends default no-cache directives.</td></tr>
                             <tr><td><code>--cache</code></td><td>off</td><td><code>server.noCache=false</code></td><td>Omits the default no-cache header; it does not add a cache lifetime.</td></tr>
+                            <tr><td><code>--allow-dotfiles</code></td><td>off</td><td><code>server.allowDotfiles=true</code></td><td>Explicit all-dotfile opt-in; <code>--allow-dotfiles=false</code> restores the default denial.</td></tr>
                             <tr><td><code>--spa[=&lt;file&gt;]</code></td><td>off</td><td><code>server.spaFallback</code></td><td>No value uses the index; custom filename requires <code>=</code>.</td></tr>
                             <tr><td><code>--compression</code></td><td>off</td><td><code>server.compression=true</code></td><td>Static eligible responses at least 1024 bytes; not byte ranges.</td></tr>
                             <tr><td><code>--max-body &lt;bytes|false&gt;</code></td><td>unlimited</td><td><code>server.maxRequestBodyBytes</code></td><td>Nonnegative bytes; <code>false</code>, <code>off</code>, or <code>0</code> is unlimited.</td></tr>
@@ -72,7 +74,7 @@
                             <tr><td>Short option</td><td><code>-p 9000</code></td><td><code>-p</code>, <code>-r</code>, <code>-v</code>, and <code>-h</code> are supported.</td></tr>
                             <tr><td>Positional root</td><td><code>node-http-server ./public</code></td><td>The first bare token becomes <code>root</code>; later bare tokens fail.</td></tr>
                             <tr><td>v8 key=value</td><td><code>root=./public port=9000 verbose=true</code></td><td>Compatibility form; sequential inputs are last-wins.</td></tr>
-                            <tr><td>Legacy camelCase aliases</td><td><code>requestTimeout=false</code></td><td><code>noCache</code>, <code>spaFallback</code>, <code>maxRequestBodyBytes</code>, <code>requestTimeout</code>, <code>headersTimeout</code>, and <code>keepAliveTimeout</code> map to modern options.</td></tr>
+                            <tr><td>Legacy camelCase aliases</td><td><code>requestTimeout=false</code></td><td><code>noCache</code>, <code>allowDotfiles</code>, <code>spaFallback</code>, <code>maxRequestBodyBytes</code>, <code>requestTimeout</code>, <code>headersTimeout</code>, and <code>keepAliveTimeout</code> map to modern options.</td></tr>
                         </tbody></table></div>
                         <div class="callout"><strong>Ordering:</strong> options are processed from left to right; the last value for the same setting wins. All arguments are validated before help or version output.</div>
                         <div class="callout-warning callout"><strong>Parsing details:</strong> boolean words are lowercase <code>true</code>/<code>false</code>. A flag needs equals to turn it off—for example <code>--compression=false</code>, not <code>--compression false</code>. Short options cannot be bundled. If a value starts with <code>-</code>, use equals, such as <code>--root=-name</code>. <code>--cache=&lt;anything&gt;</code> still enables caching.</div>
@@ -100,6 +102,7 @@ node-http-server --version</code></pre></div>
                             <tr><td><code>421 Misdirected Request</code></td><td>The Host header does not match <code>domain</code>.</td><td>Fix the request Host or remove/change <code>--domain</code>.</td></tr>
                             <tr><td>Remote machine cannot connect</td><td>Loopback bind, firewall, or wrong address.</td><td>Set <code>--host 0.0.0.0</code> deliberately, allow the port, then connect to the machine's network address—not <code>0.0.0.0</code>.</td></tr>
                             <tr><td>SPA file not selected</td><td>The custom file was separated by a space.</td><td>Use <code>--spa=app.html</code>.</td></tr>
+                            <tr><td>Dot-prefixed path returns <code>403</code></td><td>Dotfiles are blocked by default.</td><td>Move the public file to a normal path, or use <code>--allow-dotfiles</code> only with a dedicated audited root.</td></tr>
                             <tr><td>Log errors appear later</td><td>Parent directory missing or write denied.</td><td>Create/protect the directory and use <code>--verbose</code> to surface asynchronous failures.</td></tr>
                             <tr><td><code>Unknown option: config</code></td><td>The CLI has no JSON config loader.</td><td>Use the module API; a bare <code>config.json</code> is treated as the root path.</td></tr>
                         </tbody></table></div>

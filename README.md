@@ -101,6 +101,7 @@ npx node-http-server --root ./public
 | `--index <file>` | Directory index; default `index.html` |
 | `--no-cache` | Send no-cache response directives |
 | `--cache` | Allow client caching |
+| `--allow-dotfiles` | Allow dot-prefixed path segments; blocked by default |
 | `--spa[=<file>]` | Enable SPA fallback; optional fallback file |
 | `--compression` | Enable negotiated Brotli or gzip responses |
 | `--max-body <bytes or false>` | Set the request-body limit; `false`, `off`, or `0` is unlimited |
@@ -133,6 +134,7 @@ node-http-server root=./public port=9000 verbose=true
 | Disable the request timeout | `node-http-server --request-timeout false` |
 | Disable socket inactivity timeout | `node-http-server --timeout false` |
 | Allow client caching | `node-http-server --cache` |
+| Deliberately serve `/.well-known` | `node-http-server --root ./public --allow-dotfiles` |
 | Write NDJSON request logs | `node-http-server --log ./requests.ndjson` |
 
 Use the module API for HTTPS certificates, virtual hosts, hooks, and custom configuration functions.
@@ -190,7 +192,7 @@ server.deploy();
 server.server.once('error',error=>console.error(error));
 ```
 
-Attach the same handler to `server.secureServer` when HTTPS also runs. `serveFile()` trusts its filename; never pass unvalidated request input to it.
+Attach the same handler to `server.secureServer` when HTTPS also runs. `serveFile()` trusts its filename and is a deliberate escape hatch from automatic routing policies, including dotfile blocking; never pass unvalidated request input to it.
 
 ## Configuration
 
@@ -205,6 +207,7 @@ const config={
     server:{
         index:'index.html',
         noCache:false,
+        allowDotfiles:false,
         maxRequestBodyBytes:1024*1024,
         compression:true,
         compressionThreshold:1024,
@@ -238,6 +241,7 @@ const config={
 |---|---|---|
 | `index` | `'index.html'` | File used for directory requests |
 | `noCache` | `true` | Send no-cache response directives |
+| `allowDotfiles` | `false` | Allow any dot-prefixed path segment; only literal `true` opts in |
 | `timeout` | `30000` | Socket inactivity timeout in milliseconds |
 | `requestTimeout` | `300000` | Complete-request timeout in milliseconds |
 | `headersTimeout` | `60000` | Request-header timeout in milliseconds |
@@ -258,6 +262,7 @@ Every timeout accepts a nonnegative millisecond value. Programmatic configuratio
 | `server.headersTimeout` | Disabled | Disabled | Disabled |
 | `server.keepAliveTimeout` | Disabled | Disabled | Disabled |
 | `server.maxRequestBodyBytes` | Unlimited | Unlimited | Unlimited |
+| `server.allowDotfiles` | Dotfiles blocked | Invalid | Invalid |
 | `contentType` | Automatic MIME map removed; files use `application/octet-stream` | Not a supported map value | Not a supported map value |
 
 Deployment validates port ranges, requires a nonempty listen address, verifies static roots, and rejects negative timeout or limit values before opening a listener.
@@ -359,6 +364,7 @@ new Server({
 - Compression negotiates Brotli or gzip only for eligible static responses when enabled, accepted by the client, above the threshold, and not a byte range. Manual `serve()` responses are not compressed automatically.
 - SPA fallback is off by default. When enabled, an extensionless missing path that accepts HTML falls back to the configured index or root-relative filename.
 - Requested paths are decoded and resolved inside the configured root. Traversal and filesystem escapes are rejected.
+- Dot-prefixed path segments return `403` before filesystem lookup or SPA fallback. Set `server.allowDotfiles:true` only when the entire root is safe to expose, including paths such as `/.well-known`.
 
 See [SECURITY.md](SECURITY.md) before exposing a server outside the local machine.
 

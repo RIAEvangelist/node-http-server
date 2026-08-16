@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [9.0.1] - 2026-08-16
+
+### Added
+
+- Blocked every dot-prefixed static path segment by default, including encoded names, nested directories, configured indexes or SPA fallbacks, and visible symlink aliases into hidden content.
+- Added the explicit `server.allowDotfiles:true` and CLI `--allow-dotfiles` opt-ins for deliberate content such as `/.well-known`.
+
 ### Changed
 
 - Upgraded the sole direct development dependency to `vanilla-test@2.1.0`, using its project-owned native V8 reporter, complete test-result artifact, and Node-only coverage configuration without c8, Playwright, Monocart, or Istanbul tooling.
