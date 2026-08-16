@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [9.0.2] - 2026-08-16
+
+### Changed
+
+- Upgraded the sole direct development dependency to `vanilla-test@2.1.1`, including its bound comparison helpers and `strong-type` v2 runtime, while keeping published `node-http-server` installs free of runtime dependencies.
+
 ## [9.0.1] - 2026-08-16
 
 ### Added

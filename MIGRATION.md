@@ -6,7 +6,7 @@ Version 9 keeps the small server, default singleton, hooks, HTTPS configuration,
 
 - Use Node.js 22.12 or newer.
 - Install normally with `npm install node-http-server`.
-- Published installs have zero runtime dependencies. The repository uses the exact owner-maintained `vanilla-test@2.1.0` release as its sole direct development dependency for native V8 coverage.
+- Published installs have zero runtime dependencies. The repository uses the exact owner-maintained `vanilla-test@2.1.1` release as its sole direct development dependency for native V8 coverage.
 - CommonJS and ESM are both supported. No transpiler or TypeScript toolchain is needed.
 
 ## CommonJS and ESM

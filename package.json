@@ -1,6 +1,6 @@
 {
   "name": "node-http-server",
-  "version": "9.0.1",
+  "version": "9.0.2",
   "description": "A lightweight, secure, zero-runtime-dependency HTTP and HTTPS static server for Node.js.",
   "type": "commonjs",
   "main": "./server/Server.js",
@@ -73,6 +73,6 @@
   "license": "MIT",
   "sideEffects": false,
   "devDependencies": {
-    "vanilla-test": "2.1.0"
+    "vanilla-test": "2.1.1"
   }
 }

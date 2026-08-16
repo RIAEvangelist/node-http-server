@@ -17,7 +17,7 @@ const npmCli = process.env.npm_execpath || (fs.existsSync(adjacentNpm) && adjace
 assert.deepEqual(manifest.dependencies || {}, {}, 'runtime dependencies must stay empty');
 assert.deepEqual(
     manifest.devDependencies || {},
-    {'vanilla-test':'2.1.0'},
+    {'vanilla-test':'2.1.1'},
     'vanilla-test must stay the only direct development dependency'
 );
 

@@ -16,7 +16,7 @@
 
 [![Sponsor RIAEvangelist to help development of node-http-server](https://img.shields.io/static/v1?label=Sponsor%20Me%20On%20GitHub&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/RIAEvangelist)
 
-A small HTTP and HTTPS static server for Node.js. It has zero runtime dependencies, works from CommonJS and ESM, and binds to localhost by default. The sole direct development dependency is the owner-maintained `vanilla-test@2.1.0`, used for project-owned native V8 coverage.
+A small HTTP and HTTPS static server for Node.js. It has zero runtime dependencies, works from CommonJS and ESM, and binds to localhost by default. The sole direct development dependency is the owner-maintained `vanilla-test@2.1.1`, used for project-owned native V8 coverage.
 
 Version 9 adds streaming files, clean multi-server lifecycle, modern cache and range behavior, optional compression and SPA fallback, configurable request limits, and strict root containment without turning the package into a framework.
 
@@ -436,7 +436,7 @@ The built-in logger adds a timestamp without mutating the supplied record, redac
 
 ## Development
 
-Install the exact workspace state once with `npm ci`. Published installs have zero runtime dependencies. The exact `vanilla-test@2.1.0` release is the sole direct development dependency and runs the Node-only native V8 coverage workflow.
+Install the exact workspace state once with `npm ci`. Published installs have zero runtime dependencies. The exact `vanilla-test@2.1.1` release is the sole direct development dependency and runs the Node-only native V8 coverage workflow.
 
 Vanilla Test owns the reporter in 2.1, so this repository no longer installs c8, Playwright, Monocart, or Istanbul tooling.
 
