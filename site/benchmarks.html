@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Real node-http-server loopback benchmark scenarios, request profiles, throughput, latency percentiles, and reproducible comparison guidance."><meta name="theme-color" content="#08110d"><title>Benchmarks — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/benchmarks.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script><script src="./benchmark-results.js" defer></script></head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./benchmarks.html" aria-current="page">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
+        <main id="main"><header class="page-header page-header-compact"><p class="kicker">Real server + real HTTP requests</p><h1>Measure public paths.</h1><p class="lead">Run node-http-server and the HTTP driver in separate Node processes, validate every loopback response, and record throughput plus p50, p95, and p99 latency.</p></header>
+            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#latest">Latest CI run</a><a href="#run">Run it</a><a href="#model">Execution model</a><a href="#scenarios">Scenarios</a><a href="#metrics">Measurements</a><a href="#compare">Compare runs</a></aside>
+                <div class="doc-content">
+                    <section class="doc-section" id="latest"><p class="kicker">Published measurement</p><h2>Inspect the latest canonical Ubuntu run.</h2>
+                        <p id="benchmark-status" aria-live="polite">Loading <code>benchmarks/latest.json</code> from the published site…</p>
+                        <div id="benchmark-result" hidden>
+                            <div class="table-wrap"><table><thead><tr><th>Generated</th><th>Package</th><th>Node</th><th>Platform</th><th>Measured / scenario</th><th>Warmup / scenario</th><th>Clients</th></tr></thead><tbody id="benchmark-environment"></tbody></table></div>
+                            <div class="table-wrap"><table><thead><tr><th>Scenario</th><th>Requests</th><th>Requests/sec</th><th>p50 ms</th><th>p95 ms</th><th>p99 ms</th></tr></thead><tbody id="benchmark-scenarios"></tbody></table></div>
+                        </div>
+                        <div class="callout"><strong>Local fallback:</strong> run <code>npm run benchmark</code> for a current measurement on your machine. Use <code>node benchmark/run.js --json</code> for structured local evidence.</div>
+                        <div class="page-links"><a href="https://riaevangelist.github.io/node-http-server/benchmarks/latest.json">Open latest benchmark JSON →</a></div>
+                    </section>
+
+                    <section class="doc-section" id="run"><p class="kicker">Commands and profiles</p><h2>Select a bounded run.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Command</th><th>Profile</th><th>Output</th></tr></thead><tbody>
+                            <tr><td><code>npm run benchmark</code></td><td>250 measured requests + 25 warmups per scenario, 10 concurrent clients.</td><td>Readable scenario table.</td></tr>
+                            <tr><td><code>npm run benchmark:smoke</code></td><td>8 measured requests + 2 warmups per scenario, 2 concurrent clients.</td><td>Short readable verification table.</td></tr>
+                            <tr><td><code>node benchmark/run.js --json</code></td><td>Standard profile.</td><td>One structured JSON document for storage or analysis.</td></tr>
+                        </tbody></table></div>
+                        <div class="code-block"><div class="code-head"><span class="code-label">shell · custom measured run</span><button type="button" data-copy-target="benchmark-custom">Copy</button></div><pre><code id="benchmark-custom">node benchmark/run.js \
+    --requests 1000 \
+    --warmup 100 \
+    --concurrency 25 \
+    --json</code></pre></div>
+                        <div class="table-wrap"><table><thead><tr><th>Option</th><th>Standard</th><th>Smoke</th><th>Contract</th></tr></thead><tbody>
+                            <tr><td><code>--requests &lt;count&gt;</code></td><td>250</td><td>8</td><td>Measured requests for each scenario; positive integer.</td></tr>
+                            <tr><td><code>--warmup &lt;count&gt;</code></td><td>25</td><td>2</td><td>Validated warmup requests for each scenario; non-negative integer.</td></tr>
+                            <tr><td><code>--concurrency &lt;count&gt;</code></td><td>10</td><td>2</td><td>Concurrent HTTP clients; positive integer up to the measured request count.</td></tr>
+                            <tr><td><code>--json</code></td><td>off</td><td>off</td><td>Emit structured result data to standard output.</td></tr>
+                            <tr><td><code>--smoke</code></td><td>off</td><td>on</td><td>Select the short profile; explicit numeric options take precedence.</td></tr>
+                        </tbody></table></div>
+                    </section>
+
+                    <section class="doc-section" id="model"><p class="kicker">Execution model</p><h2>Exercise the shipped public paths.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Stage</th><th>What happens</th><th>Engineering value</th></tr></thead><tbody>
+                            <tr><td>Fixture setup</td><td>Creates temporary text, binary, and SPA files.</td><td>Known bytes make response validation exact.</td></tr>
+                            <tr><td>Server start</td><td>The parent forks <code>benchmark/server.js</code>; the child creates a public <code>Server</code> instance on <code>127.0.0.1</code> with an OS-assigned port.</td><td>Separate event loops isolate server work from client measurement.</td></tr>
+                            <tr><td>Warmup</td><td>Sends and validates the selected warmup count.</td><td>Connection and runtime startup occur before the measurement window.</td></tr>
+                            <tr><td>Measurement</td><td>The parent process drives concurrent loopback requests through Node's HTTP client and a keep-alive agent.</td><td>Results represent actual request, routing, file, compression, and hook work.</td></tr>
+                            <tr><td>Validation</td><td>Checks the expected status, headers, and exact response bytes for every request.</td><td>Each validated response contributes to the latency and throughput summary.</td></tr>
+                            <tr><td>Cleanup</td><td>IPC carries a bounded close handshake; the parent destroys the client agent and removes temporary files.</td><td>Each run leaves a clean workspace.</td></tr>
+                        </tbody></table></div>
+                        <div class="callout"><strong>Process contract:</strong> IPC carries readiness, the selected port, and shutdown state. The harness uses Node built-ins and node-http-server itself.</div>
+                    </section>
+
+                    <section class="doc-section" id="scenarios"><p class="kicker">Public-path inventory</p><h2>Five validated server workloads.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Request path</th><th>Accepted response</th></tr></thead><tbody>
+                            <tr><td><code>static-get-small</code></td><td><code>GET /small.txt</code></td><td><code>200</code>, content length, exact bytes.</td></tr>
+                            <tr><td><code>static-head-small</code></td><td><code>HEAD /small.txt</code></td><td><code>200</code>, content length, empty response body.</td></tr>
+                            <tr><td><code>static-range-large</code></td><td><code>GET /large.bin</code> with a byte range.</td><td><code>206</code>, content range, exact 64 KiB slice from a 1 MiB file.</td></tr>
+                            <tr><td><code>spa-fallback-gzip</code></td><td><code>GET /dashboard/settings</code> with HTML and gzip negotiation.</td><td><code>200</code>, gzip and Vary headers, exact decompressed SPA document.</td></tr>
+                            <tr><td><code>dynamic-hook</code></td><td><code>GET /dynamic</code> handled by <code>onRequest</code>.</td><td><code>200</code>, JSON content type, exact hook response.</td></tr>
+                        </tbody></table></div>
+                    </section>
+
+                    <section class="doc-section" id="metrics"><p class="kicker">Result contract</p><h2>Read throughput and the latency distribution together.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Field</th><th>Meaning</th><th>Use</th></tr></thead><tbody>
+                            <tr><td><code>requestsPerSecond</code></td><td>Validated measured requests divided by scenario wall time.</td><td>Compare completed work per second.</td></tr>
+                            <tr><td><code>latencyMilliseconds.p50</code></td><td>Median measured request latency.</td><td>Understand the common request.</td></tr>
+                            <tr><td><code>latencyMilliseconds.p95</code></td><td>95th-percentile measured request latency.</td><td>Track slower requests near the tail.</td></tr>
+                            <tr><td><code>latencyMilliseconds.p99</code></td><td>99th-percentile measured request latency.</td><td>Track the high tail.</td></tr>
+                            <tr><td><code>durationMilliseconds</code></td><td>Scenario wall time after warmup.</td><td>Audit the throughput calculation and run cost.</td></tr>
+                        </tbody></table></div>
+                        <p>JSON output also records the package version, generation time, Node version, platform, architecture, and effective request profile.</p>
+                    </section>
+
+                    <section class="doc-section" id="compare"><p class="kicker">Comparison discipline</p><h2>Keep the environment equivalent.</h2>
+                        <ol class="steps">
+                            <li><strong>Record the environment.</strong><span>Keep package, Node, operating system, architecture, and request profile with every result.</span></li>
+                            <li><strong>Control host load.</strong><span>Use the same machine and an idle system for comparable runs.</span></li>
+                            <li><strong>Repeat the run.</strong><span>Collect several samples and compare the distribution across runs.</span></li>
+                            <li><strong>Compare by scenario.</strong><span>Review throughput and p50/p95/p99 together for the same scenario ID.</span></li>
+                            <li><strong>Verify behavior first.</strong><span>Run <code>npm test</code>; the benchmark then validates every measured response again.</span></li>
+                        </ol>
+                        <div class="page-links"><a href="https://github.com/RIAEvangelist/node-http-server/blob/main/benchmark/README.md">Benchmark source guide →</a><a href="https://github.com/RIAEvangelist/node-http-server/blob/main/benchmark/run.js">Open the harness →</a><a href="./testing.html">Testing &amp; coverage →</a></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>Real public-path measurements. <span data-year></span></p><div><a href="./testing.html">Testing</a><a href="https://github.com/RIAEvangelist/node-http-server/tree/main/benchmark">Source</a></div></footer>
+    </body>
+</html>

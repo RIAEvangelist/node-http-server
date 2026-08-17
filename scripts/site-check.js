@@ -15,6 +15,7 @@ const requiredPages = [
     'examples.html',
     'playground.html',
     'testing.html',
+    'benchmarks.html',
     'operations.html',
     'resources.html'
 ];
@@ -325,15 +326,20 @@ function checkCss(){
 }
 
 function checkJavaScript(){
-    const filename = path.join(siteRoot, 'script.js');
-    const result = spawnSync(process.execPath, ['--check', filename], {
-        cwd:projectRoot,
-        encoding:'utf8',
-        shell:false
-    });
+    for(const filename of ['script.js', 'benchmark-results.js']){
+        const absoluteFilename = path.join(siteRoot, filename);
+        const result = spawnSync(process.execPath, ['--check', absoluteFilename], {
+            cwd:projectRoot,
+            encoding:'utf8',
+            shell:false
+        });
 
-    if(result.status !== 0){
-        report('site/script.js', (result.stderr || result.stdout || 'syntax check failed').trim());
+        if(result.status !== 0){
+            report(
+                'site/' + filename,
+                (result.stderr || result.stdout || 'syntax check failed').trim()
+            );
+        }
     }
 }
 

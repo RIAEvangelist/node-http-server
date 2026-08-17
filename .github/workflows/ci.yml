@@ -111,6 +111,34 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  benchmark:
+    name: HTTP benchmark / Node 24.18.0
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js 24.18.0
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24.18.0'
+
+      - name: Run validated HTTP benchmarks
+        shell: bash
+        run: |
+          set -o pipefail
+          node ./benchmark/run.js --json | tee benchmark-results.json
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v7
+        with:
+          name: node-http-server-benchmark
+          path: benchmark-results.json
+          if-no-files-found: error
+          retention-days: 14
+
   pages:
     name: Assemble GitHub Pages site
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -118,6 +146,7 @@ jobs:
       - test
       - coverage
       - package-smoke
+      - benchmark
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -139,6 +168,12 @@ jobs:
           name: vanilla-test-node-coverage
           path: _coverage
 
+      - name: Download benchmark results
+        uses: actions/download-artifact@v8
+        with:
+          name: node-http-server-benchmark
+          path: _benchmark
+
       - name: Assemble static site
         shell: bash
         run: |
@@ -149,6 +184,8 @@ jobs:
           mkdir -p _site/coverage
           cp --recursive _coverage/node _site/coverage/node
           cp --recursive _coverage/badges _site/badges
+          mkdir -p _site/benchmarks
+          cp _benchmark/benchmark-results.json _site/benchmarks/latest.json
           touch _site/.nojekyll
 
           test -f _site/index.html
@@ -159,6 +196,7 @@ jobs:
           test -f _site/examples.html
           test -f _site/playground.html
           test -f _site/testing.html
+          test -f _site/benchmarks.html
           test -f _site/operations.html
           test -f _site/resources.html
           test -f _site/styles.css
@@ -168,6 +206,7 @@ jobs:
           test -f _site/badges/lines.json
           test -f _site/badges/functions.json
           test -f _site/badges/branches.json
+          test -f _site/benchmarks/latest.json
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6

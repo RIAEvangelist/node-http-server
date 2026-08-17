@@ -75,6 +75,7 @@ try{
     );
     const publishedTopLevels = new Set([
         'assets',
+        'benchmark',
         'bin',
         'server',
         'CHANGELOG.md',
@@ -157,6 +158,26 @@ try{
     assert.match(cliHelp, /--timeout/);
     assert.match(cliHelp, /--allow-dotfiles/);
     assert.equal(cliVersion.trim(), manifest.version);
+
+    const installedBenchmark = path.join(
+        installed,
+        'node_modules',
+        'node-http-server',
+        'benchmark',
+        'run.js'
+    );
+    const benchmark = JSON.parse(run(
+        process.execPath,
+        [installedBenchmark, '--smoke', '--json'],
+        {cwd:installed}
+    ));
+
+    assert.equal(benchmark.benchmark, 'node-http-server');
+    assert.equal(benchmark.version, manifest.version);
+    assert.equal(benchmark.scenarios.length, 5);
+    assert.equal(benchmark.scenarios.every(function(scenario){
+        return scenario.requests===8 && scenario.requestsPerSecond>0;
+    }), true);
 
     process.stdout.write('Package smoke test passed: ' + details.filename + '\n');
 }finally{

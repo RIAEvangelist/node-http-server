@@ -12,13 +12,13 @@
 [![function coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Ffunctions.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
 [![branch coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Fbranches.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
 
-[Start](https://riaevangelist.github.io/node-http-server/) · [Docs hub](https://riaevangelist.github.io/node-http-server/guide.html) · [CLI](https://riaevangelist.github.io/node-http-server/cli.html) · [Library API](https://riaevangelist.github.io/node-http-server/api.html) · [Configuration](https://riaevangelist.github.io/node-http-server/configuration.html) · [Examples](https://riaevangelist.github.io/node-http-server/examples.html) · [Playground](https://riaevangelist.github.io/node-http-server/playground.html) · [Testing](https://riaevangelist.github.io/node-http-server/testing.html) · [Operations](https://riaevangelist.github.io/node-http-server/operations.html)
+[Start](https://riaevangelist.github.io/node-http-server/) · [Docs hub](https://riaevangelist.github.io/node-http-server/guide.html) · [CLI](https://riaevangelist.github.io/node-http-server/cli.html) · [Library API](https://riaevangelist.github.io/node-http-server/api.html) · [Configuration](https://riaevangelist.github.io/node-http-server/configuration.html) · [Examples](https://riaevangelist.github.io/node-http-server/examples.html) · [Playground](https://riaevangelist.github.io/node-http-server/playground.html) · [Testing](https://riaevangelist.github.io/node-http-server/testing.html) · [Benchmarks](https://riaevangelist.github.io/node-http-server/benchmarks.html) · [Operations](https://riaevangelist.github.io/node-http-server/operations.html)
 
 [![Sponsor RIAEvangelist to help development of node-http-server](https://img.shields.io/static/v1?label=Sponsor%20Me%20On%20GitHub&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/RIAEvangelist)
 
 A small HTTP and HTTPS static server for Node.js. It has zero runtime dependencies, works from CommonJS and ESM, and binds to localhost by default. The sole direct development dependency is the owner-maintained `vanilla-test@2.1.1`, used for project-owned native V8 coverage.
 
-Version 9 adds streaming files, clean multi-server lifecycle, modern cache and range behavior, optional compression and SPA fallback, configurable request limits, and strict root containment without turning the package into a framework.
+Version 9 is a focused static-server toolkit with streaming files, clean multi-server lifecycle, modern cache and range behavior, optional compression and SPA fallback, configurable request limits, and strict root containment.
 
 ## Install
 
@@ -86,7 +86,7 @@ npm install --global node-http-server
 node-http-server --root ./public --port 8080
 ```
 
-Or run it without a global install:
+Or run the package directly through npm:
 
 ```sh
 npx node-http-server --root ./public
@@ -223,7 +223,7 @@ const config={
 | `host` | `'127.0.0.1'` | Address used by `listen()` |
 | `port` | `8080` | HTTP port |
 | `root` | `process.cwd()` | Static file root |
-| `domain` | `'0.0.0.0'` | Legacy primary Host check; this does not control the listen address |
+| `domain` | `'0.0.0.0'` | Legacy primary Host check; `host` controls the listen address |
 | `domains` | `{}` | Additional hostname-to-root mappings |
 | `verbose` | `false` | Console activity output |
 | `log` | `false` | NDJSON log path, or `false` to disable request logging |
@@ -285,7 +285,7 @@ import Config from 'node-http-server/config';
 import contentTypes from 'node-http-server/mime-types';
 ```
 
-### Modern MIME types without a dependency
+### Built-in modern MIME types
 
 The built-in MIME map is isolated in the small `server/MimeTypes.js` file. A `contentType` object adds or overrides entries:
 
@@ -356,12 +356,12 @@ new Server({
 ## Static HTTP behavior
 
 - `GET` streams files instead of loading every file into memory.
-- `HEAD` returns the same status and headers without a response body.
+- `HEAD` returns the same status and headers with an empty response body.
 - Other methods reach the hooks first, then receive `405 Method Not Allowed` from the static fallback.
 - A satisfiable single `GET` byte range returns `206 Partial Content`; a valid but unsatisfiable range returns `416`.
-- Malformed, unsupported-unit, and multi-range headers are ignored, so the response remains a full `200`. `HEAD` ignores Range and mirrors the full `GET` headers without a body.
+- Malformed, unsupported-unit, and multi-range headers are ignored, so the response remains a full `200`. `HEAD` ignores Range and mirrors the full `GET` headers with an empty body.
 - Weak ETags and `Last-Modified` support conditional `304 Not Modified` responses.
-- Compression negotiates Brotli or gzip only for eligible static responses when enabled, accepted by the client, above the threshold, and not a byte range. Manual `serve()` responses are not compressed automatically.
+- Automatic compression negotiates Brotli or gzip for eligible static responses when enabled, accepted by the client, above the threshold, and outside byte-range handling. Manual `serve()` responses retain their caller-selected encoding.
 - SPA fallback is off by default. When enabled, an extensionless missing path that accepts HTML falls back to the configured index or root-relative filename.
 - Requested paths are decoded and resolved inside the configured root. Traversal and filesystem escapes are rejected.
 - Dot-prefixed path segments return `403` before filesystem lookup or SPA fallback. Set `server.allowDotfiles:true` only when the entire root is safe to expose, including paths such as `/.well-known`.
@@ -395,7 +395,7 @@ Subclass `Server` or assign hook functions to intercept the lifecycle. The first
 
 Return a truthy value from the first three hooks when the hook is taking over that step. Complete the response with the supplied `serve` function or the Node response object.
 
-`onRawRequest` and `onRequest` receive the public safe `serve` path. The fifth `beforeServe` argument is a one-shot completion continuation: call it after manual or asynchronous body work. It completes the response without entering `beforeServe` again.
+`onRawRequest` and `onRequest` receive the public safe `serve` path. The fifth `beforeServe` argument is a one-shot completion continuation: call it after manual or asynchronous body work. It completes the response once and bypasses another `beforeServe` pass.
 
 ```js
 import {Server} from 'node-http-server';
@@ -432,29 +432,37 @@ new Server({
 }).deploy();
 ```
 
-The built-in logger adds a timestamp without mutating the supplied record, redacts common credential headers, and reports serialization or filesystem errors. Replace `logFunction` when records need to go somewhere else. Set `logBody:true` only when storing request bodies is intentional. Treat request logs as sensitive data and protect the destination accordingly.
+The built-in logger preserves the supplied record, adds a timestamp to its own copy, redacts common credential headers, and reports serialization or filesystem errors. Replace `logFunction` when records need to go somewhere else. Set `logBody:true` only when storing request bodies is intentional. Treat request logs as sensitive data and protect the destination accordingly.
 
 ## Development
 
 Install the exact workspace state once with `npm ci`. Published installs have zero runtime dependencies. The exact `vanilla-test@2.1.1` release is the sole direct development dependency and runs the Node-only native V8 coverage workflow.
 
-Vanilla Test owns the reporter in 2.1, so this repository no longer installs c8, Playwright, Monocart, or Istanbul tooling.
+Vanilla Test 2.1 uses Node's native V8 coverage path and its project-owned reporter. Node's built-in test runner and assertion module execute the behavior suite.
+
+The suite contains 156 unique, focused leaf cases: 34 Unit, 46 Functional, 24 Integration, and 52 Regression. Each behavior has one owning case. Both the normal runner and coverage use the ordered manifest in `test/suites.js`; generated `coverage/node/test-results.json` is the authoritative ordered case evidence.
 
 | Script | Purpose |
 |---|---|
 | `npm start` | Serve the current directory with the CLI |
-| `npm test` | Run the Node test suite |
+| `npm test` | Run all 156 cases discovered by the shared suite manifest |
+| `npm run test:unit` | Run 34 isolated Config and suite-discovery tests from `test/unit/` |
+| `npm run test:functional` | Run 46 public HTTP behavior tests from `test/functional/` |
+| `npm run test:integration` | Run 24 module, CLI, benchmark, listener, stream, and filesystem boundary tests from `test/integration/` |
+| `npm run test:regression` | Run 52 owned cases for previously fixed failures and security boundaries from `test/regression/` |
 | `npm run test:site` | Check docs pages, local links/fragments, IDs, label/ARIA targets, image alt text, nav state, CSS, and site JavaScript |
 | `npm run coverage` | Run `vanilla-test` Node coverage gates, write `coverage/node/`, and refresh measured badge JSON |
 | `npm run test:package` | Pack, install, and smoke-test the publishable package |
 | `npm run verify` | Run tests, static-doc checks, coverage, and the package smoke test |
+| `npm run benchmark` | Measure five validated public paths with the bounded developer profile |
+| `npm run benchmark:smoke` | Run the short real-server measurement profile |
 | `npm run basic` | Run the basic HTTP example |
 | `npm run https` | Run the HTTPS-only example; local certificates are required |
 | `npm run both` | Run the combined HTTP/HTTPS example; local certificates are required |
 | `npm run template` | Run the template example |
 | `npm run cluster` | Run the cluster example |
 
-GitHub Actions tests Node.js 22.12 and Node.js 24, validates the dependency-free static docs, runs the Node-only `vanilla-test` coverage gate, smoke-tests the packed npm artifact, uploads the report and measured badges, and publishes them with the static project site from `main`.
+GitHub Actions tests Node.js 22.12 and Node.js 24, validates the dependency-free static docs, runs the Node-only `vanilla-test` coverage gate, smoke-tests the packed npm artifact, measures real HTTP paths on Ubuntu Node 24.18.0, and publishes the reports, badges, and latest benchmark JSON with the static project site from `main`.
 
 When upgrading from v8, read [MIGRATION.md](MIGRATION.md). Release details are in [CHANGELOG.md](CHANGELOG.md).
 

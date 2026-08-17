@@ -1,17 +1,10 @@
 'use strict';
 
 const childProcess=require('node:child_process'),
-    fs=require('node:fs'),
-    path=require('node:path');
+    path=require('node:path'),
+    suites=require('./suites.js');
 
-const files=fs.readdirSync(__dirname)
-    .filter(function(filename){
-        return filename.endsWith('.test.js');
-    })
-    .sort()
-    .map(function(filename){
-        return path.join(__dirname,filename);
-    });
+const files=suites.filesForCategories();
 
 module.exports=function run(){
     return new Promise(function(resolve,reject){
@@ -81,7 +74,20 @@ function parseTap(output){
         (match[1]==='ok' ? passed : failed).push(description);
     }
 
+    requireUniqueDescriptions(passed.concat(failed));
+
     return {total,failureCount,passed,failed};
+}
+
+function requireUniqueDescriptions(descriptions){
+    const seen=new Set();
+
+    for(const description of descriptions){
+        if(seen.has(description)){
+            throw new Error('Duplicate test description '+JSON.stringify(description)+'.');
+        }
+        seen.add(description);
+    }
 }
 
 function summaryCount(output,label){

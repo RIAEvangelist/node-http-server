@@ -4,11 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
-## [9.0.2] - 2026-08-16
+## [9.0.2] - 2026-08-17
 
 ### Changed
 
 - Upgraded the sole direct development dependency to `vanilla-test@2.1.1`, including its bound comparison helpers and `strong-type` v2 runtime, while keeping published `node-http-server` installs free of runtime dependencies.
+- Reorganized the development tests into 156 focused cases across selectable Unit, Functional, Integration, and Regression suites. Each behavior has one owning case, and direct runs and coverage share the same discovery manifest.
+- Added validated real-HTTP benchmarks for static GET, HEAD, byte ranges, compressed SPA fallback, and dynamic hooks, with separate server/driver processes, throughput, latency percentiles, and published CI JSON evidence.
 
 ## [9.0.1] - 2026-08-16
 
