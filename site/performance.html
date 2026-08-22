@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="node-http-server 9.1.0 core performance compared with 9.0.2 using validated alternating samples and published raw JSON."><meta name="theme-color" content="#08110d"><title>Performance — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/performance.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script></head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./why.html">Why</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html" aria-current="page">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
+        <main id="main"><header class="page-header page-header-compact"><p class="kicker">9.0.2 → 9.1.0 · validated core comparison</p><h1>Measure the paths that changed.</h1><p class="lead">Nine alternating samples compare the exact 9.0.2 Git tag with the 9.1.0 working tree across request parsing, routing, hooks, file ranges, Brotli, Config allocation, and listener closure.</p><div class="header-actions"><a class="button button-primary" href="#results">Read the results</a><a class="button" href="./benchmarks/core-9.0.2-vs-9.1.0.json">Open raw JSON</a></div></header>
+            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#results">Core results</a><a href="#controls">Compatibility controls</a><a href="#contracts">Workload contracts</a><a href="#method">Method</a><a href="#reproduce">Reproduce</a></aside>
+                <div class="doc-content">
+                    <section class="doc-section" id="results"><p class="kicker">Recorded medians</p><h2>Targeted work per second and retained memory.</h2>
+                        <p>These medians come from one recorded environment. Each row keeps its nine raw baseline and candidate samples in the linked JSON.</p>
+                        <div class="facts" aria-label="Recorded benchmark environment"><div class="fact"><strong>9</strong><span>Alternating samples</span></div><div class="fact"><strong>Node 24.18.0</strong><span>Runtime</span></div><div class="fact"><strong>Windows x64</strong><span>Platform</span></div><div class="fact"><strong>Core Ultra 9 275HX</strong><span>Processor</span></div></div>
+                        <div class="table-wrap"><table><thead><tr><th>Workload</th><th>9.0.2 median</th><th>9.1.0 median</th><th>Result</th><th>Primary change</th></tr></thead><tbody>
+                            <tr><td>1,000 repeated query values</td><td>1,076 req/s</td><td>7,695 req/s</td><td><strong>7.15× speedup</strong></td><td>In-place array accumulation.</td></tr>
+                            <tr><td>1,000-domain virtual-host miss</td><td>13,926 req/s</td><td>23,259 req/s</td><td><strong>1.67× speedup</strong></td><td>Compiled O(1) hostname map.</td></tr>
+                            <tr><td>1,000-domain virtual-host hit</td><td>4,173 req/s</td><td>4,198 req/s</td><td><strong>1.01× speedup</strong></td><td>Hostname map plus canonical-root reuse.</td></tr>
+                            <tr><td>16-byte custom-hook range from 8 MiB</td><td>790 req/s</td><td>2,310 req/s</td><td><strong>2.92× speedup</strong></td><td>Exact selected-byte read.</td></tr>
+                            <tr><td>Default Brotli for 2.5 MiB structured text</td><td>0.580 req/s</td><td>112.267 req/s</td><td><strong>193.56× speedup</strong></td><td>Validated default quality 4; 161,802 → 270,759 compressed bytes.</td></tr>
+                            <tr><td>100,000 cold Config constructions</td><td>201,737 instances/s</td><td>580,412 instances/s</td><td><strong>2.88× speedup</strong></td><td>Deferred MIME-map materialization.</td></tr>
+                            <tr><td>10,000 cold Configs retained</td><td>11,816.5 B/instance</td><td>5,786.0 B/instance</td><td><strong>51.0% lower</strong></td><td>Deferred per-instance MIME map.</td></tr>
+                            <tr><td>Immediate deploy + close</td><td>180 leaked listeners</td><td>0 leaked listeners</td><td><strong>180 → 0</strong></td><td>Pending listeners close cleanly.</td></tr>
+                        </tbody></table></div>
+                        <div class="callout"><strong>Ratio meaning:</strong> each displayed ratio is the magnitude of change; its speedup, slowdown, reduction, or increase label states the direction. The listener row reports the correctness count across 180 recorded cycles per source.</div>
+                    </section>
+
+                    <section class="doc-section" id="controls"><p class="kicker">Compatibility and representative paths</p><h2>Read the optimized paths beside their controls.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Workload</th><th>9.0.2 median</th><th>9.1.0 median</th><th>Result</th><th>Contract</th></tr></thead><tbody>
+                            <tr><td>Default-hook static GET</td><td>4,055 req/s</td><td>4,254 req/s</td><td>1.05× speedup</td><td>Exact static response through the normal route.</td></tr>
+                            <tr><td>Bodyless static HEAD</td><td>10,981 req/s</td><td>13,739 req/s</td><td>1.25× speedup</td><td>GET metadata with an empty wire body.</td></tr>
+                            <tr><td>Bodyless custom request hook</td><td>16,698 req/s</td><td>16,507 req/s</td><td>1.01× slowdown</td><td>Empty string and Buffer body contract.</td></tr>
+                            <tr><td>Default-hook HEAD for 8 MiB</td><td>5,254 req/s</td><td>5,884 req/s</td><td>1.12× speedup</td><td>Full metadata and an empty wire body through the bodyless path.</td></tr>
+                            <tr><td>Custom beforeServe HEAD</td><td>765 req/s</td><td>688 req/s</td><td>1.11× slowdown</td><td>The hook receives the full 8 MiB representation; the wire body stays empty.</td></tr>
+                            <tr><td>Brotli quality 11</td><td>0.584 req/s</td><td>0.581 req/s</td><td>1.01× slowdown</td><td><code>server.brotliQuality:11</code> preserves the high-quality option through Node's built-in <code>node:zlib</code>; runtime dependencies stay at zero.</td></tr>
+                            <tr><td>Cold one-key MIME overlays retained</td><td>11,818.6 B/instance</td><td>5,972.4 B/instance</td><td>49.5% lower</td><td>Overlays stay deferred and instance-isolated.</td></tr>
+                            <tr><td>Materialized MIME maps retained</td><td>11,816.7 B/instance</td><td>12,018.8 B/instance</td><td>1.7% higher</td><td>Reading <code>contentType</code> creates the ordinary isolated map.</td></tr>
+                        </tbody></table></div>
+                        <p>The two 8 MiB HEAD rows quantify the full-representation compatibility cost for custom hooks. The materialized Config row quantifies the point where deferred state becomes the complete per-instance MIME map.</p>
+                    </section>
+
+                    <section class="doc-section" id="contracts"><p class="kicker">Workload contracts</p><h2>Every timed path proves its output.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Area</th><th>Standard profile</th><th>Acceptance contract</th></tr></thead><tbody>
+                            <tr><td>HTTP</td><td>400 small requests, 40 repeated-query requests, 8 large-file requests, or 2 Brotli requests per sample; 10 clients.</td><td>Status, headers, body bytes, decompressed bytes, and response counts.</td></tr>
+                            <tr><td>Query</td><td>1,000 ordered values assigned to one key.</td><td>Array length, first value, and last value.</td></tr>
+                            <tr><td>Routing</td><td>1,000 mixed-case domains with an accepted Host and an unknown Host.</td><td>Selected root returns exact bytes; miss returns <code>421</code>.</td></tr>
+                            <tr><td>Range hook</td><td>16 bytes selected from the middle of an 8 MiB file.</td><td>Hook sees 16 bytes, transforms them, preserves <code>206</code>/<code>Content-Range</code>, and runs <code>afterServe</code> once.</td></tr>
+                            <tr><td>Config</td><td>100,000 constructions or 10,000 retained instances in fresh garbage-collected workers.</td><td>Default checksum, key order, own MIME entries, mutation isolation, and false-to-overlay restoration.</td></tr>
+                            <tr><td>Lifecycle</td><td>20 deploy-on-port-zero plus immediate-close cycles per sample.</td><td>Live listener and ready-callback counts after close.</td></tr>
+                        </tbody></table></div>
+                    </section>
+
+                    <section class="doc-section" id="method"><p class="kicker">Comparison method</p><h2>Keep order, processes, and evidence explicit.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Method</th><th>Implementation</th></tr></thead><tbody>
+                            <tr><td>Exact baseline</td><td>Exports <code>Server.js</code>, <code>Config.js</code>, and <code>MimeTypes.js</code> from Git tag <code>9.0.2</code> into an OS temporary directory.</td></tr>
+                            <tr><td>Alternating order</td><td>Each sample alternates baseline-first and candidate-first execution.</td></tr>
+                            <tr><td>Process isolation</td><td>HTTP variants use separate server processes. Config memory and lifecycle use fresh <code>--expose-gc</code> workers.</td></tr>
+                            <tr><td>Recorded boundary</td><td>Fixture creation, startup, response preflight, warmup, worker startup, and cleanup occur outside action timing.</td></tr>
+                            <tr><td>Aggregation</td><td>Median, minimum, maximum, and all nine raw samples are retained.</td></tr>
+                            <tr><td>Source identity</td><td>Git ref, commit, working-tree state, source hashes, and benchmark-harness hashes identify the complete comparison.</td></tr>
+                            <tr><td>Environment</td><td>Node, V8, platform, OS release, architecture, processor, logical cores, and total memory are recorded.</td></tr>
+                        </tbody></table></div>
+                        <div class="callout"><strong>Interpretation:</strong> compare ratios within the recorded workload and environment. Run the same profile on deployment-class hardware when capacity planning needs host-specific numbers.</div>
+                    </section>
+
+                    <section class="doc-section" id="reproduce"><p class="kicker">Reproduce</p><h2>Run the exact source comparison.</h2>
+                        <div class="code-block"><div class="code-head"><span class="code-label">shell · repository checkout with tag 9.0.2</span><button type="button" data-copy-target="performance-command">Copy</button></div><pre><code id="performance-command">npm run benchmark:core
+
+node --expose-gc benchmark/core.js \
+    --output site/benchmarks/core-9.0.2-vs-9.1.0.json</code></pre></div>
+                        <div class="table-wrap"><table><thead><tr><th>File</th><th>Role</th></tr></thead><tbody>
+                            <tr><td><code>benchmark/core.js</code></td><td>Exports the baseline, creates fixtures, alternates samples, validates results, and writes JSON.</td></tr>
+                            <tr><td><code>benchmark/core-server.js</code></td><td>Runs one source variant and exposes the hook scenarios through IPC.</td></tr>
+                            <tr><td><code>benchmark/core-worker.js</code></td><td>Measures Config construction/memory and immediate-close correctness in fresh processes.</td></tr>
+                            <tr><td><code>site/benchmarks/core-9.0.2-vs-9.1.0.json</code></td><td>Published environment, configuration, summaries, source hashes, and raw samples.</td></tr>
+                        </tbody></table></div>
+                        <div class="page-links"><a href="./benchmarks/core-9.0.2-vs-9.1.0.json">Open raw JSON →</a><a href="https://github.com/RIAEvangelist/node-http-server/blob/main/benchmark/README.md">Read every benchmark option →</a><a href="./benchmarks.html">Run the operational benchmark →</a><a href="./testing.html">Testing &amp; coverage →</a></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>Validated alternating measurements. <span data-year></span></p><div><a href="./benchmarks.html">Benchmarks</a><a href="https://github.com/RIAEvangelist/node-http-server/tree/main/benchmark">Source</a></div></footer>
+    </body>
+</html>

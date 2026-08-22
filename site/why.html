@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Why engineers choose node-http-server: a compact install, clear interfaces, modern static HTTP, secure defaults, tests, and measured performance."><meta name="theme-color" content="#08110d"><title>Why node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/why.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script></head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./why.html" aria-current="page">Why</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
+        <main id="main"><header class="page-header page-header-compact"><p class="kicker">Small surface · complete static HTTP</p><h1>Use a server your team can understand.</h1><p class="lead">node-http-server combines a compact install with direct CLI, CommonJS, and ESM interfaces, modern static-file behavior, explicit policy controls, and reproducible engineering evidence.</p><div class="header-actions"><a class="button button-primary" href="./cli.html">Run the CLI</a><a class="button" href="./api.html">Open the API</a></div></header>
+            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#signals">Decision signals</a><a href="#fit">Project fit</a><a href="#evidence">Engineering evidence</a></aside>
+                <div class="doc-content">
+                    <section class="doc-section" id="signals"><p class="kicker">Decision signals</p><h2>A small install with useful depth.</h2>
+                        <div class="facts" aria-label="Project facts"><div class="fact"><strong>0</strong><span>Runtime dependencies</span></div><div class="fact"><strong>CLI · CJS · ESM</strong><span>Supported entry styles</span></div><div class="fact"><strong>127.0.0.1</strong><span>Default listen address</span></div><div class="fact"><strong>Node 22.12+</strong><span>Supported runtime</span></div></div>
+                        <div class="table-wrap"><table><thead><tr><th>Need</th><th>What node-http-server provides</th><th>Inspect it</th></tr></thead><tbody>
+                            <tr><td>Compact supply chain</td><td>Zero runtime dependencies and one exact owner-maintained development tool.</td><td><a href="./testing.html#commands">Dependency and verification contract</a></td></tr>
+                            <tr><td>Direct interfaces</td><td>A global or <code>npx</code> CLI, named <code>Server</code> instances, and the original singleton in CommonJS and ESM.</td><td><a href="./api.html#imports">Import matrix</a></td></tr>
+                            <tr><td>Modern static HTTP</td><td>Streaming, HEAD, ranges, conditional requests, cache controls, Brotli/gzip, SPA fallback, and MIME controls.</td><td><a href="./configuration.html#server">Static-server settings</a></td></tr>
+                            <tr><td>Explicit boundaries</td><td>Localhost binding, root containment, dotfile policy, Host routing, request limits, timeouts, and HTTPS.</td><td><a href="./operations.html#exposure">Operations and security</a></td></tr>
+                            <tr><td>Application hooks</td><td>Raw-request, parsed-request, before-serve, after-serve, custom logging, and deliberate file serving.</td><td><a href="./api.html#hooks">Hook contract</a></td></tr>
+                            <tr><td>Measured delivery</td><td>Focused behavior suites, per-file native V8 coverage, package smoke checks, and reproducible benchmarks.</td><td><a href="./performance.html">Performance evidence</a></td></tr>
+                        </tbody></table></div>
+                    </section>
+
+                    <section class="doc-section" id="fit"><p class="kicker">Project fit</p><h2>Move from local files to an embedded server.</h2>
+                        <div class="card-grid"><div class="card"><h3>Local and CI assets</h3><p>Serve a build directory with one command, an explicit root, and an OS-selected port when needed.</p><a href="./cli.html#tasks">CLI task recipes →</a></div><div class="card"><h3>Static applications</h3><p>Enable SPA fallback, compression, caching, extension policy, and request logs through one Config object.</p><a href="./examples.html#spa">SPA example →</a></div><div class="card"><h3>Embedded tooling</h3><p>Create isolated server instances, intercept requests, generate responses, and close every listener through a Promise.</p><a href="./examples.html#shutdown">Lifecycle example →</a></div><div class="card"><h3>Controlled exposure</h3><p>Choose the listen interface, accepted Host values, roots, HTTPS material, request limits, and timeouts.</p><a href="./configuration.html">Configuration reference →</a></div></div>
+                    </section>
+
+                    <section class="doc-section" id="evidence"><p class="kicker">Engineering evidence</p><h2>Inspect the behavior and the measurements.</h2>
+                        <div class="table-wrap"><table><thead><tr><th>Evidence</th><th>What it answers</th><th>Source</th></tr></thead><tbody>
+                            <tr><td>Focused test sets</td><td>Which unit, functional, integration, and regression contracts currently pass?</td><td><a href="./testing.html#areas">Test inventory</a></td></tr>
+                            <tr><td>Native V8 coverage</td><td>Which shipped files meet line, function, branch, and statement gates?</td><td><a href="./testing.html#coverage">Coverage method</a></td></tr>
+                            <tr><td>Core comparison</td><td>How does the current release compare with 9.0.2 on targeted hot paths?</td><td><a href="./performance.html">Core results</a></td></tr>
+                            <tr><td>Operational benchmark</td><td>How does the server behave on this machine across real public request paths?</td><td><a href="./benchmarks.html">Live benchmark</a></td></tr>
+                        </tbody></table></div>
+                        <div class="page-links"><a href="./index.html#quick-start">Install and start →</a><a href="./playground.html">Generate a configuration →</a><a href="https://github.com/RIAEvangelist/node-http-server">Inspect the source →</a></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>Small, direct, and measured. <span data-year></span></p><div><a href="./performance.html">Performance</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
+    </body>
+</html>

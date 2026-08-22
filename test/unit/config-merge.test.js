@@ -9,8 +9,48 @@ test('Unit | Config restores MIME defaults when merging after false', function()
 
     config.merge({contentType:{thing:'application/x-thing'}});
 
+    assert.equal(
+        typeof Object.getOwnPropertyDescriptor(config, 'contentType').get,
+        'function'
+    );
+
     assert.equal(config.contentType.html, 'text/html; charset=utf-8');
     assert.equal(config.contentType.thing, 'application/x-thing');
+});
+
+test('Unit | Config accumulates deferred MIME overlays in merge order', function(){
+    const config = new server.Config({contentType:{first:'first/type'}});
+
+    config.merge({contentType:{second:'second/type', first:'changed/type'}});
+
+    assert.equal(
+        typeof Object.getOwnPropertyDescriptor(config, 'contentType').get,
+        'function'
+    );
+    assert.equal(config.contentType.first, 'changed/type');
+    assert.equal(config.contentType.second, 'second/type');
+    assert.equal(config.contentType.html, 'text/html; charset=utf-8');
+});
+
+test('Unit | Config merges MIME overlays into an existing materialized map', function(){
+    const config = new server.Config();
+    const contentTypes = config.contentType;
+
+    config.merge({contentType:{thing:'application/x-thing'}});
+
+    assert.equal(config.contentType, contentTypes);
+    assert.equal(contentTypes.thing, 'application/x-thing');
+});
+
+test('Unit | Config resolver follows false and restored MIME states', function(){
+    const config = new server.Config({contentType:false});
+
+    assert.equal(config.contentTypeFor('html'), undefined);
+
+    config.merge({contentType:{thing:'application/x-thing'}});
+
+    assert.equal(config.contentTypeFor('html'), 'text/html; charset=utf-8');
+    assert.equal(config.contentTypeFor('thing'), 'application/x-thing');
 });
 
 test('Unit | Config restores server defaults when merging after false', function(){

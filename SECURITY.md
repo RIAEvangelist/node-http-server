@@ -4,7 +4,7 @@
 
 Please report suspected vulnerabilities privately through [GitHub Security Advisories](https://github.com/RIAEvangelist/node-http-server/security/advisories/new). Include the affected version, configuration, request or proof of concept, impact, and any known workaround.
 
-Do not open a public issue with exploit details before the report has been reviewed.
+Send exploit details through the private advisory first so they can be reviewed safely.
 
 ## Supported versions
 
@@ -12,7 +12,7 @@ Security fixes target the current supported major release. Upgrade to the latest
 
 ## Security model
 
-node-http-server is a static HTTP/HTTPS server with extension hooks. It is not an authentication system, authorization policy, application firewall, secret store, or full reverse proxy.
+node-http-server provides static HTTP/HTTPS serving with extension hooks. Add authentication, authorization, application-firewall rules, secret storage, and reverse proxying at the application or edge.
 
 Version 9 starts from these boundaries:
 
@@ -20,14 +20,14 @@ Version 9 starts from these boundaries:
 - Static requests are decoded and resolved inside the selected root.
 - Dot-prefixed path segments are blocked before filesystem lookup and SPA fallback unless literal `server.allowDotfiles:true` is configured.
 - Malformed URL escapes, traversal attempts, absolute-path injection, and filesystem escapes are rejected.
-- Virtual-host lookup does not change the listen interface.
+- `host` selects the listen interface; virtual-host lookup selects accepted Host values and document roots.
 - The static fallback accepts `GET` and `HEAD`; other methods receive `405` unless a hook handles them.
 - A configured body limit stops oversized requests with `413`.
 - One satisfiable `GET` byte range is honored. Valid but unsatisfiable ranges receive `416`; malformed, unsupported-unit, and multi-range headers are ignored and receive the full representation.
 - Unknown file extensions use `application/octet-stream` instead of guessing an executable type.
 - Configuration objects are isolated and unsafe prototype keys are blocked.
 
-These controls reduce common mistakes. They do not make an arbitrary directory safe to publish.
+These controls reduce common mistakes. Publish only a deliberately prepared public directory.
 
 ## Before exposing a server
 
@@ -60,7 +60,7 @@ Also:
 
 ## Old certificate fixtures
 
-Version 9 removes the local certificate and private-key fixtures tracked by older releases. Any copy from v8, an old npm package, or repository history must be treated as public and untrusted. It is not a deployable credential.
+Version 9 removes the local certificate and private-key fixtures tracked by older releases. Treat any copy from v8, an old npm package, or repository history as public material and generate a fresh deployment credential.
 
 Generate a fresh development certificate for local testing. Use certificates and private keys issued and stored for the real environment in production, rotate any key that was copied from the old fixtures, and never commit a private key.
 
@@ -82,8 +82,8 @@ Enabling compression for dynamic responses that mix secrets with attacker-contro
 
 ## MIME and downloads
 
-The built-in MIME map is a convenience, not a content scanner. A file's extension controls its automatic type. Validate uploaded content before it reaches the public root and set `Content-Disposition` in a hook when content should download instead of render.
+The built-in MIME map assigns an automatic type from the file extension. Validate uploaded content before it reaches the public root and set `Content-Disposition` in a hook when content should download instead of render.
 
 Set `contentType:false` when automatic types are unwanted. The server then uses `application/octet-stream` unless a hook supplies a type.
 
-`restrictedType` can block extensions, but extension blocking is not an authorization system and does not replace a carefully selected public root.
+`restrictedType` blocks selected extensions. Enforce authorization separately and serve from a carefully selected public root.

@@ -18,7 +18,7 @@
         <header class="site-header">
             <a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a>
             <nav aria-label="Documentation">
-                <a href="./index.html" aria-current="page">Start</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a>
+                <a href="./index.html" aria-current="page">Start</a><a href="./why.html">Why</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a>
             </nav>
         </header>
 
@@ -41,7 +41,7 @@
                         <div class="code-block"><div class="code-head"><span class="code-label">shell</span><button type="button" data-copy-target="start-cli">Copy</button></div><pre><code id="start-cli">npm install --global node-http-server
 node-http-server --root ./public</code></pre></div>
                         <div class="output-block"><span class="expected-label">Expected output</span><pre>node-http-server listening at http://127.0.0.1:8080</pre></div>
-                        <div class="callout"><strong>No global install:</strong> run <code>npx node-http-server --root ./public</code>. See the <a href="./cli.html">CLI task guide</a> for flags, failures, exit behavior, and deployment examples.</div>
+                        <div class="callout"><strong>Package runner:</strong> run <code>npx node-http-server --root ./public</code>. See the <a href="./cli.html">CLI task guide</a> for flags, failures, exit behavior, and deployment examples.</div>
                     </section>
 
                     <section class="doc-section" id="library-start">
@@ -81,12 +81,14 @@ new Server({root:'./public'}).deploy();</code></pre></div>
                         <p class="kicker">Documentation by task</p>
                         <h2>Go directly to the job.</h2>
                         <div class="task-grid">
+                            <a class="task-card" href="./why.html"><strong>Evaluate the fit</strong><p>Decision signals, project fit, interfaces, boundaries, and engineering evidence.</p><span>Why node-http-server →</span></a>
                             <a class="task-card" href="./cli.html"><strong>Run the command</strong><p>Install, flags, common tasks, expected output, and failure behavior.</p><span>CLI →</span></a>
                             <a class="task-card" href="./api.html"><strong>Embed the server</strong><p>Imports, lifecycle, public methods, request data, and hooks.</p><span>Library API →</span></a>
                             <a class="task-card" href="./configuration.html"><strong>Set exact behavior</strong><p>Every Config key, default, opt-out value, and validation rule.</p><span>Configuration →</span></a>
                             <a class="task-card" href="./examples.html"><strong>Copy a working pattern</strong><p>SPA, HTTPS, domains, logging, hooks, limits, and shutdown.</p><span>Examples →</span></a>
                             <a class="task-card" href="./playground.html"><strong>Generate a config</strong><p>Build CommonJS, ESM, CLI, or JSON without running a server.</p><span>Playground →</span></a>
                             <a class="task-card" href="./testing.html"><strong>Test and measure</strong><p>Test commands, coverage gates, reports, badges, and CI artifacts.</p><span>Testing →</span></a>
+                            <a class="task-card" href="./performance.html"><strong>Inspect performance</strong><p>9.0.2 comparison results, workload contracts, raw samples, and reproduction.</p><span>Performance →</span></a>
                             <a class="task-card" href="./operations.html"><strong>Operate or upgrade</strong><p>Exposure, status failures, logging, certificates, and v8 migration.</p><span>Operations →</span></a>
                             <a class="task-card" href="./guide.html"><strong>Browse the docs hub</strong><p>A compact map of every page and the source documents.</p><span>Docs hub →</span></a>
                         </div>

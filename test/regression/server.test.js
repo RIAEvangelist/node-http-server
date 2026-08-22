@@ -92,6 +92,17 @@ test('Regression | deploy rejects a negative compression threshold', function(t)
     );
 });
 
+test('Regression | deploy rejects Brotli qualities outside the integer range from zero to eleven', function(t){
+    const root = temporaryDirectory(t);
+
+    for(const brotliQuality of [-1, 12, 1.5, 'invalid', NaN, Infinity]){
+        assert.throws(
+            ()=>new Server({root, server:{brotliQuality}}).deploy(),
+            /server\.brotliQuality must be an integer from 0 to 11/
+        );
+    }
+});
+
 test('Regression | deploy rejects a non-boolean allowDotfiles value', function(t){
     const root = temporaryDirectory(t);
 
@@ -235,6 +246,31 @@ test('Regression | prototype names do not leak into MIME or restriction lookup',
     assert.equal(toString.headers['content-type'], 'application/octet-stream');
 });
 
+test('Regression | a top-level contentTypeFor shadow cannot replace the canonical MIME resolver', async function(t){
+    const root = temporaryDirectory(t);
+    let shadowCalls = 0;
+    const shadow = function(){
+        shadowCalls++;
+        throw new Error('shadow resolver must remain unused');
+    };
+
+    writeFiles(root, {'index.html':'canonical MIME'});
+
+    const {server} = await start(t, Server, {
+        root,
+        port:0,
+        contentTypeFor:shadow
+    });
+    const response = await request(server);
+
+    assert.equal(Object.hasOwn(server.config, 'contentTypeFor'), true);
+    assert.equal(server.config.contentTypeFor, shadow);
+    assert.equal(shadowCalls, 0);
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.headers['content-type'], 'text/html; charset=utf-8');
+    assert.equal(response.text, 'canonical MIME');
+});
+
 test('Regression | unsupported and malformed range syntax is ignored', async function(t){
     const root = temporaryDirectory(t);
 
@@ -313,6 +349,103 @@ test('Regression | HEAD ignores a byte range and returns full-response metadata'
     assert.equal(head.statusCode, 200);
     assert.equal(head.body.length, 0);
     assert.equal(Number(head.headers['content-length']), 10);
+});
+
+test('Regression | a ranged custom beforeServe reads only selected bytes and preserves completion metadata', async function(t){
+    const root = temporaryDirectory(t);
+    const source = Buffer.from('0123456789abcdef'.repeat(65536));
+    const filename = path.join(root, 'large.bin');
+    const rangeStart = 131072;
+    const rangeEnd = rangeStart + 15;
+    const selected = source.subarray(rangeStart, rangeEnd + 1);
+    const originalReadFile = fsp.readFile;
+    let fullReadCalls = 0;
+    let hookBody;
+    let afterCount = 0;
+
+    writeFiles(root, {'large.bin':source});
+
+    fsp.readFile = async function(target){
+        if(path.resolve(String(target)) === path.resolve(filename)){
+            fullReadCalls++;
+        }
+
+        return originalReadFile.apply(fsp, arguments);
+    };
+
+    try{
+        const {server} = await start(t, Server, {root, port:0}, function(server){
+            server.beforeServe = function(request, response, body){
+                if(request.url !== '/large.bin'){
+                    return;
+                }
+
+                hookBody = Buffer.from(body.value);
+                body.value = Buffer.concat([body.value, Buffer.from('!')]);
+            };
+            server.afterServe = function(request){
+                if(request.url === '/large.bin'){
+                    afterCount++;
+                }
+            };
+        });
+        const response = await request(server, {
+            path:'/large.bin',
+            headers:{Range:`bytes=${rangeStart}-${rangeEnd}`}
+        });
+
+        await waitFor(()=>afterCount === 1);
+        assert.equal(response.statusCode, 206);
+        assert.equal(response.headers['content-range'], `bytes ${rangeStart}-${rangeEnd}/${source.length}`);
+        assert.equal(Number(response.headers['content-length']), selected.length + 1);
+        assert.deepEqual(hookBody, selected);
+        assert.deepEqual(response.body, Buffer.concat([selected, Buffer.from('!')]));
+        assert.equal(fullReadCalls, 0);
+        assert.equal(afterCount, 1);
+    }finally{
+        fsp.readFile = originalReadFile;
+    }
+});
+
+test('Regression | a short custom-hook range read closes its handle and returns a sanitized 500', async function(t){
+    const root = temporaryDirectory(t);
+    const filename = path.join(root, 'changing.bin');
+    const originalOpen = fsp.open;
+    let closed = false;
+
+    writeFiles(root, {'changing.bin':'0123456789'});
+
+    fsp.open = async function(target, flags){
+        if(path.resolve(String(target)) === path.resolve(filename) && flags === 'r'){
+            return {
+                read:async function(){
+                    return {bytesRead:0};
+                },
+                close:async function(){
+                    closed = true;
+                }
+            };
+        }
+
+        return originalOpen.apply(fsp, arguments);
+    };
+
+    try{
+        const {server} = await start(t, Server, {root, port:0}, function(server){
+            server.beforeServe = function(){};
+        });
+        const response = await request(server, {
+            path:'/changing.bin',
+            headers:{Range:'bytes=1-3'}
+        });
+
+        assert.equal(response.statusCode, 500);
+        assert.equal(response.text, '500 Internal Server Error');
+        assert.equal(closed, true);
+        assert.equal(server.lastError.code, 'ERR_FILE_CHANGED');
+    }finally{
+        fsp.open = originalOpen;
+    }
 });
 
 test('Regression | encoded slash traversal returns 403 and keeps protected content private', async function(t){
@@ -490,12 +623,17 @@ test('Regression | trusted direct serveFile remains the deliberate dotfile-polic
 
 test('Regression | a second serve call cannot overwrite the first response', async function(t){
     const root = temporaryDirectory(t);
+    let completedRequest;
+    let completedResponse;
+    let lateAfterServeCount = 0;
 
     writeFiles(root, {'index.html':'index'});
 
     const {server} = await start(t, Server, {root, port:0}, function(server){
         server.onRequest = async function(request, response, serve){
             if(request.url === '/twice'){
+                completedRequest = request;
+                completedResponse = response;
                 await serve(request, response, 'once');
                 await serve(request, response, 'ignored');
                 return true;
@@ -505,6 +643,11 @@ test('Regression | a second serve call cannot overwrite the first response', asy
     const response = await request(server, {path:'/twice'});
 
     assert.equal(response.text, 'once');
+    server.afterServe = function(){
+        lateAfterServeCount++;
+    };
+    await server.serve(completedRequest, completedResponse, 'still ignored');
+    assert.equal(lateAfterServeCount, 0);
 });
 
 test('Regression | onRequest throwing after response.end preserves the response and records the error', async function(t){
@@ -588,6 +731,30 @@ test('Regression | beforeServe failure returns 500 and contains the rejected pro
     assert.equal(response.statusCode, 500);
     assert.equal(server.lastError, failure);
     assert.equal(unhandled, undefined);
+});
+
+test('Regression | prototype hooks replaced after module initialization remain active', async function(t){
+    const root = temporaryDirectory(t);
+    const originalOnRequest = Server.prototype.onRequest;
+    let calls = 0;
+
+    writeFiles(root, {'index.html':'static'});
+
+    Server.prototype.onRequest = function(request, response, serve){
+        calls++;
+        serve(request, response, 'prototype hook');
+        return true;
+    };
+
+    try{
+        const {server} = await start(t, Server, {root, port:0});
+        const response = await request(server, {path:'/prototype-hook'});
+
+        assert.equal(response.text, 'prototype hook');
+        assert.equal(calls, 1);
+    }finally{
+        Server.prototype.onRequest = originalOnRequest;
+    }
 });
 
 test('Regression | read-stream failures return a sanitized 500 response', async function(t){
@@ -722,14 +889,20 @@ test('Regression | an unexpected candidate realpath failure returns a sanitized 
 
 test('Regression | an unexpected root realpath failure returns a sanitized 500 response', async function(t){
     const root = temporaryDirectory(t);
+    const alternateRoot = temporaryDirectory(t, 'node-http-server-request-root-');
 
     writeFiles(root, {'index.html':'ok'});
+    writeFiles(alternateRoot, {'index.html':'alternate'});
 
-    const {server} = await start(t, Server, {root, port:0});
+    const {server} = await start(t, Server, {root, port:0}, function(server){
+        server.onRequest = function(request){
+            request.serverRoot = alternateRoot;
+        };
+    });
     const originalRealpath = fsp.realpath;
 
     fsp.realpath = async function(filename){
-        if(path.resolve(filename) === path.resolve(root)){
+        if(path.resolve(filename) === path.resolve(alternateRoot)){
             const error = new Error('private root detail');
             error.code = 'EIO';
             throw error;
@@ -771,6 +944,35 @@ test('Regression | resolved symlinks cannot escape the configured root', async f
 
     assert.equal(response.statusCode, 403);
     assert.doesNotMatch(response.text, /outside/);
+});
+
+test('Regression | a symlink document root follows a retargeted destination', async function(t){
+    const workspace = temporaryDirectory(t);
+    const firstRoot = path.join(workspace, 'first');
+    const secondRoot = path.join(workspace, 'second');
+    const rootLink = path.join(workspace, 'public');
+
+    writeFiles(workspace, {
+        'first/index.html':'first target',
+        'second/index.html':'second target'
+    });
+
+    try{
+        fs.symlinkSync(firstRoot, rootLink, process.platform === 'win32' ? 'junction' : 'dir');
+    }catch(error){
+        t.skip('filesystem does not permit test symlinks: ' + error.code);
+        return;
+    }
+
+    const {server} = await start(t, Server, {root:rootLink, port:0});
+    const first = await request(server);
+
+    fs.unlinkSync(rootLink);
+    fs.symlinkSync(secondRoot, rootLink, process.platform === 'win32' ? 'junction' : 'dir');
+    const second = await request(server);
+
+    assert.equal(first.text, 'first target');
+    assert.equal(second.text, 'second target');
 });
 
 test('Regression | an async custom logger rejection preserves the response and records diagnostics', async function(t){

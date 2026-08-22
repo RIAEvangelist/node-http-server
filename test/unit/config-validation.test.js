@@ -47,6 +47,15 @@ test('Unit | Config rejects nested constructor keys', function(){
     }, /unsafe key/);
 });
 
+test('Unit | Config rejects unsafe keys in deferred MIME overlays', function(){
+    assert.throws(function(){
+        return new server.Config({
+            contentType:JSON.parse('{"__proto__":{"polluted":true}}')
+        });
+    }, /unsafe key/);
+    assert.equal({}.polluted, undefined);
+});
+
 test('Unit | Config rejects deeply cloned prototype keys', function(){
     assert.throws(function(){
         return new server.Config({extra:JSON.parse('{"prototype":true}')});

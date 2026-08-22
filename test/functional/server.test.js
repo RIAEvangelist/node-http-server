@@ -56,6 +56,27 @@ test('Functional | close is Promise-based, invokes callbacks, clears address, an
     assert.equal(callbacks, 3);
 });
 
+test('Functional | close called immediately after deploy leaves no pending listener', async function(t){
+    const root = temporaryDirectory(t);
+    const server = new Server({root, port:0});
+
+    writeFiles(root, {'index.html':'closed'});
+
+    t.after(async function(){
+        await server.close();
+    });
+
+    server.deploy();
+    const nodeServer = server.server;
+
+    await server.close();
+    await new Promise(resolve=>setTimeout(resolve, 25));
+
+    assert.equal(nodeServer.listening, false);
+    assert.equal(server.address(), null);
+    assert.equal(server._deployed, false);
+});
+
 test('Functional | a closed instance redeploys with overrides and invokes its ready callback', async function(t){
     const root = temporaryDirectory(t);
 
@@ -114,6 +135,46 @@ test('Functional | HEAD returns GET metadata with an empty body', async function
     assert.equal(response.statusCode, 200);
     assert.equal(response.body.length, 0);
     assert.equal(Number(response.headers['content-length']), Buffer.byteLength('home'));
+});
+
+test('Functional | custom beforeServe receives the full HEAD representation and controls its metadata', async function(t){
+    const root = temporaryDirectory(t);
+    const representation = Buffer.from('complete representation');
+    let bodySeen;
+    let afterCount = 0;
+
+    writeFiles(root, {'representation.txt':representation});
+
+    const {server} = await start(t, Server, {root, port:0}, function(server){
+        server.beforeServe = function(request, response, body){
+            if(request.url !== '/representation.txt'){
+                return;
+            }
+
+            bodySeen = Buffer.from(body.value);
+            response.setHeader('X-Representation-Length', body.value.length);
+            body.value = Buffer.from('short');
+        };
+        server.afterServe = function(request){
+            if(request.url === '/representation.txt'){
+                afterCount++;
+            }
+        };
+    });
+    const response = await request(server, {
+        path:'/representation.txt',
+        method:'HEAD',
+        headers:{Range:'bytes=0-1'}
+    });
+
+    await waitFor(()=>afterCount === 1);
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.headers['content-range'], undefined);
+    assert.equal(response.headers['x-representation-length'], String(representation.length));
+    assert.equal(Number(response.headers['content-length']), Buffer.byteLength('short'));
+    assert.equal(response.body.length, 0);
+    assert.deepEqual(bodySeen, representation);
+    assert.equal(afterCount, 1);
 });
 
 test('Functional | automatic MIME maps modern WebP and Wasm types', async function(t){
@@ -359,6 +420,77 @@ test('Functional | request.uri preserves repeated query values as an array', asy
     assert.equal(uri.query.b, '3');
 });
 
+test('Functional | request.uri preserves three thousand repeated query values in order', async function(t){
+    const root = temporaryDirectory(t);
+    const values = Array.from({length:3000}, function(value, index){
+        return String(index % 10);
+    });
+    let uri;
+
+    writeFiles(root, {'index.html':'ok'});
+
+    const {server} = await start(t, Server, {root, port:0}, function(server){
+        server.onRequest = function(request, response, serve){
+            if(request.url !== '/inspect-large-query'){
+                return;
+            }
+
+            uri = request.uri;
+            serve(request, response, 'inspected');
+            return true;
+        };
+    });
+    const response = await request(server, {
+        path:'/inspect-large-query?' + values.map(value=>'a=' + value).join('&')
+    });
+
+    assert.equal(response.text, 'inspected');
+    assert.equal(Object.getPrototypeOf(uri.query), null);
+    assert.deepEqual(uri.query.a, values);
+});
+
+test('Functional | a frozen request.uri keeps its parsed query readable', async function(t){
+    const root = temporaryDirectory(t);
+    let query;
+
+    writeFiles(root, {'index.html':'ok'});
+
+    const {server} = await start(t, Server, {root, port:0}, function(server){
+        server.onRequest = function(request, response, serve){
+            Object.freeze(request.uri);
+            query = request.uri.query;
+            serve(request, response, 'frozen');
+            return true;
+        };
+    });
+    const response = await request(server, {path:'/inspect?a=1&a=2'});
+
+    assert.equal(response.text, 'frozen');
+    assert.deepEqual(query.a, ['1', '2']);
+});
+
+test('Functional | a sealed request.uri keeps its query property writable', async function(t){
+    const root = temporaryDirectory(t);
+    const replacement = Object.assign(Object.create(null), {ready:'yes'});
+    let query;
+
+    writeFiles(root, {'index.html':'ok'});
+
+    const {server} = await start(t, Server, {root, port:0}, function(server){
+        server.onRequest = function(request, response, serve){
+            Object.seal(request.uri);
+            request.uri.query = replacement;
+            query = request.uri.query;
+            serve(request, response, 'sealed');
+            return true;
+        };
+    });
+    const response = await request(server, {path:'/inspect?a=1'});
+
+    assert.equal(response.text, 'sealed');
+    assert.equal(query, replacement);
+});
+
 test('Functional | request.uri parses an IPv6 hostname and explicit port', async function(t){
     const root = temporaryDirectory(t);
     let uri;
@@ -419,6 +551,125 @@ test('Functional | domain routing rejects an unknown host with 421', async funct
     const unknown = await request(server, {headers:{Host:'unknown.test'}});
 
     assert.equal(unknown.statusCode, 421);
+});
+
+test('Functional | normalized domain routing preserves exact lowercase precedence and mixed-case aliases', async function(t){
+    const primaryRoot = temporaryDirectory(t, 'node-http-server-primary-domain-');
+    const firstAliasRoot = temporaryDirectory(t, 'node-http-server-first-alias-');
+    const exactAliasRoot = temporaryDirectory(t, 'node-http-server-exact-alias-');
+    const mixedAliasRoot = temporaryDirectory(t, 'node-http-server-mixed-alias-');
+
+    writeFiles(primaryRoot, {'index.html':'primary'});
+    writeFiles(firstAliasRoot, {'index.html':'first alias'});
+    writeFiles(exactAliasRoot, {'index.html':'exact alias'});
+    writeFiles(mixedAliasRoot, {'index.html':'mixed alias'});
+
+    const {server} = await start(t, Server, {
+        root:primaryRoot,
+        port:0,
+        domain:'PRIMARY.TEST',
+        domains:{
+            'EXAMPLE.TEST':firstAliasRoot,
+            'example.test':exactAliasRoot,
+            'Mixed.TEST':mixedAliasRoot
+        }
+    });
+
+    const primary = await request(server, {headers:{Host:'primary.test'}});
+    const exact = await request(server, {headers:{Host:'example.test'}});
+    const mixed = await request(server, {headers:{Host:'mixed.test'}});
+    const unknown = await request(server, {headers:{Host:'unknown.test'}});
+
+    assert.equal(primary.text, 'primary');
+    assert.equal(exact.text, 'exact alias');
+    assert.equal(mixed.text, 'mixed alias');
+    assert.equal(unknown.statusCode, 421);
+});
+
+test('Functional | changing the active root rebuilds routing on the next request', async function(t){
+    const firstRoot = temporaryDirectory(t, 'node-http-server-live-root-a-');
+    const secondRoot = temporaryDirectory(t, 'node-http-server-live-root-b-');
+
+    writeFiles(firstRoot, {'index.html':'first root'});
+    writeFiles(secondRoot, {'index.html':'second root'});
+
+    const {server} = await start(t, Server, {root:firstRoot, port:0});
+    const first = await request(server);
+    server.config.root = secondRoot;
+    const second = await request(server);
+
+    assert.equal(first.text, 'first root');
+    assert.equal(second.text, 'second root');
+});
+
+test('Functional | changing the active primary domain rebuilds Host routing', async function(t){
+    const root = temporaryDirectory(t);
+
+    writeFiles(root, {'index.html':'domain root'});
+
+    const {server} = await start(t, Server, {
+        root,
+        port:0,
+        domain:'first.test'
+    });
+    const first = await request(server, {headers:{Host:'first.test'}});
+    server.config.domain = 'second.test';
+    const oldDomain = await request(server, {headers:{Host:'first.test'}});
+    const newDomain = await request(server, {headers:{Host:'second.test'}});
+
+    assert.equal(first.text, 'domain root');
+    assert.equal(oldDomain.statusCode, 421);
+    assert.equal(newDomain.text, 'domain root');
+});
+
+test('Functional | changing the active domains map rebuilds virtual-host routing', async function(t){
+    const primaryRoot = temporaryDirectory(t, 'node-http-server-live-primary-');
+    const firstRoot = temporaryDirectory(t, 'node-http-server-live-domain-a-');
+    const secondRoot = temporaryDirectory(t, 'node-http-server-live-domain-b-');
+
+    writeFiles(primaryRoot, {'index.html':'primary'});
+    writeFiles(firstRoot, {'index.html':'first domain'});
+    writeFiles(secondRoot, {'index.html':'second domain'});
+
+    const {server} = await start(t, Server, {
+        root:primaryRoot,
+        port:0,
+        domain:'primary.test',
+        domains:{'virtual.test':firstRoot}
+    });
+    const first = await request(server, {headers:{Host:'virtual.test'}});
+    server.config.domains['virtual.test'] = secondRoot;
+    const second = await request(server, {headers:{Host:'virtual.test'}});
+    delete server.config.domains['virtual.test'];
+    const removed = await request(server, {headers:{Host:'virtual.test'}});
+
+    assert.equal(first.text, 'first domain');
+    assert.equal(second.text, 'second domain');
+    assert.equal(removed.statusCode, 421);
+});
+
+test('Functional | replacing the active domains map keeps later mutations live', async function(t){
+    const primaryRoot = temporaryDirectory(t, 'node-http-server-replaced-primary-');
+    const firstRoot = temporaryDirectory(t, 'node-http-server-replaced-domain-a-');
+    const secondRoot = temporaryDirectory(t, 'node-http-server-replaced-domain-b-');
+
+    writeFiles(primaryRoot, {'index.html':'primary'});
+    writeFiles(firstRoot, {'index.html':'first replacement'});
+    writeFiles(secondRoot, {'index.html':'second replacement'});
+
+    const {server} = await start(t, Server, {
+        root:primaryRoot,
+        port:0,
+        domain:'primary.test'
+    });
+    const replacement = {'replacement.test':firstRoot};
+    server.config.domains = replacement;
+    const first = await request(server, {headers:{Host:'replacement.test'}});
+    replacement['replacement.test'] = secondRoot;
+    const second = await request(server, {headers:{Host:'replacement.test'}});
+
+    assert.equal(first.text, 'first replacement');
+    assert.equal(second.text, 'second replacement');
 });
 
 test('Functional | SPA fallback is disabled by default', async function(t){
@@ -514,6 +765,50 @@ test('Functional | Brotli is preferred over lower-quality gzip', async function(
     assert.equal(zlib.brotliDecompressSync(response.body).toString(), index);
 });
 
+test('Functional | Brotli compression uses quality four by default and accepts a configured quality', async function(t){
+    const root = temporaryDirectory(t);
+    const index = '<main>' + 'compression quality '.repeat(200) + '</main>';
+    const descriptor = Object.getOwnPropertyDescriptor(zlib, 'createBrotliCompress');
+    const qualities = [];
+
+    writeFiles(root, {'index.html':index});
+
+    Object.defineProperty(zlib, 'createBrotliCompress', {
+        configurable:true,
+        enumerable:descriptor.enumerable,
+        value:function(options){
+            qualities.push(options && options.params && options.params[zlib.constants.BROTLI_PARAM_QUALITY]);
+            return options === undefined ? descriptor.value.call(zlib) : descriptor.value.call(zlib, options);
+        }
+    });
+
+    try{
+        const defaults = await start(t, Server, {
+            root,
+            port:0,
+            server:{compression:true, compressionThreshold:0}
+        });
+        const configured = await start(t, Server, {
+            root,
+            port:0,
+            server:{compression:true, compressionThreshold:0, brotliQuality:7}
+        });
+
+        const defaultResponse = await request(defaults.server, {
+            headers:{'Accept-Encoding':'br'}
+        });
+        const configuredResponse = await request(configured.server, {
+            headers:{'Accept-Encoding':'br'}
+        });
+
+        assert.equal(zlib.brotliDecompressSync(defaultResponse.body).toString(), index);
+        assert.equal(zlib.brotliDecompressSync(configuredResponse.body).toString(), index);
+        assert.deepEqual(qualities, [4, 7]);
+    }finally{
+        Object.defineProperty(zlib, 'createBrotliCompress', descriptor);
+    }
+});
+
 test('Functional | identity is used when every supported compression encoding has zero quality', async function(t){
     const root = temporaryDirectory(t);
 
@@ -575,6 +870,58 @@ test('Functional | request bodies expose UTF-8 text and original Buffer bytes', 
     assert.equal(bodySeen, 'é');
     assert.equal(Buffer.isBuffer(bufferSeen), true);
     assert.deepEqual(response.body, Buffer.from([0xc3, 0xa9]));
+});
+
+test('Functional | bodyless GET and HEAD avoid empty concatenation while framed GET preserves its body', async function(t){
+    const root = temporaryDirectory(t);
+    const observed = [];
+    const originalConcat = Buffer.concat;
+    let emptyConcatenations = 0;
+
+    writeFiles(root, {'index.html':'unused'});
+
+    Buffer.concat = function(chunks, length){
+        if(arguments.length === 2 && chunks.length === 0 && length === 0){
+            emptyConcatenations++;
+        }
+
+        return length === undefined ? originalConcat.call(Buffer, chunks) : originalConcat.call(Buffer, chunks, length);
+    };
+
+    try{
+        const {server} = await start(t, Server, {root, port:0}, function(server){
+            server.onRequest = function(request, response, serve){
+                observed.push({
+                    method:request.method,
+                    body:request.body,
+                    bodyBuffer:request.bodyBuffer
+                });
+                serve(request, response, 'ok');
+                return true;
+            };
+        });
+
+        await request(server, {path:'/empty-get'});
+        await request(server, {path:'/empty-head', method:'HEAD'});
+        await request(server, {
+            path:'/framed-get',
+            method:'GET',
+            headers:{'Content-Length':'6'},
+            body:'framed'
+        });
+    }finally{
+        Buffer.concat = originalConcat;
+    }
+
+    assert.equal(emptyConcatenations, 0);
+    assert.equal(observed.length, 3);
+    assert.equal(observed[0].body, '');
+    assert.equal(observed[0].bodyBuffer.length, 0);
+    assert.equal(observed[1].body, '');
+    assert.equal(observed[1].bodyBuffer.length, 0);
+    assert.notEqual(observed[0].bodyBuffer, observed[1].bodyBuffer);
+    assert.equal(observed[2].body, 'framed');
+    assert.deepEqual(observed[2].bodyBuffer, Buffer.from('framed'));
 });
 
 test('Functional | maxRequestBodyBytes accepts a body exactly at its boundary', async function(t){

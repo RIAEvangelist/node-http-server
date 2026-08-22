@@ -13,10 +13,15 @@ test('Unit | Config provides secure static-file defaults', function(){
 
     assert.equal(config.server.index, 'index.html');
     assert.equal(config.server.allowDotfiles, false);
+    assert.equal(config.server.brotliQuality, 4);
 });
 
 test('Unit | Config includes modern MIME defaults', function(){
-    assert.equal(new server.Config().contentType.html, 'text/html; charset=utf-8');
+    const contentTypes = new server.Config().contentType;
+
+    assert.equal(contentTypes.html, 'text/html; charset=utf-8');
+    assert.equal(Object.hasOwn(contentTypes, 'html'), true);
+    assert.equal(Object.keys(contentTypes).includes('html'), true);
 });
 
 test('Unit | Config merges custom server settings with defaults', function(){
@@ -31,6 +36,38 @@ test('Unit | Config merges custom MIME types with defaults', function(){
 
     assert.equal(config.contentType.thing, 'application/x-thing');
     assert.equal(config.contentType.html, 'text/html; charset=utf-8');
+});
+
+test('Unit | Config defers its MIME snapshot until contentType is read', function(){
+    const config = new server.Config({contentType:{thing:'application/x-thing'}});
+    const deferred = Object.getOwnPropertyDescriptor(config, 'contentType');
+
+    assert.equal(typeof deferred.get, 'function');
+    assert.deepEqual(Object.keys(config), Object.keys(server.Config.defaults));
+    assert.equal(Object.hasOwn(config, 'contentType'), true);
+
+    const contentTypes = config.contentType;
+    const materialized = Object.getOwnPropertyDescriptor(config, 'contentType');
+
+    assert.equal(materialized.value, contentTypes);
+    assert.equal(materialized.writable, true);
+    assert.equal(contentTypes.thing, 'application/x-thing');
+    assert.equal(contentTypes.html, 'text/html; charset=utf-8');
+});
+
+test('Unit | Config resolves MIME defaults and overlays without materializing', function(){
+    const config = new server.Config({
+        contentType:{thing:'application/x-thing', deny:false}
+    });
+
+    assert.equal(config.contentTypeFor('html'), 'text/html; charset=utf-8');
+    assert.equal(config.contentTypeFor('thing'), 'application/x-thing');
+    assert.equal(config.contentTypeFor('deny'), false);
+    assert.equal(config.contentTypeFor('unknown'), undefined);
+    assert.equal(
+        typeof Object.getOwnPropertyDescriptor(config, 'contentType').get,
+        'function'
+    );
 });
 
 test('Unit | Config merges custom error headers with defaults', function(){

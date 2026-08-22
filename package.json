@@ -1,6 +1,6 @@
 {
   "name": "node-http-server",
-  "version": "9.0.2",
+  "version": "9.1.0",
   "description": "A lightweight, secure, zero-runtime-dependency HTTP and HTTPS static server for Node.js.",
   "type": "commonjs",
   "main": "./server/Server.js",
@@ -50,6 +50,8 @@
     "verify": "npm test && npm run test:site && npm run coverage && npm run test:package",
     "benchmark": "node ./benchmark/run.js",
     "benchmark:smoke": "node ./benchmark/run.js --smoke",
+    "benchmark:core": "node --expose-gc ./benchmark/core.js",
+    "benchmark:core:smoke": "node --expose-gc ./benchmark/core.js --smoke",
     "basic": "node ./example/basic/basicApp.js",
     "https": "node ./example/basic/https-ONLY-basicApp.js",
     "both": "node ./example/basic/https-basicApp.js",

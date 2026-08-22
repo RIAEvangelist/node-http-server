@@ -112,13 +112,15 @@ jobs:
           retention-days: 14
 
   benchmark:
-    name: HTTP benchmark / Node 24.18.0
+    name: HTTP + core benchmarks / Node 24.18.0
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js 24.18.0
         uses: actions/setup-node@v7
@@ -131,11 +133,18 @@ jobs:
           set -o pipefail
           node ./benchmark/run.js --json | tee benchmark-results.json
 
+      - name: Compare release core paths
+        run: |
+          node --expose-gc ./benchmark/core.js --output site/benchmarks/core-ci.json
+          cp site/benchmarks/core-ci.json core-benchmark-results.json
+
       - name: Upload benchmark results
         uses: actions/upload-artifact@v7
         with:
           name: node-http-server-benchmark
-          path: benchmark-results.json
+          path: |
+            benchmark-results.json
+            core-benchmark-results.json
           if-no-files-found: error
           retention-days: 14
 
@@ -186,27 +195,33 @@ jobs:
           cp --recursive _coverage/badges _site/badges
           mkdir -p _site/benchmarks
           cp _benchmark/benchmark-results.json _site/benchmarks/latest.json
+          cp _benchmark/core-benchmark-results.json _site/benchmarks/core-latest.json
           touch _site/.nojekyll
 
           test -f _site/index.html
           test -f _site/guide.html
+          test -f _site/why.html
           test -f _site/cli.html
           test -f _site/api.html
           test -f _site/configuration.html
           test -f _site/examples.html
           test -f _site/playground.html
           test -f _site/testing.html
+          test -f _site/performance.html
           test -f _site/benchmarks.html
           test -f _site/operations.html
           test -f _site/resources.html
           test -f _site/styles.css
           test -f _site/script.js
+          test -f _site/playground.js
           test -f _site/assets/node-http-server-header.webp
           test -f _site/coverage/node/index.html
           test -f _site/badges/lines.json
           test -f _site/badges/functions.json
           test -f _site/badges/branches.json
           test -f _site/benchmarks/latest.json
+          test -f _site/benchmarks/core-latest.json
+          test -f _site/benchmarks/core-9.0.2-vs-9.1.0.json
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6

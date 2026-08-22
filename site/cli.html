@@ -6,7 +6,7 @@
     </head>
     <body>
         <a class="skip-link" href="#main">Skip to content</a>
-        <header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./cli.html" aria-current="page">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
+        <header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./why.html">Why</a><a href="./cli.html" aria-current="page">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
         <main id="main">
             <header class="page-header page-header-compact"><p class="kicker">Command line</p><h1>Run the server from a terminal.</h1><p class="lead">Install, serve, expose, tune, and stop the CLI. Every supported input and exit path is documented here.</p></header>
             <div class="doc-layout">
@@ -30,7 +30,7 @@
                             <tr><td>Pick a local port</td><td><code>node-http-server --port 9000</code></td><td>Local HTTP on port 9000.</td></tr>
                             <tr><td>Pick a free port</td><td><code>node-http-server --port 0</code></td><td>Prints the operating-system-assigned port.</td></tr>
                             <tr><td>Accept network traffic</td><td><code>node-http-server --host 0.0.0.0</code></td><td>Binds all IPv4 interfaces; firewall and network policy still apply.</td></tr>
-                            <tr><td>Require one Host value</td><td><code>node-http-server --domain example.test</code></td><td>Other Host values receive <code>421</code>; this does not set DNS or the bind address.</td></tr>
+                            <tr><td>Require one Host value</td><td><code>node-http-server --domain example.test</code></td><td>Other Host values receive <code>421</code>; configure DNS in the zone and the bind address with <code>--host</code>.</td></tr>
                             <tr><td>Serve an SPA</td><td><code>node-http-server --root ./dist --spa --compression</code></td><td>Missing extensionless HTML routes use the index; eligible responses negotiate compression.</td></tr>
                             <tr><td>Use another SPA file</td><td><code>node-http-server --spa=app.html</code></td><td>Uses <code>app.html</code> as the fallback.</td></tr>
                             <tr><td>Limit bodies to 1 MiB</td><td><code>node-http-server --max-body 1048576</code></td><td>Oversized request bodies stop with <code>413</code>.</td></tr>
@@ -40,7 +40,7 @@
                             <tr><td>Write request logs</td><td><code>node-http-server --log ./logs/requests.ndjson</code></td><td>Appends one JSON record per line; the parent directory must exist.</td></tr>
                             <tr><td>Inspect activity</td><td><code>node-http-server --verbose</code></td><td>Prints normalized configuration and listener activity.</td></tr>
                         </tbody></table></div>
-                        <div class="callout-warning callout"><strong>SPA filename syntax:</strong> use <code>--spa=app.html</code>. With <code>--spa app.html</code>, <code>app.html</code> becomes the positional root when no root is set, or becomes an unknown argument. <code>--spa=false</code> means a fallback file literally named <code>false</code>; it does not disable SPA fallback.</div>
+                        <div class="callout-warning callout"><strong>SPA filename syntax:</strong> use <code>--spa=app.html</code>. With <code>--spa app.html</code>, <code>app.html</code> becomes the positional root when no root is set, or becomes an unknown argument. The value <code>--spa=false</code> selects a fallback file literally named <code>false</code>; omit <code>--spa</code> to leave fallback disabled.</div>
                     </section>
 
                     <section class="doc-section" id="options"><p class="kicker">Complete option reference</p><h2>Every documented flag.</h2>
@@ -48,13 +48,13 @@
                             <tr><td><code>-p, --port &lt;port&gt;</code></td><td><code>8080</code></td><td><code>port</code></td><td>Nonnegative number; deployment requires an integer from 0–65535.</td></tr>
                             <tr><td><code>-r, --root &lt;path&gt;</code></td><td>current directory</td><td><code>root</code></td><td>Existing directory, resolved from the working directory.</td></tr>
                             <tr><td><code>--host &lt;address&gt;</code></td><td><code>127.0.0.1</code></td><td><code>host</code></td><td>Nonempty listen address.</td></tr>
-                            <tr><td><code>--domain &lt;hostname&gt;</code></td><td><code>0.0.0.0</code></td><td><code>domain</code></td><td>Primary accepted Host; not a network bind or DNS setting.</td></tr>
+                            <tr><td><code>--domain &lt;hostname&gt;</code></td><td><code>0.0.0.0</code></td><td><code>domain</code></td><td>Primary accepted Host; use <code>--host</code> for the network bind and configure DNS in the zone.</td></tr>
                             <tr><td><code>--index &lt;file&gt;</code></td><td><code>index.html</code></td><td><code>server.index</code></td><td>Directory index filename; there is no directory listing when it is missing.</td></tr>
                             <tr><td><code>--no-cache</code></td><td>on</td><td><code>server.noCache=true</code></td><td>Explicitly sends default no-cache directives.</td></tr>
-                            <tr><td><code>--cache</code></td><td>off</td><td><code>server.noCache=false</code></td><td>Omits the default no-cache header; it does not add a cache lifetime.</td></tr>
+                            <tr><td><code>--cache</code></td><td>off</td><td><code>server.noCache=false</code></td><td>Omits the default no-cache header; set cache lifetime headers through a hook or proxy.</td></tr>
                             <tr><td><code>--allow-dotfiles</code></td><td>off</td><td><code>server.allowDotfiles=true</code></td><td>Explicit all-dotfile opt-in; <code>--allow-dotfiles=false</code> restores the default denial.</td></tr>
                             <tr><td><code>--spa[=&lt;file&gt;]</code></td><td>off</td><td><code>server.spaFallback</code></td><td>No value uses the index; custom filename requires <code>=</code>.</td></tr>
-                            <tr><td><code>--compression</code></td><td>off</td><td><code>server.compression=true</code></td><td>Static eligible responses at least 1024 bytes; not byte ranges.</td></tr>
+                            <tr><td><code>--compression</code></td><td>off</td><td><code>server.compression=true</code></td><td>Full eligible static responses at least 1024 bytes.</td></tr>
                             <tr><td><code>--max-body &lt;bytes|false&gt;</code></td><td>unlimited</td><td><code>server.maxRequestBodyBytes</code></td><td>Nonnegative bytes; <code>false</code>, <code>off</code>, or <code>0</code> is unlimited.</td></tr>
                             <tr><td><code>--timeout &lt;ms|false&gt;</code></td><td><code>30000</code></td><td><code>server.timeout</code></td><td>Socket inactivity milliseconds; false/off/0 disables.</td></tr>
                             <tr><td><code>--request-timeout &lt;ms|false&gt;</code></td><td><code>300000</code></td><td><code>server.requestTimeout</code></td><td>Whole-request milliseconds; false/off/0 disables.</td></tr>
@@ -77,7 +77,7 @@
                             <tr><td>Legacy camelCase aliases</td><td><code>requestTimeout=false</code></td><td><code>noCache</code>, <code>allowDotfiles</code>, <code>spaFallback</code>, <code>maxRequestBodyBytes</code>, <code>requestTimeout</code>, <code>headersTimeout</code>, and <code>keepAliveTimeout</code> map to modern options.</td></tr>
                         </tbody></table></div>
                         <div class="callout"><strong>Ordering:</strong> options are processed from left to right; the last value for the same setting wins. All arguments are validated before help or version output.</div>
-                        <div class="callout-warning callout"><strong>Parsing details:</strong> boolean words are lowercase <code>true</code>/<code>false</code>. A flag needs equals to turn it off—for example <code>--compression=false</code>, not <code>--compression false</code>. Short options cannot be bundled. If a value starts with <code>-</code>, use equals, such as <code>--root=-name</code>. <code>--cache=&lt;anything&gt;</code> still enables caching.</div>
+                        <div class="callout-warning callout"><strong>Parsing details:</strong> boolean words are lowercase <code>true</code>/<code>false</code>. Use equals to turn off a flag—for example <code>--compression=false</code>; a separate <code>false</code> token becomes positional input. Write each short option separately. If a value starts with <code>-</code>, use equals, such as <code>--root=-name</code>. <code>--cache=&lt;anything&gt;</code> still enables caching.</div>
                     </section>
 
                     <section class="doc-section" id="output"><p class="kicker">Output and process exits</p><h2>Use exit status as the contract.</h2>
@@ -99,8 +99,8 @@ node-http-server --version</code></pre></div>
                             <tr><td><code>EADDRINUSE</code></td><td>Another process owns the port.</td><td>Choose another <code>--port</code> or stop the conflicting process.</td></tr>
                             <tr><td><code>EACCES</code></td><td>The address/port is not permitted.</td><td>Use an allowed unprivileged port and confirm host permissions.</td></tr>
                             <tr><td><code>root must be a directory</code></td><td>The path is missing or is a file.</td><td>Resolve the root from the current working directory.</td></tr>
-                            <tr><td><code>421 Misdirected Request</code></td><td>The Host header does not match <code>domain</code>.</td><td>Fix the request Host or remove/change <code>--domain</code>.</td></tr>
-                            <tr><td>Remote machine cannot connect</td><td>Loopback bind, firewall, or wrong address.</td><td>Set <code>--host 0.0.0.0</code> deliberately, allow the port, then connect to the machine's network address—not <code>0.0.0.0</code>.</td></tr>
+                            <tr><td><code>421 Misdirected Request</code></td><td>The Host header falls outside the configured <code>domain</code>.</td><td>Fix the request Host or remove/change <code>--domain</code>.</td></tr>
+                            <tr><td>Remote connection fails</td><td>Loopback bind, firewall, or wrong address.</td><td>Set <code>--host 0.0.0.0</code> deliberately, allow the port, then connect to the machine's real network address.</td></tr>
                             <tr><td>SPA file not selected</td><td>The custom file was separated by a space.</td><td>Use <code>--spa=app.html</code>.</td></tr>
                             <tr><td>Dot-prefixed path returns <code>403</code></td><td>Dotfiles are blocked by default.</td><td>Move the public file to a normal path, or use <code>--allow-dotfiles</code> only with a dedicated audited root.</td></tr>
                             <tr><td>Log errors appear later</td><td>Parent directory missing or write denied.</td><td>Create/protect the directory and use <code>--verbose</code> to surface asynchronous failures.</td></tr>
@@ -109,13 +109,14 @@ node-http-server --version</code></pre></div>
                     </section>
 
                     <section class="doc-section" id="limits"><p class="kicker">CLI boundary</p><h2>Use the library for object configuration.</h2>
-                        <p>The CLI intentionally covers common static-server operations. It does not load configuration JSON or expose every nested object.</p>
+                        <p>The CLI covers common static-server operations. The module API carries structured maps, certificate settings, compression tuning, and function-valued hooks.</p>
                         <div class="table-wrap"><table><thead><tr><th>Needs the module API</th><th>Configuration/API link</th></tr></thead><tbody>
                             <tr><td>HTTPS keys and certificates</td><td><a href="./configuration.html#https"><code>https</code> configuration</a></td></tr>
                             <tr><td>Multiple domain roots</td><td><a href="./configuration.html#network"><code>domains</code> mapping</a></td></tr>
                             <tr><td>MIME overrides, rejected/restricted extensions</td><td><a href="./configuration.html#mime"><code>contentType</code> and <code>restrictedType</code></a></td></tr>
                             <tr><td>Custom error bodies/headers</td><td><a href="./configuration.html#errors"><code>errors</code></a></td></tr>
                             <tr><td>Compression threshold</td><td><a href="./configuration.html#server"><code>server.compressionThreshold</code></a></td></tr>
+                            <tr><td>Brotli quality</td><td><a href="./configuration.html#server"><code>server.brotliQuality</code></a></td></tr>
                             <tr><td>Log bodies or custom logger functions</td><td><a href="./configuration.html#logging">Logging configuration</a></td></tr>
                             <tr><td>Hooks, multiple instances, lifecycle control</td><td><a href="./api.html">Library API</a></td></tr>
                         </tbody></table></div>

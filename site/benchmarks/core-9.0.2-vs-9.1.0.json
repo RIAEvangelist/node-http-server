@@ -1,0 +1,3004 @@
+{
+  "benchmark": "node-http-server-core-comparison",
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-22T04:03:04.057Z",
+  "harness": {
+    "sha256": {
+      "core.js": "1d5d6d5362c7db2e8b524ceceb7e4bc52f396199303c56a2b9589ddaa57dd919",
+      "core-server.js": "5e3378bbe5ba5b07b17626b9e077bd2c83041d06f1fded997cbee03f795f56e7",
+      "core-worker.js": "360d005ce66c75ec6edddb017f067c42737a8efb2f7970d0913a6dda35fb3607"
+    }
+  },
+  "source": {
+    "baseline": {
+      "label": "9.0.2",
+      "version": "9.0.2",
+      "ref": "9.0.2",
+      "commit": "230e9a39ca3d5043330c4e7d5a6117d214bfce30",
+      "workingTree": false,
+      "sha256": {
+        "Server.js": "b55fe9116dea0194d0cc981aefdf93dfd3bdbc0cf68378a31a04c5e89268a2c9",
+        "Config.js": "cf117649a8c2922f3791a1a7fd81078c27a44f5d62d39852d292ec7714a469e0",
+        "MimeTypes.js": "813ac7d2884bbae1d6c9719e6a9e3d6a8143ad7af9a6557fb3d6b8a21f3f1076"
+      }
+    },
+    "candidate": {
+      "label": "9.1.0 working tree",
+      "version": "9.1.0",
+      "ref": "working-tree",
+      "commit": "230e9a39ca3d5043330c4e7d5a6117d214bfce30",
+      "workingTree": true,
+      "sha256": {
+        "Server.js": "a8ddb10e159d560e13cbad866bbbb9f150eb51ea229d2c419d720af57cf7bd5f",
+        "Config.js": "b7ba5c66470eab1818427499fc29022ceb1431474577005509bcc08697947943",
+        "MimeTypes.js": "ba5baf89adb39d6e0ee2098e2908ebd459392e3c92c6d6150cba97befe1ecb0e"
+      }
+    }
+  },
+  "environment": {
+    "node": "v24.18.0",
+    "v8": "13.6.233.17-node.50",
+    "platform": "win32",
+    "release": "10.0.26200",
+    "architecture": "x64",
+    "processor": "Intel(R) Core(TM) Ultra 9 275HX",
+    "logicalCores": 24,
+    "totalMemoryBytes": 68137205760
+  },
+  "methodology": {
+    "order": "Baseline and candidate order alternates for every recorded sample.",
+    "aggregation": "Median, minimum, maximum, and every raw sample retained.",
+    "isolation": "HTTP variants run in separate server processes. Config memory and lifecycle samples run in fresh --expose-gc worker processes.",
+    "validation": "Every HTTP response is checked. Config workers verify map shape and mutation isolation. Immediate-close workers count live listeners.",
+    "timing": "Fixture creation, server startup, correctness preflight, warmup, worker startup, and cleanup are outside recorded action time."
+  },
+  "configuration": {
+    "samples": 9,
+    "concurrency": 10,
+    "requests": 400,
+    "queryRequests": 40,
+    "largeRequests": 8,
+    "brotliRequests": 2,
+    "configConstructions": 100000,
+    "configRetained": 10000,
+    "lifecycleCycles": 20,
+    "queryValues": 1000,
+    "domains": 1000,
+    "largeBytes": 8388608,
+    "rangeBytes": 16,
+    "brotliBytes": 2621440,
+    "smoke": false,
+    "selectedScenarios": "all"
+  },
+  "scenarios": [
+    {
+      "id": "default-static-get",
+      "label": "Default-hook static GET",
+      "kind": "http",
+      "profile": {
+        "requestsPerSample": 400,
+        "method": "GET",
+        "path": "/small.txt",
+        "scenario": "default static path"
+      },
+      "metric": "requestsPerSecond",
+      "unit": "requests/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 4055.027,
+          "minimum": 3756.705,
+          "maximum": 4345.573
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 103.0121,
+            "requestsPerSecond": 3883.039,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 99.3521,
+            "requestsPerSecond": 4026.085,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 98.643,
+            "requestsPerSecond": 4055.027,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 102.6095,
+            "requestsPerSecond": 3898.275,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 106.4763,
+            "requestsPerSecond": 3756.705,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 92.0477,
+            "requestsPerSecond": 4345.573,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 94.3619,
+            "requestsPerSecond": 4238.999,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 95.4472,
+            "requestsPerSecond": 4190.799,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 94.9106,
+            "requestsPerSecond": 4214.492,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 4253.862,
+          "minimum": 3867.148,
+          "maximum": 4436.296
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 101.0849,
+            "requestsPerSecond": 3957.07,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 103.4354,
+            "requestsPerSecond": 3867.148,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 91.3273,
+            "requestsPerSecond": 4379.851,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 97.3042,
+            "requestsPerSecond": 4110.819,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 94.0322,
+            "requestsPerSecond": 4253.862,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 91.1898,
+            "requestsPerSecond": 4386.456,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 93.0825,
+            "requestsPerSecond": 4297.263,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 94.6287,
+            "requestsPerSecond": 4227.047,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 90.1653,
+            "requestsPerSecond": 4436.296,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 1.049,
+        "candidateToBaseline": 1.049,
+        "percent": 4.9,
+        "label": "speedup"
+      },
+      "warmupRequests": 20,
+      "diagnostics": {
+        "baseline": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        },
+        "candidate": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        }
+      },
+      "responseBytesPerRequest": {
+        "baseline": 32,
+        "candidate": 32
+      }
+    },
+    {
+      "id": "bodyless-static-head",
+      "label": "Bodyless static HEAD",
+      "kind": "http",
+      "profile": {
+        "requestsPerSample": 400,
+        "method": "HEAD",
+        "path": "/small.txt",
+        "scenario": "default static path"
+      },
+      "metric": "requestsPerSecond",
+      "unit": "requests/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 10981.228,
+          "minimum": 8521.789,
+          "maximum": 12029.243
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 46.9385,
+            "requestsPerSecond": 8521.789,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 40.119,
+            "requestsPerSecond": 9970.338,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 33.3336,
+            "requestsPerSecond": 11999.904,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 33.4595,
+            "requestsPerSecond": 11954.751,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 37.8252,
+            "requestsPerSecond": 10574.961,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 38.6802,
+            "requestsPerSecond": 10341.208,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 36.4258,
+            "requestsPerSecond": 10981.228,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 35.5476,
+            "requestsPerSecond": 11252.518,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 33.2523,
+            "requestsPerSecond": 12029.243,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 13739.283,
+          "minimum": 9844.458,
+          "maximum": 14798.646
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 40.632,
+            "requestsPerSecond": 9844.458,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 34.5453,
+            "requestsPerSecond": 11578.999,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 27.4343,
+            "requestsPerSecond": 14580.288,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 27.0295,
+            "requestsPerSecond": 14798.646,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 27.5237,
+            "requestsPerSecond": 14532.93,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 30.5276,
+            "requestsPerSecond": 13102.897,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 31.1901,
+            "requestsPerSecond": 12824.582,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 29.1136,
+            "requestsPerSecond": 13739.283,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          },
+          {
+            "durationMilliseconds": 29.0992,
+            "requestsPerSecond": 13746.082,
+            "requests": 400,
+            "responseBytes": 0,
+            "checksum": 80000
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 1.251,
+        "candidateToBaseline": 1.251,
+        "percent": 25.1,
+        "label": "speedup"
+      },
+      "warmupRequests": 20,
+      "diagnostics": {
+        "baseline": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        },
+        "candidate": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        }
+      },
+      "responseBytesPerRequest": {
+        "baseline": 0,
+        "candidate": 0
+      }
+    },
+    {
+      "id": "bodyless-request-hook",
+      "label": "Bodyless request hook",
+      "kind": "http",
+      "profile": {
+        "requestsPerSample": 400,
+        "method": "GET",
+        "path": "/hook",
+        "scenario": "bodyless-hook"
+      },
+      "metric": "requestsPerSecond",
+      "unit": "requests/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 16698.463,
+          "minimum": 15585.185,
+          "maximum": 24211.316
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 24.0137,
+            "requestsPerSecond": 16657.158,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 24.6867,
+            "requestsPerSecond": 16203.057,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 20.7005,
+            "requestsPerSecond": 19323.205,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 25.6654,
+            "requestsPerSecond": 15585.185,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 24.1376,
+            "requestsPerSecond": 16571.656,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 16.5212,
+            "requestsPerSecond": 24211.316,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 22.4726,
+            "requestsPerSecond": 17799.454,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 23.9543,
+            "requestsPerSecond": 16698.463,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 23.5435,
+            "requestsPerSecond": 16989.827,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 16507.302,
+          "minimum": 15329.664,
+          "maximum": 33187.034
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 24.7705,
+            "requestsPerSecond": 16148.241,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 24.2317,
+            "requestsPerSecond": 16507.302,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 25.0385,
+            "requestsPerSecond": 15975.398,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 12.0529,
+            "requestsPerSecond": 33187.034,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 26.0932,
+            "requestsPerSecond": 15329.664,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 25.1369,
+            "requestsPerSecond": 15912.861,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 23.0031,
+            "requestsPerSecond": 17388.961,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 23.9832,
+            "requestsPerSecond": 16678.342,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          },
+          {
+            "durationMilliseconds": 23.573,
+            "requestsPerSecond": 16968.566,
+            "requests": 400,
+            "responseBytes": 2800,
+            "checksum": 82800
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 1.012,
+        "candidateToBaseline": 0.989,
+        "percent": -1.1,
+        "label": "slowdown"
+      },
+      "warmupRequests": 20,
+      "diagnostics": {
+        "baseline": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        },
+        "candidate": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        }
+      },
+      "responseBytesPerRequest": {
+        "baseline": 7,
+        "candidate": 7
+      }
+    },
+    {
+      "id": "repeated-query-hook",
+      "label": "1000 repeated query values",
+      "kind": "http",
+      "profile": {
+        "requestsPerSample": 40,
+        "method": "GET",
+        "path": "/query",
+        "scenario": "query-repeat"
+      },
+      "metric": "requestsPerSecond",
+      "unit": "requests/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 1076.021,
+          "minimum": 725.738,
+          "maximum": 1231.618
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 55.1163,
+            "requestsPerSecond": 725.738,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 34.254,
+            "requestsPerSecond": 1167.747,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 32.4776,
+            "requestsPerSecond": 1231.618,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 38.2565,
+            "requestsPerSecond": 1045.574,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 38.1233,
+            "requestsPerSecond": 1049.227,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 37.2856,
+            "requestsPerSecond": 1072.8,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 37.174,
+            "requestsPerSecond": 1076.021,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 33.8134,
+            "requestsPerSecond": 1182.963,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 32.5142,
+            "requestsPerSecond": 1230.232,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 7694.823,
+          "minimum": 3989.468,
+          "maximum": 8355.964
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 10.0264,
+            "requestsPerSecond": 3989.468,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 6.8457,
+            "requestsPerSecond": 5843.084,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 5.9335,
+            "requestsPerSecond": 6741.384,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 5.1034,
+            "requestsPerSecond": 7837.912,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 5.1983,
+            "requestsPerSecond": 7694.823,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 4.787,
+            "requestsPerSecond": 8355.964,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 6.5786,
+            "requestsPerSecond": 6080.321,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 5.1406,
+            "requestsPerSecond": 7781.193,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          },
+          {
+            "durationMilliseconds": 4.993,
+            "requestsPerSecond": 8011.216,
+            "requests": 40,
+            "responseBytes": 320,
+            "checksum": 8320
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 7.151,
+        "candidateToBaseline": 7.151,
+        "percent": 615.1,
+        "label": "speedup"
+      },
+      "warmupRequests": 4,
+      "diagnostics": {
+        "baseline": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        },
+        "candidate": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        }
+      },
+      "responseBytesPerRequest": {
+        "baseline": 8,
+        "candidate": 8
+      }
+    },
+    {
+      "id": "virtual-host-miss",
+      "label": "1000-domain virtual-host miss",
+      "kind": "http",
+      "profile": {
+        "requestsPerSample": 400,
+        "method": "GET",
+        "path": "/small.txt",
+        "scenario": "default static path"
+      },
+      "metric": "requestsPerSecond",
+      "unit": "requests/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 13926.364,
+          "minimum": 6856.724,
+          "maximum": 17499.803
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 58.3369,
+            "requestsPerSecond": 6856.724,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 40.3193,
+            "requestsPerSecond": 9920.807,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 29.1853,
+            "requestsPerSecond": 13705.53,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 29.233,
+            "requestsPerSecond": 13683.166,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 25.5115,
+            "requestsPerSecond": 15679.203,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 26.0111,
+            "requestsPerSecond": 15378.05,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 22.8574,
+            "requestsPerSecond": 17499.803,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 25.5432,
+            "requestsPerSecond": 15659.745,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 28.7225,
+            "requestsPerSecond": 13926.364,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 23259.33,
+          "minimum": 13762.115,
+          "maximum": 26569.246
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 28.134,
+            "requestsPerSecond": 14217.673,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 29.0653,
+            "requestsPerSecond": 13762.115,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 19.6442,
+            "requestsPerSecond": 20362.244,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 16.3139,
+            "requestsPerSecond": 24518.968,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 15.055,
+            "requestsPerSecond": 26569.246,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 15.2333,
+            "requestsPerSecond": 26258.263,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 21.4422,
+            "requestsPerSecond": 18654.802,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 16.7276,
+            "requestsPerSecond": 23912.576,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          },
+          {
+            "durationMilliseconds": 17.1974,
+            "requestsPerSecond": 23259.33,
+            "requests": 400,
+            "responseBytes": 9200,
+            "checksum": 177600
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 1.67,
+        "candidateToBaseline": 1.67,
+        "percent": 67,
+        "label": "speedup"
+      },
+      "warmupRequests": 20,
+      "diagnostics": {
+        "baseline": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        },
+        "candidate": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        }
+      },
+      "responseBytesPerRequest": {
+        "baseline": 23,
+        "candidate": 23
+      }
+    },
+    {
+      "id": "virtual-host-hit",
+      "label": "1000-domain virtual-host hit",
+      "kind": "http",
+      "profile": {
+        "requestsPerSample": 400,
+        "method": "GET",
+        "path": "/small.txt",
+        "scenario": "default static path"
+      },
+      "metric": "requestsPerSecond",
+      "unit": "requests/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 4172.822,
+          "minimum": 3932.599,
+          "maximum": 4413.934
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 101.7139,
+            "requestsPerSecond": 3932.599,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 96.2902,
+            "requestsPerSecond": 4154.109,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 95.8584,
+            "requestsPerSecond": 4172.822,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 90.6221,
+            "requestsPerSecond": 4413.934,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 91.9933,
+            "requestsPerSecond": 4348.143,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 93.6775,
+            "requestsPerSecond": 4269.969,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 95.5828,
+            "requestsPerSecond": 4184.853,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 97.0568,
+            "requestsPerSecond": 4121.298,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 96.7534,
+            "requestsPerSecond": 4134.222,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 4198.466,
+          "minimum": 3967.817,
+          "maximum": 4706.336
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 97.8552,
+            "requestsPerSecond": 4087.672,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 95.2729,
+            "requestsPerSecond": 4198.466,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 100.8111,
+            "requestsPerSecond": 3967.817,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 96.0955,
+            "requestsPerSecond": 4162.526,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 88.5769,
+            "requestsPerSecond": 4515.85,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 84.9918,
+            "requestsPerSecond": 4706.336,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 96.7477,
+            "requestsPerSecond": 4134.465,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 91.7441,
+            "requestsPerSecond": 4359.953,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          },
+          {
+            "durationMilliseconds": 92.0853,
+            "requestsPerSecond": 4343.799,
+            "requests": 400,
+            "responseBytes": 12800,
+            "checksum": 92800
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 1.006,
+        "candidateToBaseline": 1.006,
+        "percent": 0.6,
+        "label": "speedup"
+      },
+      "warmupRequests": 20,
+      "diagnostics": {
+        "baseline": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        },
+        "candidate": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        }
+      },
+      "responseBytesPerRequest": {
+        "baseline": 32,
+        "candidate": 32
+      }
+    },
+    {
+      "id": "range-custom-before-serve",
+      "label": "16-byte range from 8 MiB custom beforeServe",
+      "kind": "http",
+      "profile": {
+        "requestsPerSample": 8,
+        "method": "GET",
+        "path": "/large.bin",
+        "scenario": "range-before-serve"
+      },
+      "metric": "requestsPerSecond",
+      "unit": "requests/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 790.155,
+          "minimum": 669.697,
+          "maximum": 851.046
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 11.9457,
+            "requestsPerSecond": 669.697,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 10.0754,
+            "requestsPerSecond": 794.013,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 10.8029,
+            "requestsPerSecond": 740.542,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 9.4002,
+            "requestsPerSecond": 851.046,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 10.0978,
+            "requestsPerSecond": 792.252,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 10.1246,
+            "requestsPerSecond": 790.155,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 10.3963,
+            "requestsPerSecond": 769.505,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 10.4593,
+            "requestsPerSecond": 764.87,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 9.6738,
+            "requestsPerSecond": 826.976,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 2310.202,
+          "minimum": 1870.82,
+          "maximum": 2701.607
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 4.2762,
+            "requestsPerSecond": 1870.82,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 3.336,
+            "requestsPerSecond": 2398.082,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 3.9879,
+            "requestsPerSecond": 2006.068,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 3.4629,
+            "requestsPerSecond": 2310.202,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 3.5511,
+            "requestsPerSecond": 2252.823,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 2.9612,
+            "requestsPerSecond": 2701.607,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 3.6223,
+            "requestsPerSecond": 2208.542,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 3.0047,
+            "requestsPerSecond": 2662.495,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          },
+          {
+            "durationMilliseconds": 3.381,
+            "requestsPerSecond": 2366.164,
+            "requests": 8,
+            "responseBytes": 136,
+            "checksum": 1784
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 2.924,
+        "candidateToBaseline": 2.924,
+        "percent": 192.4,
+        "label": "speedup"
+      },
+      "warmupRequests": 1,
+      "diagnostics": {
+        "baseline": {
+          "hookCount": 74,
+          "afterServeCount": 74
+        },
+        "candidate": {
+          "hookCount": 74,
+          "afterServeCount": 74
+        }
+      },
+      "responseBytesPerRequest": {
+        "baseline": 17,
+        "candidate": 17
+      }
+    },
+    {
+      "id": "head-default-hook-control",
+      "label": "Default-hook 8 MiB HEAD control",
+      "kind": "http",
+      "profile": {
+        "requestsPerSample": 8,
+        "method": "HEAD",
+        "path": "/large.bin",
+        "scenario": "default static path"
+      },
+      "metric": "requestsPerSecond",
+      "unit": "requests/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 5253.825,
+          "minimum": 2283.887,
+          "maximum": 6471.968
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 3.5028,
+            "requestsPerSecond": 2283.887,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.8867,
+            "requestsPerSecond": 4240.208,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.5987,
+            "requestsPerSecond": 5004.066,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.7743,
+            "requestsPerSecond": 4508.82,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.2558,
+            "requestsPerSecond": 6370.441,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.5227,
+            "requestsPerSecond": 5253.825,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.2493,
+            "requestsPerSecond": 6403.586,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.2361,
+            "requestsPerSecond": 6471.968,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.3773,
+            "requestsPerSecond": 5808.466,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 5884.084,
+          "minimum": 2785.903,
+          "maximum": 7335.412
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 2.8716,
+            "requestsPerSecond": 2785.903,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.8399,
+            "requestsPerSecond": 4348.062,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.4309,
+            "requestsPerSecond": 5590.887,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.3596,
+            "requestsPerSecond": 5884.084,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.4187,
+            "requestsPerSecond": 5638.965,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.2052,
+            "requestsPerSecond": 6637.902,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.2746,
+            "requestsPerSecond": 6276.479,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.0906,
+            "requestsPerSecond": 7335.412,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 1.1996,
+            "requestsPerSecond": 6668.89,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 1.12,
+        "candidateToBaseline": 1.12,
+        "percent": 12,
+        "label": "speedup"
+      },
+      "warmupRequests": 1,
+      "diagnostics": {
+        "baseline": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        },
+        "candidate": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        }
+      },
+      "responseBytesPerRequest": {
+        "baseline": 0,
+        "candidate": 0
+      }
+    },
+    {
+      "id": "head-custom-before-serve-control",
+      "label": "Custom beforeServe HEAD compatibility control",
+      "kind": "http",
+      "profile": {
+        "requestsPerSample": 8,
+        "method": "HEAD",
+        "path": "/large.bin",
+        "scenario": "head-before-serve"
+      },
+      "metric": "requestsPerSecond",
+      "unit": "requests/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 764.57,
+          "minimum": 684.773,
+          "maximum": 849.798
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 11.1545,
+            "requestsPerSecond": 717.199,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 11.0231,
+            "requestsPerSecond": 725.749,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 11.6827,
+            "requestsPerSecond": 684.773,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 9.7076,
+            "requestsPerSecond": 824.097,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 9.414,
+            "requestsPerSecond": 849.798,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 10.9476,
+            "requestsPerSecond": 730.754,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 10.4634,
+            "requestsPerSecond": 764.57,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 10.1515,
+            "requestsPerSecond": 788.061,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 9.7509,
+            "requestsPerSecond": 820.437,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 688.19,
+          "minimum": 537.804,
+          "maximum": 804.675
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 11.6247,
+            "requestsPerSecond": 688.19,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 10.7106,
+            "requestsPerSecond": 746.924,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 11.8621,
+            "requestsPerSecond": 674.417,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 14.8753,
+            "requestsPerSecond": 537.804,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 10.3254,
+            "requestsPerSecond": 774.788,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 11.6706,
+            "requestsPerSecond": 685.483,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 11.9682,
+            "requestsPerSecond": 668.438,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 9.9419,
+            "requestsPerSecond": 804.675,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          },
+          {
+            "durationMilliseconds": 10.2005,
+            "requestsPerSecond": 784.275,
+            "requests": 8,
+            "responseBytes": 0,
+            "checksum": 1600
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 1.111,
+        "candidateToBaseline": 0.9,
+        "percent": -10,
+        "label": "slowdown"
+      },
+      "warmupRequests": 1,
+      "diagnostics": {
+        "baseline": {
+          "hookCount": 74,
+          "afterServeCount": 74
+        },
+        "candidate": {
+          "hookCount": 74,
+          "afterServeCount": 74
+        }
+      },
+      "responseBytesPerRequest": {
+        "baseline": 0,
+        "candidate": 0
+      }
+    },
+    {
+      "id": "brotli-static-default",
+      "label": "Default Brotli 2560 KiB static response",
+      "kind": "http",
+      "profile": {
+        "requestsPerSample": 2,
+        "method": "GET",
+        "path": "/brotli.txt",
+        "scenario": "default static path"
+      },
+      "metric": "requestsPerSecond",
+      "unit": "requests/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 0.58,
+          "minimum": 0.563,
+          "maximum": 0.618
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 3245.5142,
+            "requestsPerSecond": 0.616,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3236.7805,
+            "requestsPerSecond": 0.618,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3479.6286,
+            "requestsPerSecond": 0.575,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3550.2342,
+            "requestsPerSecond": 0.563,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3372.5289,
+            "requestsPerSecond": 0.593,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3304.8707,
+            "requestsPerSecond": 0.605,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3482.9552,
+            "requestsPerSecond": 0.574,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3446.2467,
+            "requestsPerSecond": 0.58,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3450.8095,
+            "requestsPerSecond": 0.58,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 112.267,
+          "minimum": 85.344,
+          "maximum": 122.407
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 17.8147,
+            "requestsPerSecond": 112.267,
+            "requests": 2,
+            "responseBytes": 541518,
+            "checksum": 541918
+          },
+          {
+            "durationMilliseconds": 17.4488,
+            "requestsPerSecond": 114.621,
+            "requests": 2,
+            "responseBytes": 541518,
+            "checksum": 541918
+          },
+          {
+            "durationMilliseconds": 23.4346,
+            "requestsPerSecond": 85.344,
+            "requests": 2,
+            "responseBytes": 541518,
+            "checksum": 541918
+          },
+          {
+            "durationMilliseconds": 17.0847,
+            "requestsPerSecond": 117.064,
+            "requests": 2,
+            "responseBytes": 541518,
+            "checksum": 541918
+          },
+          {
+            "durationMilliseconds": 18.228,
+            "requestsPerSecond": 109.721,
+            "requests": 2,
+            "responseBytes": 541518,
+            "checksum": 541918
+          },
+          {
+            "durationMilliseconds": 16.339,
+            "requestsPerSecond": 122.407,
+            "requests": 2,
+            "responseBytes": 541518,
+            "checksum": 541918
+          },
+          {
+            "durationMilliseconds": 17.3862,
+            "requestsPerSecond": 115.034,
+            "requests": 2,
+            "responseBytes": 541518,
+            "checksum": 541918
+          },
+          {
+            "durationMilliseconds": 18.7589,
+            "requestsPerSecond": 106.616,
+            "requests": 2,
+            "responseBytes": 541518,
+            "checksum": 541918
+          },
+          {
+            "durationMilliseconds": 18.1259,
+            "requestsPerSecond": 110.339,
+            "requests": 2,
+            "responseBytes": 541518,
+            "checksum": 541918
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 193.564,
+        "candidateToBaseline": 193.564,
+        "percent": 19256.4,
+        "label": "speedup"
+      },
+      "warmupRequests": 1,
+      "diagnostics": {
+        "baseline": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        },
+        "candidate": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        }
+      },
+      "responseBytesPerRequest": {
+        "baseline": 161802,
+        "candidate": 270759
+      }
+    },
+    {
+      "id": "brotli-static-quality-11-control",
+      "label": "Brotli quality 11 compatibility control",
+      "kind": "http",
+      "profile": {
+        "requestsPerSample": 2,
+        "method": "GET",
+        "path": "/brotli.txt",
+        "scenario": "default static path"
+      },
+      "metric": "requestsPerSecond",
+      "unit": "requests/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 0.584,
+          "minimum": 0.577,
+          "maximum": 0.609
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 3453.6661,
+            "requestsPerSecond": 0.579,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3465.0329,
+            "requestsPerSecond": 0.577,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3427.1475,
+            "requestsPerSecond": 0.584,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3463.8832,
+            "requestsPerSecond": 0.577,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3289.8732,
+            "requestsPerSecond": 0.608,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3384.3084,
+            "requestsPerSecond": 0.591,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3282.1317,
+            "requestsPerSecond": 0.609,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3371.3789,
+            "requestsPerSecond": 0.593,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3446.124,
+            "requestsPerSecond": 0.58,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 0.581,
+          "minimum": 0.56,
+          "maximum": 0.628
+        },
+        "samples": [
+          {
+            "durationMilliseconds": 3445.3012,
+            "requestsPerSecond": 0.581,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3381.8843,
+            "requestsPerSecond": 0.591,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3292.9172,
+            "requestsPerSecond": 0.607,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3572.4258,
+            "requestsPerSecond": 0.56,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3184.3448,
+            "requestsPerSecond": 0.628,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3454.7555,
+            "requestsPerSecond": 0.579,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3431.3511,
+            "requestsPerSecond": 0.583,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3550.7967,
+            "requestsPerSecond": 0.563,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          },
+          {
+            "durationMilliseconds": 3506.7491,
+            "requestsPerSecond": 0.57,
+            "requests": 2,
+            "responseBytes": 323604,
+            "checksum": 324004
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 1.005,
+        "candidateToBaseline": 0.995,
+        "percent": -0.5,
+        "label": "slowdown"
+      },
+      "warmupRequests": 1,
+      "diagnostics": {
+        "baseline": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        },
+        "candidate": {
+          "hookCount": 0,
+          "afterServeCount": 0
+        }
+      },
+      "responseBytesPerRequest": {
+        "baseline": 161802,
+        "candidate": 161802
+      }
+    },
+    {
+      "id": "config-construction",
+      "label": "Config construction without MIME read",
+      "kind": "worker",
+      "profile": {
+        "action": "config-construct",
+        "count": 100000
+      },
+      "metric": "instancesPerSecond",
+      "unit": "instances/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 201737.077,
+          "minimum": 191532.611,
+          "maximum": 206796.277
+        },
+        "samples": [
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 502.6731,
+            "nanosecondsPerInstance": 5026.731,
+            "instancesPerSecond": 198936.4459725416,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 488.2215,
+            "nanosecondsPerInstance": 4882.215,
+            "instancesPerSecond": 204825.06403343566,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 483.5677,
+            "nanosecondsPerInstance": 4835.677,
+            "instancesPerSecond": 206796.2769225488,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 495.6947,
+            "nanosecondsPerInstance": 4956.947,
+            "instancesPerSecond": 201737.07727760656,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 522.1043,
+            "nanosecondsPerInstance": 5221.043,
+            "instancesPerSecond": 191532.61139584563,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 486.2006,
+            "nanosecondsPerInstance": 4862.006,
+            "instancesPerSecond": 205676.42244785384,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 505.3771,
+            "nanosecondsPerInstance": 5053.771,
+            "instancesPerSecond": 197872.04445947392,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 484.7158,
+            "nanosecondsPerInstance": 4847.158,
+            "instancesPerSecond": 206306.45834115578,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 499.4222,
+            "nanosecondsPerInstance": 4994.222,
+            "instancesPerSecond": 200231.38739126935,
+            "checksum": 808000000
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 580411.686,
+          "minimum": 560581.794,
+          "maximum": 590855.565
+        },
+        "samples": [
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 178.3861,
+            "nanosecondsPerInstance": 1783.861,
+            "instancesPerSecond": 560581.7942093022,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 170.026,
+            "nanosecondsPerInstance": 1700.26,
+            "instancesPerSecond": 588145.3424770329,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 172.8025,
+            "nanosecondsPerInstance": 1728.025,
+            "instancesPerSecond": 578695.3313754142,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 169.2461,
+            "nanosecondsPerInstance": 1692.461,
+            "instancesPerSecond": 590855.5647663373,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 172.5627,
+            "nanosecondsPerInstance": 1725.627,
+            "instancesPerSecond": 579499.5094536652,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 172.2915,
+            "nanosecondsPerInstance": 1722.915,
+            "instancesPerSecond": 580411.6860088862,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 171.2947,
+            "nanosecondsPerInstance": 1712.947,
+            "instancesPerSecond": 583789.2240682286,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 170.5008,
+            "nanosecondsPerInstance": 1705.008,
+            "instancesPerSecond": 586507.5119882135,
+            "checksum": 808000000
+          },
+          {
+            "action": "config-construct",
+            "count": 100000,
+            "durationMilliseconds": 172.7784,
+            "nanosecondsPerInstance": 1727.784,
+            "instancesPerSecond": 578776.0507100425,
+            "checksum": 808000000
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 2.877,
+        "candidateToBaseline": 2.877,
+        "percent": 187.7,
+        "label": "speedup"
+      }
+    },
+    {
+      "id": "config-retained-cold",
+      "label": "Retained Config memory without MIME read",
+      "kind": "worker",
+      "profile": {
+        "action": "config-retained",
+        "count": 10000
+      },
+      "metric": "heapBytesPerInstance",
+      "unit": "heap bytes/instance",
+      "direction": "lower",
+      "baseline": {
+        "summary": {
+          "median": 11816.548,
+          "minimum": 11816.548,
+          "maximum": 11816.641
+        },
+        "samples": [
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 91.2519,
+            "heapBytes": 118165480,
+            "heapBytesPerInstance": 11816.548,
+            "rssBytes": 241025024,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 89.9594,
+            "heapBytes": 118165480,
+            "heapBytesPerInstance": 11816.548,
+            "rssBytes": 241721344,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 91.2209,
+            "heapBytes": 118165480,
+            "heapBytesPerInstance": 11816.548,
+            "rssBytes": 241881088,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 91.7483,
+            "heapBytes": 118165576,
+            "heapBytesPerInstance": 11816.5576,
+            "rssBytes": 241254400,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 91.6331,
+            "heapBytes": 118165480,
+            "heapBytesPerInstance": 11816.548,
+            "rssBytes": 241496064,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 93.7362,
+            "heapBytes": 118165480,
+            "heapBytesPerInstance": 11816.548,
+            "rssBytes": 241299456,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 91.096,
+            "heapBytes": 118165480,
+            "heapBytesPerInstance": 11816.548,
+            "rssBytes": 241192960,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 92.2386,
+            "heapBytes": 118165480,
+            "heapBytesPerInstance": 11816.548,
+            "rssBytes": 242147328,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 89.4378,
+            "heapBytes": 118166408,
+            "heapBytesPerInstance": 11816.6408,
+            "rssBytes": 241111040,
+            "checksum": 80800000
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 5786.042,
+          "minimum": 5786.007,
+          "maximum": 5786.126
+        },
+        "samples": [
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 41.1979,
+            "heapBytes": 57860424,
+            "heapBytesPerInstance": 5786.0424,
+            "rssBytes": 99459072,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 40.3083,
+            "heapBytes": 57860424,
+            "heapBytesPerInstance": 5786.0424,
+            "rssBytes": 99426304,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 40.0607,
+            "heapBytes": 57860072,
+            "heapBytesPerInstance": 5786.0072,
+            "rssBytes": 98975744,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 40.9551,
+            "heapBytes": 57860424,
+            "heapBytesPerInstance": 5786.0424,
+            "rssBytes": 99418112,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 39.2053,
+            "heapBytes": 57861256,
+            "heapBytesPerInstance": 5786.1256,
+            "rssBytes": 99639296,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 39.5912,
+            "heapBytes": 57860424,
+            "heapBytesPerInstance": 5786.0424,
+            "rssBytes": 98897920,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 40.4315,
+            "heapBytes": 57860424,
+            "heapBytesPerInstance": 5786.0424,
+            "rssBytes": 99717120,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 39.8254,
+            "heapBytes": 57860424,
+            "heapBytesPerInstance": 5786.0424,
+            "rssBytes": 99065856,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-retained",
+            "count": 10000,
+            "durationMilliseconds": 40.8364,
+            "heapBytes": 57860424,
+            "heapBytesPerInstance": 5786.0424,
+            "rssBytes": 99201024,
+            "checksum": 80800000
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 2.042,
+        "candidateToBaseline": 0.49,
+        "percent": 51,
+        "label": "reduction factor"
+      }
+    },
+    {
+      "id": "config-overlay-retained-cold",
+      "label": "Retained one-key MIME overlay memory",
+      "kind": "worker",
+      "profile": {
+        "action": "config-overlay-retained",
+        "count": 10000
+      },
+      "metric": "heapBytesPerInstance",
+      "unit": "heap bytes/instance",
+      "direction": "lower",
+      "baseline": {
+        "summary": {
+          "median": 11818.623,
+          "minimum": 11818.623,
+          "maximum": 11818.633
+        },
+        "samples": [
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 95.9867,
+            "heapBytes": 118186232,
+            "heapBytesPerInstance": 11818.6232,
+            "rssBytes": 242151424,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 92.9199,
+            "heapBytes": 118186232,
+            "heapBytesPerInstance": 11818.6232,
+            "rssBytes": 241983488,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 91.8774,
+            "heapBytes": 118186232,
+            "heapBytesPerInstance": 11818.6232,
+            "rssBytes": 240820224,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 94.6015,
+            "heapBytes": 118186328,
+            "heapBytesPerInstance": 11818.6328,
+            "rssBytes": 241291264,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 95.6352,
+            "heapBytes": 118186232,
+            "heapBytesPerInstance": 11818.6232,
+            "rssBytes": 241238016,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 95.164,
+            "heapBytes": 118186232,
+            "heapBytesPerInstance": 11818.6232,
+            "rssBytes": 241401856,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 93.2734,
+            "heapBytes": 118186232,
+            "heapBytesPerInstance": 11818.6232,
+            "rssBytes": 241639424,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 93.1737,
+            "heapBytes": 118186232,
+            "heapBytesPerInstance": 11818.6232,
+            "rssBytes": 241242112,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 94.839,
+            "heapBytes": 118186232,
+            "heapBytesPerInstance": 11818.6232,
+            "rssBytes": 241778688,
+            "checksum": 80800000
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 5972.402,
+          "minimum": 5972.338,
+          "maximum": 5972.482
+        },
+        "samples": [
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 47.3285,
+            "heapBytes": 59724016,
+            "heapBytesPerInstance": 5972.4016,
+            "rssBytes": 115085312,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 46.5135,
+            "heapBytes": 59724016,
+            "heapBytesPerInstance": 5972.4016,
+            "rssBytes": 115036160,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 45.4412,
+            "heapBytes": 59724016,
+            "heapBytesPerInstance": 5972.4016,
+            "rssBytes": 115200000,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 44.4031,
+            "heapBytes": 59724016,
+            "heapBytesPerInstance": 5972.4016,
+            "rssBytes": 115462144,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 46.617,
+            "heapBytes": 59724016,
+            "heapBytesPerInstance": 5972.4016,
+            "rssBytes": 115765248,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 49.119,
+            "heapBytes": 59723376,
+            "heapBytesPerInstance": 5972.3376,
+            "rssBytes": 115331072,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 46.824,
+            "heapBytes": 59724016,
+            "heapBytesPerInstance": 5972.4016,
+            "rssBytes": 115064832,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 47.0484,
+            "heapBytes": 59724816,
+            "heapBytesPerInstance": 5972.4816,
+            "rssBytes": 114839552,
+            "checksum": 80800000
+          },
+          {
+            "action": "config-overlay-retained",
+            "count": 10000,
+            "durationMilliseconds": 45.3338,
+            "heapBytes": 59724816,
+            "heapBytesPerInstance": 5972.4816,
+            "rssBytes": 115576832,
+            "checksum": 80800000
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 1.979,
+        "candidateToBaseline": 0.505,
+        "percent": 49.5,
+        "label": "reduction factor"
+      }
+    },
+    {
+      "id": "config-materialized-control",
+      "label": "Retained materialized MIME-map control",
+      "kind": "worker",
+      "profile": {
+        "action": "config-materialized-retained",
+        "count": 10000
+      },
+      "metric": "heapBytesPerInstance",
+      "unit": "heap bytes/instance",
+      "direction": "lower",
+      "baseline": {
+        "summary": {
+          "median": 11816.662,
+          "minimum": 11816.661,
+          "maximum": 11816.672
+        },
+        "samples": [
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 90.7731,
+            "heapBytes": 118166624,
+            "heapBytesPerInstance": 11816.6624,
+            "rssBytes": 241745920,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 97.1145,
+            "heapBytes": 118166624,
+            "heapBytesPerInstance": 11816.6624,
+            "rssBytes": 240930816,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 90.0921,
+            "heapBytes": 118166624,
+            "heapBytesPerInstance": 11816.6624,
+            "rssBytes": 241758208,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 90.1352,
+            "heapBytes": 118166624,
+            "heapBytesPerInstance": 11816.6624,
+            "rssBytes": 241811456,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 91.205,
+            "heapBytes": 118166624,
+            "heapBytesPerInstance": 11816.6624,
+            "rssBytes": 241954816,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 96.7134,
+            "heapBytes": 118166624,
+            "heapBytesPerInstance": 11816.6624,
+            "rssBytes": 242163712,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 95.2973,
+            "heapBytes": 118166720,
+            "heapBytesPerInstance": 11816.672,
+            "rssBytes": 241377280,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 100.8045,
+            "heapBytes": 118166608,
+            "heapBytesPerInstance": 11816.6608,
+            "rssBytes": 241496064,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 93.257,
+            "heapBytes": 118166720,
+            "heapBytesPerInstance": 11816.672,
+            "rssBytes": 241577984,
+            "checksum": 81040000
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 12018.797,
+          "minimum": 12018.702,
+          "maximum": 12018.797
+        },
+        "samples": [
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 100.6116,
+            "heapBytes": 120187968,
+            "heapBytesPerInstance": 12018.7968,
+            "rssBytes": 243453952,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 102.9467,
+            "heapBytes": 120187016,
+            "heapBytesPerInstance": 12018.7016,
+            "rssBytes": 243433472,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 100.6302,
+            "heapBytes": 120187968,
+            "heapBytesPerInstance": 12018.7968,
+            "rssBytes": 243531776,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 99.6556,
+            "heapBytes": 120187968,
+            "heapBytesPerInstance": 12018.7968,
+            "rssBytes": 243462144,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 99.6857,
+            "heapBytes": 120187968,
+            "heapBytesPerInstance": 12018.7968,
+            "rssBytes": 243638272,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 103.0183,
+            "heapBytes": 120187016,
+            "heapBytesPerInstance": 12018.7016,
+            "rssBytes": 243343360,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 102.6764,
+            "heapBytes": 120187016,
+            "heapBytesPerInstance": 12018.7016,
+            "rssBytes": 243073024,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 101.5211,
+            "heapBytes": 120187968,
+            "heapBytesPerInstance": 12018.7968,
+            "rssBytes": 243482624,
+            "checksum": 81040000
+          },
+          {
+            "action": "config-materialized-retained",
+            "count": 10000,
+            "durationMilliseconds": 101.6939,
+            "heapBytes": 120187872,
+            "heapBytesPerInstance": 12018.7872,
+            "rssBytes": 243306496,
+            "checksum": 81040000
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 1.017,
+        "candidateToBaseline": 1.017,
+        "percent": -1.7,
+        "label": "increase"
+      }
+    },
+    {
+      "id": "immediate-close-correctness",
+      "label": "Deploy plus immediate close correctness",
+      "kind": "worker",
+      "profile": {
+        "action": "immediate-close",
+        "count": 20
+      },
+      "metric": "cyclesPerSecond",
+      "unit": "cycles/second",
+      "direction": "higher",
+      "baseline": {
+        "summary": {
+          "median": 931.971,
+          "minimum": 845.026,
+          "maximum": 978.675
+        },
+        "samples": [
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 23.6679,
+            "cyclesPerSecond": 845.0263859489013,
+            "leakedListeners": 20,
+            "readyCallbacks": 20
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 21.6984,
+            "cyclesPerSecond": 921.7269476090403,
+            "leakedListeners": 20,
+            "readyCallbacks": 20
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 21.5969,
+            "cyclesPerSecond": 926.0588325176299,
+            "leakedListeners": 20,
+            "readyCallbacks": 20
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 21.5492,
+            "cyclesPerSecond": 928.1087000909546,
+            "leakedListeners": 20,
+            "readyCallbacks": 20
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 21.423,
+            "cyclesPerSecond": 933.5760631097418,
+            "leakedListeners": 20,
+            "readyCallbacks": 20
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 20.6052,
+            "cyclesPerSecond": 970.6287733193562,
+            "leakedListeners": 20,
+            "readyCallbacks": 20
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 20.6298,
+            "cyclesPerSecond": 969.4713472743313,
+            "leakedListeners": 20,
+            "readyCallbacks": 20
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 20.4358,
+            "cyclesPerSecond": 978.6746787500367,
+            "leakedListeners": 20,
+            "readyCallbacks": 20
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 21.4599,
+            "cyclesPerSecond": 931.9707920353776,
+            "leakedListeners": 20,
+            "readyCallbacks": 20
+          }
+        ]
+      },
+      "candidate": {
+        "summary": {
+          "median": 1846.91,
+          "minimum": 1709.46,
+          "maximum": 2043.047
+        },
+        "samples": [
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 10.8417,
+            "cyclesPerSecond": 1844.7291476428975,
+            "leakedListeners": 0,
+            "readyCallbacks": 0
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 11.6996,
+            "cyclesPerSecond": 1709.4601524838456,
+            "leakedListeners": 0,
+            "readyCallbacks": 0
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 10.8289,
+            "cyclesPerSecond": 1846.9096584140586,
+            "leakedListeners": 0,
+            "readyCallbacks": 0
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 11.1542,
+            "cyclesPerSecond": 1793.046565419304,
+            "leakedListeners": 0,
+            "readyCallbacks": 0
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 10.2065,
+            "cyclesPerSecond": 1959.5355900651546,
+            "leakedListeners": 0,
+            "readyCallbacks": 0
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 10.294,
+            "cyclesPerSecond": 1942.8793471925394,
+            "leakedListeners": 0,
+            "readyCallbacks": 0
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 10.8639,
+            "cyclesPerSecond": 1840.9595080956196,
+            "leakedListeners": 0,
+            "readyCallbacks": 0
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 9.7893,
+            "cyclesPerSecond": 2043.0470002962415,
+            "leakedListeners": 0,
+            "readyCallbacks": 0
+          },
+          {
+            "action": "immediate-close",
+            "count": 20,
+            "durationMilliseconds": 10.6221,
+            "cyclesPerSecond": 1882.866853070485,
+            "leakedListeners": 0,
+            "readyCallbacks": 0
+          }
+        ]
+      },
+      "comparison": {
+        "ratio": 1.982,
+        "candidateToBaseline": 1.982,
+        "percent": 98.2,
+        "label": "speedup"
+      },
+      "correctness": {
+        "field": "leakedListeners",
+        "baselineTotal": 180,
+        "candidateTotal": 0
+      }
+    }
+  ],
+  "output": "site/benchmarks/core-9.0.2-vs-9.1.0.json"
+}

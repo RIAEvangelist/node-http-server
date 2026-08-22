@@ -9,12 +9,14 @@ const siteRoot = path.join(projectRoot, 'site');
 const requiredPages = [
     'index.html',
     'guide.html',
+    'why.html',
     'cli.html',
     'api.html',
     'configuration.html',
     'examples.html',
     'playground.html',
     'testing.html',
+    'performance.html',
     'benchmarks.html',
     'operations.html',
     'resources.html'
@@ -119,6 +121,20 @@ function checkDocument(filename, source){
     const ids = [];
 
     checkMarkup(filename, source);
+    if(/__[A-Z][A-Z0-9_]*__/.test(source)){
+        report(filename, 'contains an unresolved result placeholder');
+    }
+    const loadsPlaygroundScript = source.includes('src="./playground.js"');
+    if(filename === 'playground.html' && !loadsPlaygroundScript){
+        report(filename, 'must load playground.js');
+    }
+    if(filename === 'playground.html' &&
+        source.indexOf('src="./script.js"') > source.indexOf('src="./playground.js"')){
+        report(filename, 'must load shared script.js before playground.js');
+    }
+    if(filename !== 'playground.html' && loadsPlaygroundScript){
+        report(filename, 'loads the playground-only JavaScript');
+    }
 
     for(const tag of tags){
         if(tag.attributes.has('id')){
@@ -326,7 +342,7 @@ function checkCss(){
 }
 
 function checkJavaScript(){
-    for(const filename of ['script.js', 'benchmark-results.js']){
+    for(const filename of ['script.js', 'playground.js', 'benchmark-results.js']){
         const absoluteFilename = path.join(siteRoot, filename);
         const result = spawnSync(process.execPath, ['--check', absoluteFilename], {
             cwd:projectRoot,

@@ -14,7 +14,8 @@ const hiddenHeaders=new Set([
     'proxy-authorization',
     'set-cookie',
     'x-api-key'
-]);
+]),
+    selectedRoute=Symbol('selectedRoute');
 
 class Server{
     constructor(userConfig){
@@ -24,6 +25,7 @@ class Server{
         this.lastError=null;
         this._deployed=false;
         this._closing=null;
+        this._routing=null;
     }
 
     deploy(userConfig,readyCallback){
@@ -83,6 +85,11 @@ class Server{
     }
 }
 
+const defaultOnRawRequest=Server.prototype.onRawRequest,
+    defaultOnRequest=Server.prototype.onRequest,
+    defaultBeforeServe=Server.prototype.beforeServe,
+    defaultAfterServe=Server.prototype.afterServe;
+
 function deploy(userConfig,readyCallback=function(){}){
     if(typeof userConfig=='function'){
         readyCallback=userConfig;
@@ -105,20 +112,23 @@ function deploy(userConfig,readyCallback=function(){}){
 
     validateConfig(this.config);
 
-    const requestHandler=function(request,response){
-        requestReceived.call(this,request,response).catch(
-            function(err){
-                handleRequestError.call(this,err,request,response);
-            }.bind(this)
-        );
-    }.bind(this);
+    this._routing=createRouting(this.config);
+    const server=this;
+
+    const requestHandler=async function(request,response){
+        try{
+            await requestReceived.call(server,request,response);
+        }catch(err){
+            await handleRequestError.call(server,err,request,response);
+        }
+    };
 
     const clientErrorHandler=function(err,socket){
-        this.lastError=err;
+        server.lastError=err;
         if(socket.writable){
             socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 0\r\n\r\n');
         }
-    }.bind(this);
+    };
 
     let httpsOptions;
     const secureConfigured=this.config.https.privateKey || this.config.https.certificate;
@@ -184,18 +194,20 @@ function deploy(userConfig,readyCallback=function(){}){
 }
 
 function listen(nodeServer,port,readyCallback,secure){
+    const server=this;
+
     nodeServer.listen(
         port,
-        this.config.host,
+        server.config.host,
         function(){
-            if(this.config.verbose){
+            if(server.config.verbose){
                 const address=nodeServer.address();
                 const protocol=secure ? 'https' : 'http';
                 console.log(`${protocol}://${formatAddress(address.address)}:${address.port}`);
             }
 
-            readyCallback(this,nodeServer);
-        }.bind(this)
+            readyCallback(server,nodeServer);
+        }
     );
 }
 
@@ -226,34 +238,35 @@ async function close(callback){
         return this._closing;
     }
 
-    this._closing=Promise.all([
-        closeNodeServer(this.server),
-        closeNodeServer(this.secureServer)
+    const server=this;
+    server._closing=Promise.all([
+        closeNodeServer(server.server),
+        closeNodeServer(server.secureServer)
     ]).then(
         function(){
-            this._deployed=false;
-            this._closing=null;
-        }.bind(this)
+            server._deployed=false;
+            server._closing=null;
+        }
     ).catch(
         function(err){
-            this._closing=null;
+            server._closing=null;
             throw err;
-        }.bind(this)
+        }
     );
 
     if(callback){
-        this._closing.then(()=>callback(),callback);
+        server._closing.then(()=>callback(),callback);
     }
 
-    return this._closing;
+    return server._closing;
 }
 
 function closeNodeServer(nodeServer){
-    if(!nodeServer || !nodeServer.listening){
+    if(!nodeServer){
         return Promise.resolve();
     }
 
-    if(typeof nodeServer.closeIdleConnections=='function'){
+    if(nodeServer.listening && typeof nodeServer.closeIdleConnections=='function'){
         nodeServer.closeIdleConnections();
     }
 
@@ -261,7 +274,7 @@ function closeNodeServer(nodeServer){
         function(resolve,reject){
             nodeServer.close(
                 function(err){
-                    if(err){
+                    if(err && err.code!='ERR_SERVER_NOT_RUNNING'){
                         reject(err);
                         return;
                     }
@@ -273,34 +286,46 @@ function closeNodeServer(nodeServer){
 }
 
 async function requestReceived(request,response){
-    const rawHandled=await this.onRawRequest(
-        request,
-        response,
-        hookServe.bind(this)
-    );
+    const rawRequestHook=this.onRawRequest;
 
-    if(rawHandled || response.writableEnded){
-        return;
+    if(rawRequestHook!==defaultOnRawRequest){
+        const rawHandled=await rawRequestHook.call(
+            this,
+            request,
+            response,
+            hookServe.bind(this)
+        );
+
+        if(rawHandled || response.writableEnded){
+            return;
+        }
     }
 
-    decorateRequest.call(this,request);
-    request.serverRoot=selectRoot.call(this,request.uri.hostname);
+    const hostname=decorateRequest.call(this,request);
+    const route=selectRoot.call(this,hostname);
+    request.serverRoot=route.value;
+    request[selectedRoute]=route;
 
-    const bodyComplete=await collectBody.call(this,request,response);
+    const collected=collectBody.call(this,request,response);
+    const bodyComplete=collected===true ? true : await collected;
     if(!bodyComplete || response.writableEnded){
         return;
     }
 
     logRequest.call(this,request);
 
-    const handled=await this.onRequest(
-        request,
-        response,
-        hookServe.bind(this)
-    );
+    const requestHook=this.onRequest;
+    if(requestHook!==defaultOnRequest){
+        const handled=await requestHook.call(
+            this,
+            request,
+            response,
+            hookServe.bind(this)
+        );
 
-    if(handled || response.writableEnded){
-        return;
+        if(handled || response.writableEnded){
+            return;
+        }
     }
 
     if(request.method!='GET' && request.method!='HEAD'){
@@ -312,12 +337,12 @@ async function requestReceived(request,response){
     await serveRequestFile.call(this,request,response);
 }
 
-function hookServe(request,response,body,encoding){
-    return this.serve(request,response,body,encoding).catch(
-        function(err){
-            handleRequestError.call(this,err,request,response);
-        }.bind(this)
-    );
+async function hookServe(request,response,body,encoding){
+    try{
+        await this.serve(request,response,body,encoding);
+    }catch(err){
+        await handleRequestError.call(this,err,request,response);
+    }
 }
 
 function decorateRequest(request){
@@ -339,7 +364,7 @@ function decorateRequest(request){
     let pathname;
     try{
         const rawTarget=String(request.url || '/');
-        const rawPath=rawTarget.startsWith('/') ? rawTarget.split(/[?#]/,1)[0] : requestURL.pathname;
+        const rawPath=rawTarget.startsWith('/') ? originPath(rawTarget) : requestURL.pathname;
         pathname=decodeURIComponent(rawPath).replace(/\\/g,'/');
     }catch{
         throw new HttpError(400,'Malformed URL encoding');
@@ -353,22 +378,26 @@ function decorateRequest(request){
         throw new HttpError(403,'Alternate data streams are not served');
     }
 
-    if(pathname.split('/').includes('..')){
+    if(containsParentSegment(pathname)){
         throw new HttpError(403,'Path escapes server root');
-    }
-
-    const query=Object.create(null);
-    for(const [key,value] of requestURL.searchParams){
-        if(Object.hasOwn(query,key)){
-            query[key]=Array.isArray(query[key]) ? [...query[key],value] : [query[key],value];
-        }else{
-            query[key]=value;
-        }
     }
 
     let hostname=requestURL.hostname.toLowerCase();
     if(hostname.startsWith('[') && hostname.endsWith(']')){
         hostname=hostname.slice(1,-1);
+    }
+
+    const query=Object.create(null);
+    if(requestURL.search){
+        for(const [key,value] of requestURL.searchParams){
+            if(!Object.hasOwn(query,key)){
+                query[key]=value;
+            }else if(Array.isArray(query[key])){
+                query[key].push(value);
+            }else{
+                query[key]=[query[key],value];
+            }
+        }
     }
 
     request.originalUrl=request.url;
@@ -384,16 +413,97 @@ function decorateRequest(request){
         search:requestURL.search,
         href:requestURL.href
     };
+
+    return hostname;
+}
+
+function originPath(target){
+    const query=target.indexOf('?'),
+        fragment=target.indexOf('#');
+    let end=target.length;
+
+    if(query!=-1 && query<end){
+        end=query;
+    }
+    if(fragment!=-1 && fragment<end){
+        end=fragment;
+    }
+
+    return target.slice(0,end);
+}
+
+function containsParentSegment(filename){
+    let start=0;
+
+    for(let index=0;index<=filename.length;index++){
+        if(index<filename.length && filename[index]!='/' && filename[index]!='\\'){
+            continue;
+        }
+
+        if(index-start==2 && filename[start]=='.' && filename[start+1]=='.'){
+            return true;
+        }
+        start=index+1;
+    }
+
+    return false;
+}
+
+function createRouting(config,version=Config.prototype.routingVersion.call(config)){
+    const domains=Object.create(null),
+        roots=new Map,
+        domain=String(config.domain || '0.0.0.0').toLowerCase(),
+        root=createRoot(config.root,roots);
+
+    if(domain!='0.0.0.0' && domain!='*'){
+        for(const key of Object.keys(config.domains)){
+            const route=createRoot(config.domains[key],roots),
+                hostname=key.toLowerCase();
+            if(!Object.hasOwn(domains,hostname) || key==hostname){
+                domains[hostname]=route;
+            }
+        }
+    }
+
+    return {
+        version:version,
+        domain:domain,
+        root:root,
+        domains:domains
+    };
+}
+
+function createRoot(root,roots){
+    const resolved=path.resolve(root);
+    if(roots.has(resolved)){
+        return roots.get(resolved);
+    }
+
+    const real=fs.realpathSync(resolved);
+    const route={
+        value:root,
+        resolved:resolved,
+        real:real,
+        refreshReal:path.relative(resolved,real)!==''
+    };
+    roots.set(resolved,route);
+    return route;
 }
 
 function selectRoot(hostname){
-    const configuredDomain=String(this.config.domain || '0.0.0.0').toLowerCase();
+    const version=Config.prototype.routingVersion.call(this.config);
+    let routing=this._routing;
 
-    if(configuredDomain=='0.0.0.0' || configuredDomain=='*' || configuredDomain==hostname){
-        return this.config.root;
+    if(!routing || routing.version!==version){
+        routing=createRouting(this.config,version);
+        this._routing=routing;
     }
 
-    const domainRoot=ownDomain(this.config.domains,hostname);
+    if(routing.domain=='0.0.0.0' || routing.domain=='*' || routing.domain==hostname){
+        return routing.root;
+    }
+
+    const domainRoot=routing.domains[hostname];
     if(domainRoot){
         return domainRoot;
     }
@@ -401,23 +511,25 @@ function selectRoot(hostname){
     throw new HttpError(421,'Misdirected request');
 }
 
-function ownDomain(domains,hostname){
-    if(Object.hasOwn(domains,hostname)){
-        return domains[hostname];
+function hasRequestBody(request){
+    if(request.headers['transfer-encoding']!==undefined){
+        return true;
     }
 
-    for(const key of Object.keys(domains)){
-        if(key.toLowerCase()==hostname){
-            return domains[key];
-        }
-    }
-
-    return false;
+    const length=request.headers['content-length'];
+    return length!==undefined && Number(length)>0;
 }
 
 function collectBody(request,response){
+    if(!hasRequestBody(request)){
+        request.bodyBuffer=Buffer.alloc(0);
+        request.body='';
+        return true;
+    }
+
     const configuredLimit=this.config.server.maxRequestBodyBytes;
-    const limit=configuredLimit===false || configuredLimit===null || Number(configuredLimit)===0 ? false : Number(configuredLimit);
+    const limit=configuredLimit===false || configuredLimit===null || Number(configuredLimit)===0 ? false : Number(configuredLimit),
+        server=this;
 
     return new Promise(
         function(resolve,reject){
@@ -445,13 +557,13 @@ function collectBody(request,response){
 
                     if(limit!==false && length>limit){
                         settled=true;
-                        sendError.call(this,413,request,response).then(()=>resolve(false),reject);
+                        sendError.call(server,413,request,response).then(()=>resolve(false),reject);
                         request.resume();
                         return;
                     }
 
                     chunks.push(buffer);
-                }.bind(this)
+                }
             );
 
             request.on(
@@ -461,7 +573,7 @@ function collectBody(request,response){
                         return;
                     }
 
-                    request.bodyBuffer=Buffer.concat(chunks,length);
+                    request.bodyBuffer=chunks.length==1 ? chunks[0] : Buffer.concat(chunks,length);
                     request.body=request.bodyBuffer.toString('utf8');
                     finish(true);
                 }
@@ -469,7 +581,7 @@ function collectBody(request,response){
 
             request.on('aborted',()=>reject(new HttpError(400,'Request aborted')));
             request.on('error',reject);
-        }.bind(this)
+        }
     );
 }
 
@@ -499,13 +611,14 @@ function logRequest(request){
         return;
     }
 
+    const server=this;
     Promise.resolve(result).catch(
         function(err){
-            this.lastError=err;
-            if(this.config.verbose){
+            server.lastError=err;
+            if(server.config.verbose){
                 console.error('Unable to write request log',err.message);
             }
-        }.bind(this)
+        }
     );
 }
 
@@ -520,13 +633,29 @@ function redactHeaders(headers){
 }
 
 async function serveRequestFile(request,response){
-    const root=path.resolve(request.serverRoot);
+    const route=request[selectedRoute];
+    let root;
     let rootReal;
 
-    try{
-        rootReal=await fsp.realpath(root);
-    }catch(err){
-        throw internalError(err);
+    if(route && request.serverRoot===route.value){
+        root=route.resolved;
+        if(route.refreshReal){
+            try{
+                rootReal=await fsp.realpath(root);
+                route.real=rootReal;
+            }catch(err){
+                throw internalError(err);
+            }
+        }else{
+            rootReal=route.real;
+        }
+    }else{
+        root=path.resolve(request.serverRoot);
+        try{
+            rootReal=await fsp.realpath(root);
+        }catch(err){
+            throw internalError(err);
+        }
     }
 
     let filename=resolveInsideRoot(root,request.url);
@@ -625,10 +754,21 @@ function isInside(root,filename){
 
 function containsDotfile(root,filename){
     const relative=path.relative(root,filename);
+    let start=0;
 
-    return relative.split(/[\\/]/).some(
-        segment=>segment.length>1 && segment!='..' && segment[0]=='.'
-    );
+    for(let index=0;index<=relative.length;index++){
+        if(index<relative.length && relative[index]!='/' && relative[index]!='\\'){
+            continue;
+        }
+
+        const length=index-start;
+        if(length>1 && relative[start]=='.' && (length!=2 || relative[start+1]!='.')){
+            return true;
+        }
+        start=index+1;
+    }
+
+    return false;
 }
 
 function shouldUseSpaFallback(request){
@@ -692,12 +832,13 @@ async function serveStaticFile(filename,stat,request,response){
         return;
     }
 
-    if(this.config.contentType && Object.hasOwn(this.config.contentType,extension) && this.config.contentType[extension]===false){
+    const configuredContentType=Config.prototype.contentTypeFor.call(this.config,extension);
+    if(configuredContentType===false){
         await sendError.call(this,415,request,response);
         return;
     }
 
-    const contentType=this.config.contentType && Object.hasOwn(this.config.contentType,extension) && this.config.contentType[extension] || 'application/octet-stream';
+    const contentType=configuredContentType || 'application/octet-stream';
     const etag=weakEtag(stat);
 
     response.setHeader('Content-Type',contentType);
@@ -746,11 +887,10 @@ async function serveStaticFile(filename,stat,request,response){
     response.statusCode=response.statusCode==206 ? 206 : 200;
 
     const length=range ? end-start+1 : stat.size;
-    const customBeforeServe=this.beforeServe!==Server.prototype.beforeServe;
+    const customBeforeServe=this.beforeServe!==defaultBeforeServe;
 
     if(customBeforeServe){
-        const file=await fsp.readFile(filename);
-        const body=range ? file.subarray(start,end+1) : file;
+        const body=range ? await readFileRange(filename,start,end) : await fsp.readFile(filename);
         await this.serve(request,response,body,'binary');
         return;
     }
@@ -775,6 +915,32 @@ async function serveStaticFile(filename,stat,request,response){
     }
 
     await streamFile.call(this,filename,start,end,compression,request,response);
+}
+
+async function readFileRange(filename,start,end){
+    const handle=await fsp.open(filename,'r'),
+        body=Buffer.allocUnsafe(end-start+1);
+    let offset=0;
+
+    try{
+        while(offset<body.length){
+            const result=await handle.read(body,offset,body.length-offset,start+offset);
+            if(result.bytesRead===0){
+                break;
+            }
+            offset+=result.bytesRead;
+        }
+    }finally{
+        await handle.close();
+    }
+
+    if(offset!=body.length){
+        const error=new Error('Static file changed while reading its byte range');
+        error.code='ERR_FILE_CHANGED';
+        throw error;
+    }
+
+    return body;
 }
 
 function weakEtag(stat){
@@ -902,28 +1068,43 @@ function appendVary(response,value){
 }
 
 function streamFile(filename,start,end,compression,request,response){
+    const server=this;
+
     return new Promise(
         function(resolve,reject){
-            const source=fs.createReadStream(filename,{start:start,end:end});
-            const streams=[source];
-            let output=source;
+            let source;
+            let output;
+            let transform;
             let settled=false;
 
-            if(compression=='br'){
-                output=zlib.createBrotliCompress();
-                streams.push(output);
-                source.pipe(output);
-            }else if(compression=='gzip'){
-                output=zlib.createGzip();
-                streams.push(output);
-                source.pipe(output);
+            try{
+                if(compression=='br'){
+                    transform=zlib.createBrotliCompress({
+                        params:{
+                            [zlib.constants.BROTLI_PARAM_QUALITY]:server.config.server.brotliQuality
+                        }
+                    });
+                }else if(compression=='gzip'){
+                    transform=zlib.createGzip();
+                }
+
+                source=fs.createReadStream(filename,{start:start,end:end});
+            }catch(err){
+                if(transform){
+                    transform.destroy();
+                }
+                reject(err);
+                return;
             }
 
+            output=transform || source;
+
             const destroyStreams=function(){
-                for(const stream of streams){
-                    if(!stream.destroyed){
-                        stream.destroy();
-                    }
+                if(!source.destroyed){
+                    source.destroy();
+                }
+                if(transform && !transform.destroyed){
+                    transform.destroy();
                 }
             };
 
@@ -932,9 +1113,9 @@ function streamFile(filename,start,end,compression,request,response){
                     return;
                 }
                 settled=true;
-                invokeAfterServe.call(this,request,response);
+                invokeAfterServe.call(server,request,response);
                 resolve();
-            }.bind(this);
+            };
 
             const close=function(){
                 if(settled){
@@ -954,7 +1135,7 @@ function streamFile(filename,start,end,compression,request,response){
                 destroyStreams();
 
                 if(response.headersSent || response.destroyed){
-                    this.lastError=err;
+                    server.lastError=err;
                     if(!response.destroyed){
                         response.destroy();
                     }
@@ -963,16 +1144,20 @@ function streamFile(filename,start,end,compression,request,response){
                 }
 
                 reject(err);
-            }.bind(this);
+            };
 
-            for(const stream of streams){
-                stream.once('error',fail);
+            source.once('error',fail);
+            if(transform){
+                transform.once('error',fail);
             }
             response.once('finish',finish);
             response.once('close',close);
             response.once('error',fail);
+            if(transform){
+                source.pipe(transform);
+            }
             output.pipe(response);
-        }.bind(this)
+        }
     );
 }
 
@@ -990,9 +1175,16 @@ async function serve(request,response,body='',encoding='utf8'){
         response.setHeader('Content-Type','text/plain; charset=utf-8');
     }
 
-    const refBody=new RefString(body);
-    const refEncoding=new RefString(encoding);
-    const handled=await this.beforeServe(
+    const beforeServe=this.beforeServe;
+    if(beforeServe===defaultBeforeServe){
+        completeServing.call(this,request,response,body,encoding);
+        return;
+    }
+
+    const refBody=new RefString(body),
+        refEncoding=new RefString(encoding);
+    const handled=await beforeServe.call(
+        this,
         request,
         response,
         refBody,
@@ -1008,26 +1200,19 @@ async function serve(request,response,body='',encoding='utf8'){
 }
 
 function completeServing(request,response,refBody,refEncoding){
-    if(!(refBody instanceof RefString)){
-        refBody=new RefString(refBody);
-    }
-
-    if(!(refEncoding instanceof RefString)){
-        refEncoding=new RefString(refEncoding || 'utf8');
-    }
-
     if(response.writableEnded){
         invokeAfterServe.call(this,request,response);
         return;
     }
 
-    let body=refBody.value;
+    let body=refBody instanceof RefString ? refBody.value : refBody;
+    const encoding=refEncoding instanceof RefString ? refEncoding.value : refEncoding || 'utf8';
     if(body===undefined || body===null){
         body='';
     }
 
     if(!response.hasHeader('Content-Length') && !response.hasHeader('Content-Encoding') && response.statusCode!=204 && response.statusCode!=304){
-        response.setHeader('Content-Length',Buffer.isBuffer(body) ? body.length : Buffer.byteLength(String(body),refEncoding.value));
+        response.setHeader('Content-Length',Buffer.isBuffer(body) ? body.length : Buffer.byteLength(String(body),encoding));
     }
 
     if(request && request.method=='HEAD'){
@@ -1035,12 +1220,13 @@ function completeServing(request,response,refBody,refEncoding){
         return;
     }
 
+    const server=this;
     response.end(
         body,
-        Buffer.isBuffer(body) ? undefined : refEncoding.value,
+        Buffer.isBuffer(body) ? undefined : encoding,
         function(){
-            invokeAfterServe.call(this,request,response);
-        }.bind(this)
+            invokeAfterServe.call(server,request,response);
+        }
     );
 }
 
@@ -1050,10 +1236,11 @@ function completeResponse(request,response){
         return;
     }
 
+    const server=this;
     response.end(
         function(){
-            invokeAfterServe.call(this,request,response);
-        }.bind(this)
+            invokeAfterServe.call(server,request,response);
+        }
     );
 }
 
@@ -1064,8 +1251,13 @@ function invokeAfterServe(request,response){
 
     Object.defineProperty(response,'__nodeHttpServerAfterServe',{value:true});
 
+    const afterServe=this.afterServe;
+    if(afterServe===defaultAfterServe){
+        return;
+    }
+
     try{
-        const result=this.afterServe(request,response);
+        const result=afterServe.call(this,request,response);
         if(result && typeof result.catch=='function'){
             result.catch(err=>{
                 this.lastError=err;
@@ -1116,7 +1308,7 @@ function setHeaders(response,headers){
     }
 }
 
-function handleRequestError(err,request,response){
+async function handleRequestError(err,request,response){
     this.lastError=err;
 
     if(this.config.verbose){
@@ -1128,14 +1320,14 @@ function handleRequestError(err,request,response){
     }
 
     const status=err instanceof HttpError ? err.status : 500;
-    sendError.call(this,status,request,response).catch(
-        function(sendErr){
-            this.lastError=sendErr;
-            if(!response.destroyed){
-                response.destroy();
-            }
-        }.bind(this)
-    );
+    try{
+        await sendError.call(this,status,request,response);
+    }catch(sendErr){
+        this.lastError=sendErr;
+        if(!response.destroyed){
+            response.destroy();
+        }
+    }
 }
 
 function internalError(err){
@@ -1176,6 +1368,8 @@ function validateConfig(config){
     validateNonNegative(config.server.keepAliveTimeout,'server.keepAliveTimeout');
     validateNonNegative(config.server.maxRequestBodyBytes,'server.maxRequestBodyBytes',true);
     validateNonNegative(config.server.compressionThreshold,'server.compressionThreshold');
+    validateIntegerRange(config.server.brotliQuality,'server.brotliQuality',0,11);
+    config.server.brotliQuality=Number(config.server.brotliQuality);
 
     if(typeof config.server.allowDotfiles!='boolean'){
         throw new TypeError('server.allowDotfiles must be true or false');
@@ -1186,6 +1380,13 @@ function validatePort(value,name){
     const port=Number(value);
     if(!Number.isInteger(port) || port<0 || port>65535){
         throw new RangeError(`${name} must be an integer from 0 to 65535`);
+    }
+}
+
+function validateIntegerRange(value,name,minimum,maximum){
+    const number=Number(value);
+    if(!Number.isInteger(number) || number<minimum || number>maximum){
+        throw new RangeError(`${name} must be an integer from ${minimum} to ${maximum}`);
     }
 }
 
@@ -1220,6 +1421,7 @@ function sanitizedConfig(config){
             maxRequestBodyBytes:config.server.maxRequestBodyBytes,
             compression:config.server.compression,
             compressionThreshold:config.server.compressionThreshold,
+            brotliQuality:config.server.brotliQuality,
             spaFallback:config.server.spaFallback
         },
         https:{

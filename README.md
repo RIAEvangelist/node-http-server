@@ -12,13 +12,41 @@
 [![function coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Ffunctions.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
 [![branch coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Fbranches.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
 
-[Start](https://riaevangelist.github.io/node-http-server/) · [Docs hub](https://riaevangelist.github.io/node-http-server/guide.html) · [CLI](https://riaevangelist.github.io/node-http-server/cli.html) · [Library API](https://riaevangelist.github.io/node-http-server/api.html) · [Configuration](https://riaevangelist.github.io/node-http-server/configuration.html) · [Examples](https://riaevangelist.github.io/node-http-server/examples.html) · [Playground](https://riaevangelist.github.io/node-http-server/playground.html) · [Testing](https://riaevangelist.github.io/node-http-server/testing.html) · [Benchmarks](https://riaevangelist.github.io/node-http-server/benchmarks.html) · [Operations](https://riaevangelist.github.io/node-http-server/operations.html)
+[Start](https://riaevangelist.github.io/node-http-server/) · [Why](https://riaevangelist.github.io/node-http-server/why.html) · [Docs hub](https://riaevangelist.github.io/node-http-server/guide.html) · [CLI](https://riaevangelist.github.io/node-http-server/cli.html) · [Library API](https://riaevangelist.github.io/node-http-server/api.html) · [Configuration](https://riaevangelist.github.io/node-http-server/configuration.html) · [Examples](https://riaevangelist.github.io/node-http-server/examples.html) · [Playground](https://riaevangelist.github.io/node-http-server/playground.html) · [Testing](https://riaevangelist.github.io/node-http-server/testing.html) · [Performance](https://riaevangelist.github.io/node-http-server/performance.html) · [Benchmarks](https://riaevangelist.github.io/node-http-server/benchmarks.html) · [Operations](https://riaevangelist.github.io/node-http-server/operations.html)
 
 [![Sponsor RIAEvangelist to help development of node-http-server](https://img.shields.io/static/v1?label=Sponsor%20Me%20On%20GitHub&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/RIAEvangelist)
 
 A small HTTP and HTTPS static server for Node.js. It has zero runtime dependencies, works from CommonJS and ESM, and binds to localhost by default. The sole direct development dependency is the owner-maintained `vanilla-test@2.1.1`, used for project-owned native V8 coverage.
 
 Version 9 is a focused static-server toolkit with streaming files, clean multi-server lifecycle, modern cache and range behavior, optional compression and SPA fallback, configurable request limits, and strict root containment.
+
+## Why node-http-server
+
+| Signal | Engineering value |
+|---|---|
+| Zero runtime dependencies | A compact install and an inspectable runtime surface. |
+| CLI + CommonJS + ESM | One server fits shell tasks, existing Node applications, and modern modules. |
+| Modern static HTTP | Streaming, HEAD, ranges, validators, Brotli/gzip, SPA fallback, and MIME controls. |
+| Explicit security and operations | Localhost binding, root containment, dotfile policy, Host routing, HTTPS, limits, timeouts, and logs. |
+| Measured delivery | 192 focused cases, per-file native V8 coverage, packed-package smoke checks, and reproducible benchmarks. |
+
+See the compact [decision guide](https://riaevangelist.github.io/node-http-server/why.html) for project fit and source links.
+
+## 9.1.0 measured core results
+
+Nine alternating samples on Node 24.18.0 compare the exact `9.0.2` tag with `9.1.0`. Every timed response is validated, and the complete samples, environment, configuration, and source hashes are published in the [raw result](https://riaevangelist.github.io/node-http-server/benchmarks/core-9.0.2-vs-9.1.0.json).
+
+| Targeted path | 9.0.2 median | 9.1.0 median | Result |
+|---|---:|---:|---:|
+| 1,000 repeated query values | 1,076 req/s | 7,695 req/s | 7.15× speedup |
+| 1,000-domain routing miss | 13,926 req/s | 23,259 req/s | 1.67× speedup |
+| 16-byte custom-hook range from 8 MiB | 790 req/s | 2,310 req/s | 2.92× speedup |
+| Default Brotli for 2.5 MiB structured text | 0.580 req/s | 112.267 req/s | 193.56× speedup; 161,802 → 270,759 compressed bytes |
+| Cold Config construction | 201,737 instances/s | 580,412 instances/s | 2.88× speedup |
+| Cold Config retained bytes | 11,816.5 B/instance | 5,786.0 B/instance | 51.0% lower |
+| Immediate deploy + close | 180 leaked listeners | 0 leaked listeners | Clean closure |
+
+The [Performance page](https://riaevangelist.github.io/node-http-server/performance.html) includes representative paths, compatibility controls, workload contracts, and reproduction commands.
 
 ## Install
 
@@ -137,7 +165,7 @@ node-http-server root=./public port=9000 verbose=true
 | Deliberately serve `/.well-known` | `node-http-server --root ./public --allow-dotfiles` |
 | Write NDJSON request logs | `node-http-server --log ./requests.ndjson` |
 
-Use the module API for HTTPS certificates, virtual hosts, hooks, and custom configuration functions.
+Use the module API for HTTPS certificates, virtual hosts, hooks, Brotli quality, compression thresholds, and custom configuration functions.
 
 ## Server lifecycle
 
@@ -211,6 +239,7 @@ const config={
         maxRequestBodyBytes:1024*1024,
         compression:true,
         compressionThreshold:1024,
+        brotliQuality:4,
         spaFallback:false
     }
 };
@@ -247,8 +276,9 @@ const config={
 | `headersTimeout` | `60000` | Request-header timeout in milliseconds |
 | `keepAliveTimeout` | `5000` | Keep-alive timeout in milliseconds |
 | `maxRequestBodyBytes` | `false` | Maximum body size in bytes; `false`, `null`, or `0` means unlimited |
-| `compression` | `false` | Negotiate Brotli or gzip for eligible responses |
+| `compression` | `false` | Negotiate Brotli or gzip through Node's built-in `node:zlib`; runtime dependencies stay at zero |
 | `compressionThreshold` | `1024` | Minimum uncompressed size in bytes |
+| `brotliQuality` | `4` | Brotli quality from `0` through `11` for automatically compressed static responses through `node:zlib` |
 | `spaFallback` | `false` | `true` uses `server.index`; a string selects another fallback file |
 
 Every timeout accepts a nonnegative millisecond value. Programmatic configuration accepts `false`, `null`, or `0` to disable it. Limits and compression stay under your control; no request-body limit or compression is enabled by default.
@@ -263,7 +293,7 @@ Every timeout accepts a nonnegative millisecond value. Programmatic configuratio
 | `server.keepAliveTimeout` | Disabled | Disabled | Disabled |
 | `server.maxRequestBodyBytes` | Unlimited | Unlimited | Unlimited |
 | `server.allowDotfiles` | Dotfiles blocked | Invalid | Invalid |
-| `contentType` | Automatic MIME map removed; files use `application/octet-stream` | Not a supported map value | Not a supported map value |
+| `contentType` | Automatic MIME map removed; files use `application/octet-stream` | Unsupported map value | Unsupported map value |
 
 Deployment validates port ranges, requires a nonempty listen address, verifies static roots, and rejects negative timeout or limit values before opening a listener.
 
@@ -340,6 +370,8 @@ new Server({
     }
 }).deploy();
 ```
+
+`deploy()` compiles `domain`, `domains`, and their canonical roots into an O(1) routing table. Assigning `server.config.root` or `server.config.domain`, or changing entries in `server.config.domains`, invalidates the table; the next request rebuilds it with the live values.
 
 `host` decides which network interface listens. `domain` and `domains` decide which Host headers and roots the server accepts. A wildcard primary `domain` (`'0.0.0.0'` or `'*'`) selects the primary root before the `domains` map; set a non-wildcard primary domain when using virtual hosts.
 
@@ -440,22 +472,24 @@ Install the exact workspace state once with `npm ci`. Published installs have ze
 
 Vanilla Test 2.1 uses Node's native V8 coverage path and its project-owned reporter. Node's built-in test runner and assertion module execute the behavior suite.
 
-The suite contains 156 unique, focused leaf cases: 34 Unit, 46 Functional, 24 Integration, and 52 Regression. Each behavior has one owning case. Both the normal runner and coverage use the ordered manifest in `test/suites.js`; generated `coverage/node/test-results.json` is the authoritative ordered case evidence.
+The suite contains 192 unique, focused leaf cases: 52 Unit, 58 Functional, 24 Integration, and 58 Regression. Each behavior has one owning case. Both the normal runner and coverage use the ordered manifest in `test/suites.js`; generated `coverage/node/test-results.json` is the authoritative ordered case evidence.
 
 | Script | Purpose |
 |---|---|
 | `npm start` | Serve the current directory with the CLI |
-| `npm test` | Run all 156 cases discovered by the shared suite manifest |
-| `npm run test:unit` | Run 34 isolated Config and suite-discovery tests from `test/unit/` |
-| `npm run test:functional` | Run 46 public HTTP behavior tests from `test/functional/` |
+| `npm test` | Run all 192 cases discovered by the shared suite manifest |
+| `npm run test:unit` | Run 52 isolated Config and suite-discovery tests from `test/unit/` |
+| `npm run test:functional` | Run 58 public HTTP behavior tests from `test/functional/` |
 | `npm run test:integration` | Run 24 module, CLI, benchmark, listener, stream, and filesystem boundary tests from `test/integration/` |
-| `npm run test:regression` | Run 52 owned cases for previously fixed failures and security boundaries from `test/regression/` |
+| `npm run test:regression` | Run 58 owned cases for previously fixed failures and security boundaries from `test/regression/` |
 | `npm run test:site` | Check docs pages, local links/fragments, IDs, label/ARIA targets, image alt text, nav state, CSS, and site JavaScript |
 | `npm run coverage` | Run `vanilla-test` Node coverage gates, write `coverage/node/`, and refresh measured badge JSON |
 | `npm run test:package` | Pack, install, and smoke-test the publishable package |
 | `npm run verify` | Run tests, static-doc checks, coverage, and the package smoke test |
 | `npm run benchmark` | Measure five validated public paths with the bounded developer profile |
 | `npm run benchmark:smoke` | Run the short real-server measurement profile |
+| `npm run benchmark:core` | Compare targeted core paths with 9.0.2 using nine alternating samples |
+| `npm run benchmark:core:smoke` | Verify the short core comparison profile |
 | `npm run basic` | Run the basic HTTP example |
 | `npm run https` | Run the HTTPS-only example; local certificates are required |
 | `npm run both` | Run the combined HTTP/HTTPS example; local certificates are required |

@@ -6,7 +6,7 @@ const benchmarkStatus=document.querySelector('#benchmark-status'),
     scenariosBody=document.querySelector('#benchmark-scenarios');
 
 if(benchmarkStatus && benchmarkResult && environmentBody && scenariosBody){
-    fetch('./benchmarks/latest.json',{cache:'no-store'})
+    fetch('./benchmarks/latest.json',{cache:'no-cache'})
         .then(function(response){
             if(!response.ok){
                 throw new Error('Benchmark result returned HTTP '+response.status+'.');

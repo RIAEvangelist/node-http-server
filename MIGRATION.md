@@ -58,7 +58,7 @@ new Server({
 
 ## Multiple servers and shutdown
 
-Do not call `deploy()` repeatedly on the imported singleton to create unrelated listeners. Give each listener set its own instance:
+Give each unrelated listener set its own `Server` instance:
 
 ```js
 const {Server}=require('node-http-server');
@@ -148,7 +148,7 @@ Malformed, unsupported-unit, and multi-range headers are ignored and receive the
 
 The local certificate and private-key fixtures tracked by older releases were removed. Any copy obtained from v8, an old package, or repository history is public and untrusted. Never deploy with it.
 
-Generate a new development certificate when one is needed, and use certificates and keys managed for the actual environment in production. Do not commit private keys.
+Generate a new development certificate when one is needed, use certificates and keys managed for the actual environment in production, and keep private keys out of source control.
 
 ## Hook compatibility
 

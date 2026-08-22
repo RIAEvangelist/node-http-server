@@ -4,6 +4,27 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [9.1.0] - 2026-08-21
+
+### Added
+
+- Added configurable `server.brotliQuality` with a responsive quality-4 default for on-demand compression.
+- Added reproducible `9.0.2`-versus-`9.1.0` core benchmarks with alternating samples, raw JSON evidence, environment metadata, and correctness checks.
+- Added focused Performance and Why documentation for engineering evaluation and adoption.
+
+### Changed
+
+- Replaced quadratic repeated-query array copying with linear accumulation while preserving ordered string-or-array values.
+- Bypassed unchanged request and response hooks, empty request-body collectors, empty query iteration, repeated virtual-host scans, and redundant stream wrappers on ordinary static requests.
+- Shared the frozen MIME defaults until a Config consumer requests a mutable snapshot, reducing cold Config construction time and retained memory while preserving isolated direct mutation.
+- Cached validated document-root canonical paths per deployment while retaining candidate real-path containment checks and fallback validation for hook-selected roots.
+- Read only the selected byte range before a custom `beforeServe` hook instead of buffering the complete source file.
+
+### Fixed
+
+- Cancelled pending listeners when `close()` runs immediately after `deploy()`, preventing an untracked listener from becoming active after closure resolves.
+- Set on-demand Brotli compression to an operational quality level instead of Node's maximum-CPU default.
+
 ## [9.0.2] - 2026-08-17
 
 ### Changed
@@ -63,4 +84,4 @@ All notable changes to this project are documented here.
 
 - Support for Node.js versions older than 22.12.
 - Implicit CLI parsing from the reusable configuration class.
-- Legacy tooling that is not part of the zero-runtime-dependency server.
+- Legacy tooling outside the zero-runtime-dependency server.
