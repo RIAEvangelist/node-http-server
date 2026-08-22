@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Documentation
+
+- Made native HTTP and HTTPS support explicit in the README header, protocol badge, project positioning, repository metadata, and developer documentation.
+- Added a focused HTTPS guide covering HTTP-only, HTTPS-only, and paired listener modes, certificate configuration, lifecycle, examples, and troubleshooting.
+
 ## [9.1.0] - 2026-08-21
 
 ### Added

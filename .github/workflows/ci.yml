@@ -189,7 +189,7 @@ jobs:
           mkdir -p _site
           cp --recursive site/. _site/
           mkdir -p _site/assets
-          cp assets/node-http-server-header.webp _site/assets/
+          cp assets/node-http-server-header-https.webp _site/assets/
           mkdir -p _site/coverage
           cp --recursive _coverage/node _site/coverage/node
           cp --recursive _coverage/badges _site/badges
@@ -204,6 +204,7 @@ jobs:
           test -f _site/cli.html
           test -f _site/api.html
           test -f _site/configuration.html
+          test -f _site/https.html
           test -f _site/examples.html
           test -f _site/playground.html
           test -f _site/testing.html
@@ -214,7 +215,7 @@ jobs:
           test -f _site/styles.css
           test -f _site/script.js
           test -f _site/playground.js
-          test -f _site/assets/node-http-server-header.webp
+          test -f _site/assets/node-http-server-header-https.webp
           test -f _site/coverage/node/index.html
           test -f _site/badges/lines.json
           test -f _site/badges/functions.json

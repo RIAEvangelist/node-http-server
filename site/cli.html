@@ -6,9 +6,9 @@
     </head>
     <body>
         <a class="skip-link" href="#main">Skip to content</a>
-        <header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./why.html">Why</a><a href="./cli.html" aria-current="page">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
+        <header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./why.html">Why</a><a href="./cli.html" aria-current="page">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./https.html">HTTPS</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
         <main id="main">
-            <header class="page-header page-header-compact"><p class="kicker">Command line</p><h1>Run the server from a terminal.</h1><p class="lead">Install, serve, expose, tune, and stop the CLI. Every supported input and exit path is documented here.</p></header>
+            <header class="page-header page-header-compact"><p class="kicker">Command line · HTTP listener</p><h1>Run the server from a terminal.</h1><p class="lead">Install, serve, expose, tune, and stop the HTTP CLI. Use CommonJS or ESM for HTTPS-only or paired HTTP + HTTPS listeners.</p></header>
             <div class="doc-layout">
                 <aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#install">Install and run</a><a href="#tasks">Common tasks</a><a href="#options">All options</a><a href="#syntax">Input syntax</a><a href="#output">Output and exits</a><a href="#failures">Troubleshooting</a><a href="#limits">CLI boundary</a></aside>
                 <div class="doc-content">
@@ -111,7 +111,7 @@ node-http-server --version</code></pre></div>
                     <section class="doc-section" id="limits"><p class="kicker">CLI boundary</p><h2>Use the library for object configuration.</h2>
                         <p>The CLI covers common static-server operations. The module API carries structured maps, certificate settings, compression tuning, and function-valued hooks.</p>
                         <div class="table-wrap"><table><thead><tr><th>Needs the module API</th><th>Configuration/API link</th></tr></thead><tbody>
-                            <tr><td>HTTPS keys and certificates</td><td><a href="./configuration.html#https"><code>https</code> configuration</a></td></tr>
+                            <tr><td>HTTPS-only or paired HTTP + HTTPS listeners</td><td><a href="./https.html">HTTPS guide and module examples</a></td></tr>
                             <tr><td>Multiple domain roots</td><td><a href="./configuration.html#network"><code>domains</code> mapping</a></td></tr>
                             <tr><td>MIME overrides, rejected/restricted extensions</td><td><a href="./configuration.html#mime"><code>contentType</code> and <code>restrictedType</code></a></td></tr>
                             <tr><td>Custom error bodies/headers</td><td><a href="./configuration.html#errors"><code>errors</code></a></td></tr>
@@ -120,7 +120,7 @@ node-http-server --version</code></pre></div>
                             <tr><td>Log bodies or custom logger functions</td><td><a href="./configuration.html#logging">Logging configuration</a></td></tr>
                             <tr><td>Hooks, multiple instances, lifecycle control</td><td><a href="./api.html">Library API</a></td></tr>
                         </tbody></table></div>
-                        <div class="page-links"><a href="./playground.html">Generate module and CLI snippets →</a><a href="./examples.html#cli">More CLI examples →</a><a href="./operations.html#exposure">Expose a listener safely →</a></div>
+                        <div class="page-links"><a href="./https.html">Configure HTTPS →</a><a href="./playground.html">Generate module and CLI snippets →</a><a href="./examples.html#cli">More CLI examples →</a><a href="./operations.html#exposure">Expose a listener safely →</a></div>
                     </section>
                 </div>
             </div>

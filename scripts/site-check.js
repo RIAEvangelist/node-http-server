@@ -13,6 +13,7 @@ const requiredPages = [
     'cli.html',
     'api.html',
     'configuration.html',
+    'https.html',
     'examples.html',
     'playground.html',
     'testing.html',
@@ -359,6 +360,39 @@ function checkJavaScript(){
     }
 }
 
+function checkProtocolPositioning(){
+    const checks = [
+        {
+            filename:'README.md',
+            source:fs.readFileSync(path.join(projectRoot, 'README.md'), 'utf8'),
+            phrases:['HTTP and HTTPS static serving', 'protocols-HTTP_%2B_HTTPS', 'HTTP and HTTPS modes']
+        },
+        {
+            filename:'site/index.html',
+            source:fs.readFileSync(path.join(siteRoot, 'index.html'), 'utf8'),
+            phrases:['Native HTTP + HTTPS', 'Start an HTTP or HTTPS static server.']
+        },
+        {
+            filename:'site/cli.html',
+            source:fs.readFileSync(path.join(siteRoot, 'cli.html'), 'utf8'),
+            phrases:['Command line · HTTP listener', 'Use CommonJS or ESM for HTTPS-only or paired HTTP + HTTPS listeners.']
+        },
+        {
+            filename:'site/https.html',
+            source:fs.readFileSync(path.join(siteRoot, 'https.html'), 'utf8'),
+            phrases:['Native Node HTTPS · zero runtime dependencies', 'node:https', 'HTTPS only', 'HTTP + HTTPS']
+        }
+    ];
+
+    for(const check of checks){
+        for(const phrase of check.phrases){
+            if(!check.source.includes(phrase)){
+                report(check.filename, 'missing protocol-positioning phrase: ' + phrase);
+            }
+        }
+    }
+}
+
 if(!fs.existsSync(siteRoot)){
     throw new Error('site directory does not exist');
 }
@@ -380,6 +414,7 @@ for(const filename of pages){
 checkLinks();
 checkCss();
 checkJavaScript();
+checkProtocolPositioning();
 
 if(failures.length){
     process.stderr.write(failures.sort().join('\n') + '\n');

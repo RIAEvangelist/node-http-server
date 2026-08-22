@@ -21,7 +21,7 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "assets/node-http-server-header.webp",
+    "assets/node-http-server-header-https.webp",
     "benchmark/",
     "bin/",
     "server/",
@@ -70,6 +70,8 @@
   "keywords": [
     "http",
     "https",
+    "https-server",
+    "tls",
     "server",
     "static-server",
     "node",

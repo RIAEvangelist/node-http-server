@@ -12,7 +12,7 @@ Security fixes target the current supported major release. Upgrade to the latest
 
 ## Security model
 
-node-http-server provides static HTTP/HTTPS serving with extension hooks. Add authentication, authorization, application-firewall rules, secret storage, and reverse proxying at the application or edge.
+node-http-server provides native Node HTTP and HTTPS static listeners with extension hooks. Add authentication, authorization, application-firewall rules, secret storage, and reverse proxying at the application or edge.
 
 Version 9 starts from these boundaries:
 

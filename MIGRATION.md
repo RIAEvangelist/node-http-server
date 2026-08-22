@@ -1,6 +1,6 @@
 # Migrating from node-http-server v8 to v9
 
-Version 9 keeps the small server, default singleton, hooks, HTTPS configuration, and `key=value` CLI. The major changes make network exposure explicit, isolate multiple servers, and bring static HTTP behavior up to date.
+Version 9 keeps native HTTP and HTTPS listeners, the small server surface, default singleton, hooks, and `key=value` CLI. The major changes make network exposure explicit, isolate multiple servers, and bring static delivery behavior up to date.
 
 ## Runtime
 

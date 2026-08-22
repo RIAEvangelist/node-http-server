@@ -3,11 +3,11 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Start node-http-server from the CLI, CommonJS, or ESM.">
+        <meta name="description" content="Start an HTTP or HTTPS static server from the CLI, CommonJS, or ESM with zero runtime dependencies.">
         <meta name="theme-color" content="#08110d">
         <meta property="og:title" content="Start — node-http-server">
         <meta property="og:description" content="A small HTTP and HTTPS static server with zero runtime dependencies.">
-        <meta property="og:image" content="https://riaevangelist.github.io/node-http-server/assets/node-http-server-header.webp">
+        <meta property="og:image" content="https://riaevangelist.github.io/node-http-server/assets/node-http-server-header-https.webp">
         <title>Start — node-http-server</title>
         <link rel="canonical" href="https://riaevangelist.github.io/node-http-server/">
         <link rel="stylesheet" href="./styles.css">
@@ -18,16 +18,16 @@
         <header class="site-header">
             <a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a>
             <nav aria-label="Documentation">
-                <a href="./index.html" aria-current="page">Start</a><a href="./why.html">Why</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a>
+                <a href="./index.html" aria-current="page">Start</a><a href="./why.html">Why</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./https.html">HTTPS</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a>
             </nav>
         </header>
 
         <main id="main">
             <header class="page-header">
-                <figure class="hero-art"><img src="./assets/node-http-server-header.webp" alt="node-http-server — small server, modern HTTP" fetchpriority="high"></figure>
-                <p class="kicker">Node.js 22.12+ · CommonJS + ESM · localhost first</p>
-                <h1>Start a static server.</h1>
-                <p class="lead">Serve files over HTTP or HTTPS with ranges, cache validation, optional compression, clean shutdown, and zero runtime dependencies.</p>
+                <figure class="hero-art"><img src="./assets/node-http-server-header-https.webp" alt="node-http-server — HTTP and HTTPS static server for Node.js" fetchpriority="high"></figure>
+                <p class="kicker">Native HTTP + HTTPS · Node.js 22.12+ · CommonJS + ESM</p>
+                <h1>Start an HTTP or HTTPS static server.</h1>
+                <p class="lead">Serve the same static-file contract over HTTP, HTTPS-only, or paired listeners with ranges, cache validation, optional compression, clean shutdown, and zero runtime dependencies.</p>
                 <div class="header-actions"><a class="button button-primary" href="#quick-start">Quick start</a><a class="button" href="./guide.html">Browse all docs</a></div>
             </header>
 
@@ -85,6 +85,7 @@ new Server({root:'./public'}).deploy();</code></pre></div>
                             <a class="task-card" href="./cli.html"><strong>Run the command</strong><p>Install, flags, common tasks, expected output, and failure behavior.</p><span>CLI →</span></a>
                             <a class="task-card" href="./api.html"><strong>Embed the server</strong><p>Imports, lifecycle, public methods, request data, and hooks.</p><span>Library API →</span></a>
                             <a class="task-card" href="./configuration.html"><strong>Set exact behavior</strong><p>Every Config key, default, opt-out value, and validation rule.</p><span>Configuration →</span></a>
+                            <a class="task-card" href="./https.html"><strong>Serve with HTTPS</strong><p>HTTPS-only and paired listeners, key/certificate settings, lifecycle, and deployment patterns.</p><span>HTTPS guide →</span></a>
                             <a class="task-card" href="./examples.html"><strong>Copy a working pattern</strong><p>SPA, HTTPS, domains, logging, hooks, limits, and shutdown.</p><span>Examples →</span></a>
                             <a class="task-card" href="./playground.html"><strong>Generate a config</strong><p>Build CommonJS, ESM, CLI, or JSON without running a server.</p><span>Playground →</span></a>
                             <a class="task-card" href="./testing.html"><strong>Test and measure</strong><p>Test commands, coverage gates, reports, badges, and CI artifacts.</p><span>Testing →</span></a>

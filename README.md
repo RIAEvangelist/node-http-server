@@ -1,6 +1,8 @@
-![node-http-server — small server, modern HTTP](assets/node-http-server-header.webp)
+![node-http-server — HTTP and HTTPS static server for Node.js](assets/node-http-server-header-https.webp)
 
 # node-http-server
+
+**HTTP and HTTPS static serving for Node.js — CLI, CommonJS, ESM, and zero runtime dependencies.**
 
 [![CI](https://github.com/RIAEvangelist/node-http-server/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/RIAEvangelist/node-http-server/actions/workflows/ci.yml?query=branch%3Amain)
 [![npm version](https://img.shields.io/npm/v/node-http-server.svg)](https://www.npmjs.com/package/node-http-server)
@@ -8,17 +10,28 @@
 [![license](https://img.shields.io/github/license/RIAEvangelist/node-http-server.svg)](https://github.com/RIAEvangelist/node-http-server/blob/main/licence)
 [![supported Node.js version](https://img.shields.io/node/v/node-http-server.svg)](https://github.com/RIAEvangelist/node-http-server/blob/main/package.json)
 [![runtime dependencies](https://img.shields.io/badge/runtime_dependencies-0-2ea44f)](https://github.com/RIAEvangelist/node-http-server/blob/main/package.json)
+[![protocols: HTTP + HTTPS](https://img.shields.io/badge/protocols-HTTP_%2B_HTTPS-2ea44f)](https://riaevangelist.github.io/node-http-server/https.html)
 [![line coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Flines.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
 [![function coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Ffunctions.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
 [![branch coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FRIAEvangelist%2Fnode-http-server%2Fmain%2Fbadges%2Fbranches.json)](https://riaevangelist.github.io/node-http-server/coverage/node/)
 
-[Start](https://riaevangelist.github.io/node-http-server/) · [Why](https://riaevangelist.github.io/node-http-server/why.html) · [Docs hub](https://riaevangelist.github.io/node-http-server/guide.html) · [CLI](https://riaevangelist.github.io/node-http-server/cli.html) · [Library API](https://riaevangelist.github.io/node-http-server/api.html) · [Configuration](https://riaevangelist.github.io/node-http-server/configuration.html) · [Examples](https://riaevangelist.github.io/node-http-server/examples.html) · [Playground](https://riaevangelist.github.io/node-http-server/playground.html) · [Testing](https://riaevangelist.github.io/node-http-server/testing.html) · [Performance](https://riaevangelist.github.io/node-http-server/performance.html) · [Benchmarks](https://riaevangelist.github.io/node-http-server/benchmarks.html) · [Operations](https://riaevangelist.github.io/node-http-server/operations.html)
+[Start](https://riaevangelist.github.io/node-http-server/) · [Why](https://riaevangelist.github.io/node-http-server/why.html) · [Docs hub](https://riaevangelist.github.io/node-http-server/guide.html) · [CLI](https://riaevangelist.github.io/node-http-server/cli.html) · [Library API](https://riaevangelist.github.io/node-http-server/api.html) · [Configuration](https://riaevangelist.github.io/node-http-server/configuration.html) · [HTTPS](https://riaevangelist.github.io/node-http-server/https.html) · [Examples](https://riaevangelist.github.io/node-http-server/examples.html) · [Playground](https://riaevangelist.github.io/node-http-server/playground.html) · [Testing](https://riaevangelist.github.io/node-http-server/testing.html) · [Performance](https://riaevangelist.github.io/node-http-server/performance.html) · [Benchmarks](https://riaevangelist.github.io/node-http-server/benchmarks.html) · [Operations](https://riaevangelist.github.io/node-http-server/operations.html)
 
 [![Sponsor RIAEvangelist to help development of node-http-server](https://img.shields.io/static/v1?label=Sponsor%20Me%20On%20GitHub&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/RIAEvangelist)
 
-A small HTTP and HTTPS static server for Node.js. It has zero runtime dependencies, works from CommonJS and ESM, and binds to localhost by default. The sole direct development dependency is the owner-maintained `vanilla-test@2.1.1`, used for project-owned native V8 coverage.
+node-http-server serves static files over HTTP and HTTPS. TLS uses Node's built-in `node:https` and adds zero runtime dependencies. The CLI starts HTTP; CommonJS and ESM support HTTP, HTTPS-only, and paired HTTP + HTTPS listeners. The sole direct development dependency is the owner-maintained `vanilla-test@2.1.1`, used for project-owned native V8 coverage.
 
 Version 9 is a focused static-server toolkit with streaming files, clean multi-server lifecycle, modern cache and range behavior, optional compression and SPA fallback, configurable request limits, and strict root containment.
+
+## HTTP and HTTPS modes
+
+| Mode | Start it with | Active listener |
+|---|---|---|
+| HTTP | CLI or module API with the default configuration | `server.server` |
+| HTTPS only | CommonJS or ESM with key/certificate paths and `https.only:true` | `server.secureServer` |
+| HTTP + HTTPS | CommonJS or ESM with key/certificate paths and `https.only:false` | `server.server` and `server.secureServer` |
+
+Both transports use the same roots, hooks, limits, timeouts, range behavior, cache validation, and static-file pipeline. See the focused [HTTPS guide](https://riaevangelist.github.io/node-http-server/https.html) for complete CommonJS and ESM examples.
 
 ## Why node-http-server
 
@@ -26,7 +39,8 @@ Version 9 is a focused static-server toolkit with streaming files, clean multi-s
 |---|---|
 | Zero runtime dependencies | A compact install and an inspectable runtime surface. |
 | CLI + CommonJS + ESM | One server fits shell tasks, existing Node applications, and modern modules. |
-| Modern static HTTP | Streaming, HEAD, ranges, validators, Brotli/gzip, SPA fallback, and MIME controls. |
+| Native HTTP + HTTPS | Node's built-in `node:http` and `node:https`, with HTTP-only, HTTPS-only, and paired listeners. |
+| Modern static delivery | Streaming, HEAD, ranges, validators, Brotli/gzip, SPA fallback, and MIME controls across both transports. |
 | Explicit security and operations | Localhost binding, root containment, dotfile policy, Host routing, HTTPS, limits, timeouts, and logs. |
 | Measured delivery | 192 focused cases, per-file native V8 coverage, packed-package smoke checks, and reproducible benchmarks. |
 
@@ -331,6 +345,8 @@ Unknown extensions use `application/octet-stream`. Set `contentType:false` to re
 
 ### HTTPS
 
+HTTPS is a first-class module API mode built on Node's `node:https`. It shares the HTTP request pipeline and keeps runtime dependencies at zero. Use the [focused HTTPS guide](https://riaevangelist.github.io/node-http-server/https.html) for HTTPS-only, paired-listener, lifecycle, and certificate examples.
+
 | Key | Default | Description |
 |---|---|---|
 | `https.ca` | `''` | Optional CA certificate path |
@@ -385,7 +401,7 @@ new Server({
 | `contentType` entry | `{extension:false}` | Return `415` for one selected extension |
 | `domains` | `{hostname:root}` | Map accepted Host values to isolated static roots |
 
-## Static HTTP behavior
+## Static HTTP and HTTPS behavior
 
 - `GET` streams files instead of loading every file into memory.
 - `HEAD` returns the same status and headers with an empty response body.
