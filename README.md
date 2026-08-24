@@ -42,7 +42,7 @@ Both transports use the same roots, hooks, limits, timeouts, range behavior, cac
 | Native HTTP + HTTPS | Node's built-in `node:http` and `node:https`, with HTTP-only, HTTPS-only, and paired listeners. |
 | Modern static delivery | Streaming, HEAD, ranges, validators, Brotli/gzip, SPA fallback, and MIME controls across both transports. |
 | Explicit security and operations | Localhost binding, root containment, dotfile policy, Host routing, HTTPS, limits, timeouts, and logs. |
-| Measured delivery | 192 focused cases, per-file native V8 coverage, packed-package smoke checks, and reproducible benchmarks. |
+| Measured delivery | 193 focused cases, per-file native V8 coverage, packed-package smoke checks, and reproducible benchmarks. |
 
 See the compact [decision guide](https://riaevangelist.github.io/node-http-server/why.html) for project fit and source links.
 
@@ -488,15 +488,18 @@ Install the exact workspace state once with `npm ci`. Published installs have ze
 
 Vanilla Test 2.1 uses Node's native V8 coverage path and its project-owned reporter. Node's built-in test runner and assertion module execute the behavior suite.
 
-The suite contains 192 unique, focused leaf cases: 52 Unit, 58 Functional, 24 Integration, and 58 Regression. Each behavior has one owning case. Both the normal runner and coverage use the ordered manifest in `test/suites.js`; generated `coverage/node/test-results.json` is the authoritative ordered case evidence.
+The suite contains 193 unique, focused leaf cases: 52 Unit, 58 Functional, 25 Integration, and 58 Regression. Each behavior has one owning case. Both the normal runner and coverage use the ordered manifest in `test/suites.js`; generated `coverage/node/test-results.json` is the authoritative ordered case evidence.
+
+For a non-unit behavioral pass, run `npm run test:behavioral`. It selects the 141 Functional, Integration, and Regression cases from the same manifest rather than maintaining duplicate test sources.
 
 | Script | Purpose |
 |---|---|
 | `npm start` | Serve the current directory with the CLI |
-| `npm test` | Run all 192 cases discovered by the shared suite manifest |
+| `npm test` | Run all 193 cases discovered by the shared suite manifest |
 | `npm run test:unit` | Run 52 isolated Config and suite-discovery tests from `test/unit/` |
 | `npm run test:functional` | Run 58 public HTTP behavior tests from `test/functional/` |
-| `npm run test:integration` | Run 24 module, CLI, benchmark, listener, stream, and filesystem boundary tests from `test/integration/` |
+| `npm run test:behavioral` | Run 141 non-unit behavioral contracts across Functional, Integration, and Regression |
+| `npm run test:integration` | Run 25 module, CLI, benchmark, listener, stream, and filesystem boundary tests from `test/integration/` |
 | `npm run test:regression` | Run 58 owned cases for previously fixed failures and security boundaries from `test/regression/` |
 | `npm run test:site` | Check docs pages, local links/fragments, IDs, label/ARIA targets, image alt text, nav state, CSS, and site JavaScript |
 | `npm run coverage` | Run `vanilla-test` Node coverage gates, write `coverage/node/`, and refresh measured badge JSON |

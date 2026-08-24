@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- Added `npm run test:behavioral` for the 141 non-unit Functional, Integration, and Regression contracts, including a live CLI SPA journey that verifies browser deep links do not mask missing assets.
+
 ### Documentation
 
 - Made native HTTP and HTTPS support explicit in the README header, protocol badge, project positioning, repository metadata, and developer documentation.

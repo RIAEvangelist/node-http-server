@@ -56,11 +56,34 @@ test('Integration | CLI serves dotfiles after explicit opt-in', async function(t
     assert.equal(response.body, 'allowed by CLI opt-in');
 });
 
+test('Integration | CLI SPA mode serves browser routes without masking missing assets', async function(t){
+    const root = fixture(t);
+    const running = await startCli(t, root, ['--spa']);
+    let navigation;
+    let asset;
+    let missingAsset;
+
+    try{
+        navigation = await get(running.port, '/dashboard/settings', {Accept:'text/html'});
+        asset = await get(running.port, '/assets/app.js', {Accept:'text/html'});
+        missingAsset = await get(running.port, '/assets/missing.js', {Accept:'text/html'});
+    }finally{
+        await stopCli(running.child);
+    }
+
+    assert.equal(navigation.statusCode, 200);
+    assert.equal(navigation.body, 'served by CLI');
+    assert.equal(asset.statusCode, 200);
+    assert.equal(asset.body, 'console.log("served asset");');
+    assert.equal(missingAsset.statusCode, 404);
+});
+
 function fixture(t){
     const root = temporaryDirectory(t);
 
     writeFiles(root, {
         'index.html':'served by CLI',
+        'assets/app.js':'console.log("served asset");',
         '.well-known/token':'allowed by CLI opt-in'
     });
 
@@ -158,10 +181,10 @@ function waitForPort(child, getOutput, getErrors){
     });
 }
 
-function get(port, requestPath = '/'){
+function get(port, requestPath = '/', headers = {}){
     return new Promise(function(resolve, reject){
         http.get(
-            {hostname:'127.0.0.1', port:port, path:requestPath},
+            {hostname:'127.0.0.1', port:port, path:requestPath, headers:headers},
             function(response){
                 const chunks = [];
 
