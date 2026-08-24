@@ -1,5 +1,7 @@
 # Benchmarks
 
+node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable. Both benchmark harnesses execute the package in Node.js and drive its listeners with Node's HTTP client.
+
 Two dependency-free harnesses answer two different engineering questions.
 
 | Harness | Question | Command |

@@ -56,7 +56,7 @@ const fields={
 
 const formats={
     cjs:'CommonJS module',
-    esm:'ES module',
+    esm:'Node.js ESM module',
     cli:'CLI command',
     json:'Configuration JSON'
 };

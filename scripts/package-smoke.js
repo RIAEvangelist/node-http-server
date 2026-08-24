@@ -13,8 +13,48 @@ const packed = path.join(workspace, 'packed');
 const installed = path.join(workspace, 'installed');
 const adjacentNpm = path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
 const npmCli = process.env.npm_execpath || (fs.existsSync(adjacentNpm) && adjacentNpm);
+const runtimeBoundary = 'node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable.';
 
-assert.deepEqual(manifest.dependencies || {}, {}, 'runtime dependencies must stay empty');
+function assertNodeOnlyMetadata(candidate, label){
+    assert.equal(
+        candidate.description,
+        'A lightweight, secure, zero-runtime-dependency HTTP and HTTPS static server for Node.js only.',
+        label + ' description must state the Node.js-only runtime'
+    );
+    assert.equal(candidate.engines && candidate.engines.node, '>=22.12.0', label + ' Node engine');
+    assert.equal(
+        Array.isArray(candidate.keywords) && candidate.keywords.includes('node-only'),
+        true,
+        label + ' must include the node-only keyword'
+    );
+    assert.equal(
+        Object.prototype.hasOwnProperty.call(candidate, 'browser'),
+        false,
+        label + ' must not declare a browser entry'
+    );
+    assert.equal(
+        JSON.stringify(candidate.exports || {}).includes('"browser"'),
+        false,
+        label + ' must not declare a browser export condition'
+    );
+    for(const field of [
+        'dependencies',
+        'optionalDependencies',
+        'peerDependencies',
+        'bundledDependencies',
+        'bundleDependencies'
+    ]){
+        const value = candidate[field];
+        const hasEntries = Array.isArray(value)
+            ? value.length !== 0
+            : value && typeof value === 'object'
+                ? Object.keys(value).length !== 0
+                : Boolean(value);
+        assert.equal(hasEntries, false, label + ' ' + field + ' must stay empty');
+    }
+}
+
+assertNodeOnlyMetadata(manifest, 'source manifest');
 assert.deepEqual(
     manifest.devDependencies || {},
     {'vanilla-test':'2.1.1'},
@@ -108,6 +148,26 @@ try{
         tarball
     ], {cwd:installed});
 
+    const installedRoot = path.join(installed, 'node_modules', 'node-http-server');
+    const installedManifest = JSON.parse(fs.readFileSync(path.join(installedRoot, 'package.json'), 'utf8'));
+    assertNodeOnlyMetadata(installedManifest, 'packed manifest');
+    assert.equal(installedManifest.version, manifest.version, 'packed manifest version');
+
+    for(const filename of [
+        'README.md',
+        'MIGRATION.md',
+        'CHANGELOG.md',
+        'SECURITY.md',
+        'benchmark/README.md'
+    ]){
+        const source = fs.readFileSync(path.join(installedRoot, filename), 'utf8');
+        assert.equal(
+            source.includes(runtimeBoundary),
+            true,
+            filename + ' must preserve the canonical Node.js-only runtime boundary'
+        );
+    }
+
     run(process.execPath, [
         '-e',
         [
@@ -150,7 +210,7 @@ try{
         ].join('')
     ], {cwd:installed});
 
-    const installedCli = path.join(installed, 'node_modules', 'node-http-server', 'bin', 'nhs.js');
+    const installedCli = path.join(installedRoot, 'bin', 'nhs.js');
     const cliHelp = run(process.execPath, [installedCli, '--help'], {cwd:installed});
     const cliVersion = run(process.execPath, [installedCli, '--version'], {cwd:installed});
 
@@ -160,9 +220,7 @@ try{
     assert.equal(cliVersion.trim(), manifest.version);
 
     const installedBenchmark = path.join(
-        installed,
-        'node_modules',
-        'node-http-server',
+        installedRoot,
         'benchmark',
         'run.js'
     );

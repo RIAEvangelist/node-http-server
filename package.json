@@ -1,7 +1,7 @@
 {
   "name": "node-http-server",
-  "version": "9.1.0",
-  "description": "A lightweight, secure, zero-runtime-dependency HTTP and HTTPS static server for Node.js.",
+  "version": "9.1.1",
+  "description": "A lightweight, secure, zero-runtime-dependency HTTP and HTTPS static server for Node.js only.",
   "type": "commonjs",
   "main": "./server/Server.js",
   "module": "./server/index.mjs",
@@ -76,6 +76,7 @@
     "server",
     "static-server",
     "node",
+    "node-only",
     "embedded",
     "lightweight",
     "commonjs",

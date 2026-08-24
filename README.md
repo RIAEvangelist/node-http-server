@@ -21,6 +21,8 @@
 
 node-http-server serves static files over HTTP and HTTPS. TLS uses Node's built-in `node:https` and adds zero runtime dependencies. The CLI starts HTTP; CommonJS and ESM support HTTP, HTTPS-only, and paired HTTP + HTTPS listeners. The sole direct development dependency is the owner-maintained `vanilla-test@2.1.1`, used for project-owned native V8 coverage.
 
+> **Runtime boundary:** node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable. It serves files to browsers; the package itself does not execute in browsers. CommonJS and ESM are Node.js module entry points, not browser entry points. A bundler is supported only when it targets Node.js; browser-targeted bundles and `file://` are not supported runtime paths. The documentation site and configuration playground run in a browser only to display or generate Node.js examples—they never import or execute this package. Because the package has zero runtime dependencies, consumer-root dependency-conflict and scoped import-map tests are also not applicable.
+
 Version 9 is a focused static-server toolkit with streaming files, clean multi-server lifecycle, modern cache and range behavior, optional compression and SPA fallback, configurable request limits, and strict root containment.
 
 ## HTTP and HTTPS modes
@@ -490,7 +492,7 @@ Vanilla Test 2.1 uses Node's native V8 coverage path and its project-owned repor
 
 The suite contains 193 unique, focused leaf cases: 52 Unit, 58 Functional, 25 Integration, and 58 Regression. Each behavior has one owning case. Both the normal runner and coverage use the ordered manifest in `test/suites.js`; generated `coverage/node/test-results.json` is the authoritative ordered case evidence.
 
-For a non-unit behavioral pass, run `npm run test:behavioral`. It selects the 141 Functional, Integration, and Regression cases from the same manifest rather than maintaining duplicate test sources.
+For a non-unit behavioral pass, run `npm run test:behavioral`. It selects the 141 Functional, Integration, and Regression cases from the same manifest rather than maintaining duplicate test sources. Its live CLI SPA journey verifies browser routes and assets served by the Node process; it does not execute node-http-server in a browser.
 
 | Script | Purpose |
 |---|---|

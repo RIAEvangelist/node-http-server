@@ -3,11 +3,11 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Generate CommonJS, ESM, CLI, and JSON configuration snippets for node-http-server in the browser.">
+        <meta name="description" content="Use a browser-based generator to create Node.js CommonJS, ESM, CLI, and JSON snippets; node-http-server itself is Node.js-only.">
         <meta name="theme-color" content="#08110d">
         <meta property="og:type" content="website">
         <meta property="og:title" content="Configuration playground — node-http-server">
-        <meta property="og:description" content="Configure node-http-server and generate copyable CommonJS, ESM, CLI, and JSON snippets.">
+        <meta property="og:description" content="Generate copyable Node.js CommonJS, ESM, CLI, and JSON snippets without executing node-http-server in the browser.">
         <meta property="og:url" content="https://riaevangelist.github.io/node-http-server/playground.html">
         <meta property="og:image" content="https://riaevangelist.github.io/node-http-server/assets/node-http-server-header-https.webp">
         <meta name="twitter:card" content="summary_large_image">
@@ -26,7 +26,7 @@
 
         <main id="main">
             <header class="page-header page-header-compact">
-                <p class="kicker">CommonJS + ESM + CLI + JSON</p>
+                <p class="kicker">CommonJS + Node.js ESM + CLI + JSON</p>
                 <h1>Build a configuration.</h1>
                 <p class="lead">Every choice updates the copyable output. Links beside each group explain the exact Config key, default, and runtime behavior.</p>
             </header>
@@ -34,12 +34,12 @@
             <section class="doc-section playground-page" id="generator" aria-labelledby="generator-heading">
                 <h2 id="generator-heading">Choose values, then copy one format.</h2>
                 <div class="playground-intro">
-                    <div class="card"><h3>Module output</h3><p>CommonJS and ESM include HTTP, HTTPS-only, paired-listener, and full Config settings.</p></div>
+                    <div class="card"><h3>Module output</h3><p>Node.js CommonJS and ESM include HTTP, HTTPS-only, paired-listener, and full Config settings.</p></div>
                     <div class="card"><h3>CLI output</h3><p>Generates the command's HTTP flags and routes HTTPS choices to the module output.</p></div>
                     <div class="card"><h3>JSON output</h3><p>A serializable Config object for module code or your own storage loader.</p></div>
                 </div>
 
-                <div class="callout-warning callout" role="note"><strong>Run the generated snippet locally.</strong> CommonJS, ESM, and JSON represent HTTPS credentials and listener modes. The CLI starts HTTP. A local Node process exercises listener, filesystem, and TLS behavior.</div>
+                <div class="callout-warning callout" role="note"><strong>The generator runs in the browser, but node-http-server does not.</strong> Run generated CommonJS, Node.js ESM, CLI, and JSON-based module snippets in a local Node process. Browser bundles, native browser ESM, import maps, and <code>file://</code> are not supported package runtime paths.</div>
 
                 <div class="playground-grid">
                     <form class="configurator" id="config-form">
@@ -259,7 +259,7 @@
                     <div class="snippet-card">
                         <div class="code-tabs" role="tablist" aria-label="Generated configuration formats">
                             <button id="tab-cjs" role="tab" aria-selected="true" aria-controls="generated-panel" tabindex="0" data-output-tab="cjs">CommonJS</button>
-                            <button id="tab-esm" role="tab" aria-selected="false" aria-controls="generated-panel" tabindex="-1" data-output-tab="esm">ESM</button>
+                            <button id="tab-esm" role="tab" aria-selected="false" aria-controls="generated-panel" tabindex="-1" data-output-tab="esm">Node.js ESM</button>
                             <button id="tab-cli" role="tab" aria-selected="false" aria-controls="generated-panel" tabindex="-1" data-output-tab="cli">CLI</button>
                             <button id="tab-json" role="tab" aria-selected="false" aria-controls="generated-panel" tabindex="-1" data-output-tab="json">JSON</button>
                             <button class="copy-button" type="button" data-copy-output aria-label="Copy generated snippet">Copy</button>
@@ -290,6 +290,6 @@ server.deploy();</code></pre>
             </section>
         </main>
 
-        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>In-browser configuration generator. <span data-year></span></p><div><a href="./configuration.html">Config</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p><span data-runtime-boundary>node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable.</span> In-browser configuration generator. <span data-year></span></p><div><a href="./configuration.html">Config</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
     </body>
 </html>

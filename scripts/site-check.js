@@ -6,6 +6,7 @@ const { spawnSync } = require('node:child_process');
 
 const projectRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(projectRoot, 'site');
+const runtimeBoundary = 'node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable.';
 const requiredPages = [
     'index.html',
     'guide.html',
@@ -393,6 +394,113 @@ function checkProtocolPositioning(){
     }
 }
 
+function checkRuntimeBoundary(){
+    const manifestFilename = path.join(projectRoot, 'package.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestFilename, 'utf8'));
+
+    if(manifest.description !== 'A lightweight, secure, zero-runtime-dependency HTTP and HTTPS static server for Node.js only.'){
+        report('package.json', 'description must state the Node.js-only runtime');
+    }
+    if(!manifest.engines || manifest.engines.node !== '>=22.12.0'){
+        report('package.json', 'must retain the exact supported Node.js engine boundary');
+    }
+    if(!Array.isArray(manifest.keywords) || !manifest.keywords.includes('node-only')){
+        report('package.json', 'must retain the node-only keyword');
+    }
+    if(Object.prototype.hasOwnProperty.call(manifest, 'browser')){
+        report('package.json', 'must not declare a browser entry for the Node.js-only package');
+    }
+    if(JSON.stringify(manifest.exports || {}).includes('"browser"')){
+        report('package.json', 'must not declare a browser export condition');
+    }
+    for(const field of [
+        'dependencies',
+        'optionalDependencies',
+        'peerDependencies',
+        'bundledDependencies',
+        'bundleDependencies'
+    ]){
+        const value = manifest[field];
+        const hasEntries = Array.isArray(value)
+            ? value.length !== 0
+            : value && typeof value === 'object'
+                ? Object.keys(value).length !== 0
+                : Boolean(value);
+        if(hasEntries){
+            report('package.json', field + ' requires a fresh dependency-boundary conformance audit');
+        }
+    }
+
+    const runtimeDocuments = [
+        'README.md',
+        'MIGRATION.md',
+        'CHANGELOG.md',
+        'SECURITY.md',
+        'example/readme.md',
+        'benchmark/README.md'
+    ];
+
+    for(const filename of runtimeDocuments){
+        const source = fs.readFileSync(path.join(projectRoot, filename), 'utf8');
+        if(!source.includes(runtimeBoundary)){
+            report(filename, 'missing canonical Node.js-only runtime boundary');
+        }
+    }
+
+    for(const filename of requiredPages){
+        const source = fs.readFileSync(path.join(siteRoot, filename), 'utf8');
+        if(!source.includes(runtimeBoundary)){
+            report(filename, 'missing canonical Node.js-only runtime boundary');
+        }
+        if((source.match(/data-runtime-boundary/g) || []).length !== 1){
+            report(filename, 'must expose exactly one durable runtime-boundary marker');
+        }
+    }
+
+    const focusedChecks = [
+        {
+            filename:'site/index.html',
+            phrases:['CommonJS and ESM are Node.js module entry points, not browser entry points.']
+        },
+        {
+            filename:'site/api.html',
+            phrases:['Node.js module entries:', 'they are not native-browser imports and do not use an import map.']
+        },
+        {
+            filename:'site/examples.html',
+            phrases:['Each example is a Node.js program', 'not browser execution of node-http-server.']
+        },
+        {
+            filename:'site/playground.html',
+            phrases:['The generator runs in the browser, but node-http-server does not.', 'Browser bundles, native browser ESM, import maps']
+        },
+        {
+            filename:'site/playground.js',
+            phrases:['Node.js ESM module']
+        },
+        {
+            filename:'site/testing.html',
+            phrases:['Native-browser conformance:', 'no browser entry, browser-targeted bundle, import map, or Chrome runtime job', 'Given the Node CLI is serving an SPA']
+        }
+    ];
+
+    for(const check of focusedChecks){
+        const source = fs.readFileSync(path.join(projectRoot, check.filename), 'utf8');
+        for(const phrase of check.phrases){
+            if(!source.includes(phrase)){
+                report(check.filename, 'missing runtime-boundary evidence phrase: ' + phrase);
+            }
+        }
+    }
+
+    const serverSource = fs.readFileSync(path.join(projectRoot, 'server', 'Server.js'), 'utf8');
+    for(const builtin of ['node:http', 'node:https', 'node:path', 'node:fs', 'node:fs/promises', 'node:zlib']){
+        if(!serverSource.includes(builtin)){
+            report('server/Server.js', 'Node.js-only evidence changed; re-audit missing builtin ' + builtin);
+        }
+    }
+}
+
 if(!fs.existsSync(siteRoot)){
     throw new Error('site directory does not exist');
 }
@@ -415,6 +523,7 @@ checkLinks();
 checkCss();
 checkJavaScript();
 checkProtocolPositioning();
+checkRuntimeBoundary();
 
 if(failures.length){
     process.stderr.write(failures.sort().join('\n') + '\n');
@@ -422,6 +531,6 @@ if(failures.length){
 }else{
     process.stdout.write(
         'Site check passed: ' + pages.length +
-        ' HTML pages, links, fragments, IDs, labels, ARIA, images, navigation, CSS, and JavaScript.\n'
+        ' HTML pages, links, fragments, IDs, labels, ARIA, images, navigation, CSS, JavaScript, and the Node.js-only runtime boundary.\n'
     );
 }

@@ -4,14 +4,21 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [9.1.1] - 2026-08-23
+
 ### Added
 
-- Added `npm run test:behavioral` for the 141 non-unit Functional, Integration, and Regression contracts, including a live CLI SPA journey that verifies browser deep links do not mask missing assets.
+- Added `npm run test:behavioral` for the 141 non-unit Functional, Integration, and Regression contracts, including a live CLI SPA journey that verifies browser routes served by the Node CLI do not mask missing assets.
 
 ### Documentation
 
+- Made the runtime boundary explicit across shipped documentation and the website: node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable. The browser playground only generates Node.js snippets.
 - Made native HTTP and HTTPS support explicit in the README header, protocol badge, project positioning, repository metadata, and developer documentation.
 - Added a focused HTTPS guide covering HTTP-only, HTTPS-only, and paired listener modes, certificate configuration, lifecycle, examples, and troubleshooting.
+
+### Fixed
+
+- Synchronized the canonical Ubuntu branch-coverage badge after the behavioral suite raised it to 88.86%.
 
 ## [9.1.0] - 2026-08-21
 

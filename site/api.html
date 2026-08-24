@@ -1,19 +1,20 @@
 <!doctype html>
 <html lang="en">
-    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="node-http-server CommonJS and ESM API for HTTP, HTTPS-only, paired listeners, lifecycle, request data, and hooks."><meta name="theme-color" content="#08110d"><title>Library API — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/api.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script></head>
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="node-http-server Node.js CommonJS and ESM API for HTTP, HTTPS-only, paired listeners, lifecycle, request data, and hooks."><meta name="theme-color" content="#08110d"><title>Library API — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/api.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script></head>
     <body>
         <a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./why.html">Why</a><a href="./cli.html">CLI</a><a href="./api.html" aria-current="page">Library</a><a href="./configuration.html">Config</a><a href="./https.html">HTTPS</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
-        <main id="main"><header class="page-header page-header-compact"><p class="kicker">CommonJS + ESM · HTTP + HTTPS</p><h1>Own the listener lifecycle.</h1><p class="lead">Create isolated HTTP, HTTPS-only, or paired servers, inspect active Node listeners, serve custom responses, and extend the request lifecycle with hooks.</p></header>
+        <main id="main"><header class="page-header page-header-compact"><p class="kicker">Node.js CommonJS + ESM · HTTP + HTTPS</p><h1>Own the listener lifecycle.</h1><p class="lead">Create isolated HTTP, HTTPS-only, or paired servers, inspect active Node listeners, serve custom responses, and extend the request lifecycle with hooks.</p></header>
             <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#imports">Imports</a><a href="#lifecycle">Lifecycle</a><a href="#members">Public members</a><a href="#requests">Request data</a><a href="#hooks">Hooks</a><a href="#manual">Manual serving</a><a href="#errors">Error contract</a></aside>
                 <div class="doc-content">
                     <section class="doc-section" id="imports"><p class="kicker">Imports</p><h2>Use the singleton or create instances.</h2>
-                        <div class="table-wrap"><table><thead><tr><th>Module style</th><th>Default</th><th>Named exports</th></tr></thead><tbody><tr><td>CommonJS</td><td><code>require('node-http-server')</code></td><td><code>Server</code>, <code>Config</code>, <code>RefString</code></td></tr><tr><td>ESM</td><td><code>import server from 'node-http-server'</code></td><td><code>Server</code>, <code>Config</code>, <code>RefString</code></td></tr></tbody></table></div>
+                        <div class="callout"><strong>Node.js module entries:</strong> CommonJS and ESM are Node.js module entry points, not browser entry points. These bare package imports resolve through Node or a Node-targeted bundler; they are not native-browser imports and do not use an import map.</div>
+                        <div class="table-wrap"><table><thead><tr><th>Module style</th><th>Default</th><th>Named exports</th></tr></thead><tbody><tr><td>CommonJS</td><td><code>require('node-http-server')</code></td><td><code>Server</code>, <code>Config</code>, <code>RefString</code></td></tr><tr><td>Node.js ESM</td><td><code>import server from 'node-http-server'</code></td><td><code>Server</code>, <code>Config</code>, <code>RefString</code></td></tr></tbody></table></div>
                         <div class="quick-grid">
                             <div class="code-block"><div class="code-head"><span class="code-label">CommonJS · isolated instance</span><button type="button" data-copy-target="api-cjs">Copy</button></div><pre><code id="api-cjs">const {Server}=require('node-http-server');
 
 const server=new Server({root:'./public'});
 server.deploy();</code></pre></div>
-                            <div class="code-block"><div class="code-head"><span class="code-label">ESM · isolated instance</span><button type="button" data-copy-target="api-esm">Copy</button></div><pre><code id="api-esm">import {Server} from 'node-http-server';
+                            <div class="code-block"><div class="code-head"><span class="code-label">Node.js ESM · isolated instance</span><button type="button" data-copy-target="api-esm">Copy</button></div><pre><code id="api-esm">import {Server} from 'node-http-server';
 
 const server=new Server({root:'./public'});
 server.deploy();</code></pre></div>
@@ -22,7 +23,7 @@ server.deploy();</code></pre></div>
                     </section>
 
                     <section class="doc-section" id="lifecycle"><p class="kicker">Lifecycle</p><h2>Deploy, observe readiness, close, redeploy.</h2>
-                        <div class="code-block"><div class="code-head"><span class="code-label">ESM · readiness and shutdown</span><button type="button" data-copy-target="api-life">Copy</button></div><pre><code id="api-life">import {Server} from 'node-http-server';
+                        <div class="code-block"><div class="code-head"><span class="code-label">Node.js ESM · readiness and shutdown</span><button type="button" data-copy-target="api-life">Copy</button></div><pre><code id="api-life">import {Server} from 'node-http-server';
 
 const server=new Server({root:'./public',port:8080});
 
@@ -70,7 +71,7 @@ process.once('SIGTERM',async()=>{
                             <tr><td><code>beforeServe</code></td><td><code>request,response,bodyRef,encodingRef,complete</code></td><td>Before a buffered response is sent.</td><td>Return truthy; <code>complete</code> is one-shot and proceeds directly to response completion.</td></tr>
                             <tr><td><code>afterServe</code></td><td><code>request,response</code></td><td>After the response finishes.</td><td>Observe; may return a Promise.</td></tr>
                         </tbody></table></div>
-                        <div class="code-block"><div class="code-head"><span class="code-label">ESM · JSON health route plus static files</span><button type="button" data-copy-target="api-hook">Copy</button></div><pre><code id="api-hook">import {Server} from 'node-http-server';
+                        <div class="code-block"><div class="code-head"><span class="code-label">Node.js ESM · JSON health route plus static files</span><button type="button" data-copy-target="api-hook">Copy</button></div><pre><code id="api-hook">import {Server} from 'node-http-server';
 
 class AppServer extends Server{
     async onRequest(request,response,serve){
@@ -115,6 +116,6 @@ server.server.once('error',error=>{
                 </div>
             </div>
         </main>
-        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>Library API for v9. <span data-year></span></p><div><a href="./configuration.html">Config</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p><span data-runtime-boundary>node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable.</span> Library API for v9. <span data-year></span></p><div><a href="./configuration.html">Config</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
     </body>
 </html>

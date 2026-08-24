@@ -1,5 +1,7 @@
 ## Node HTTP and HTTPS server examples
 
+node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable. Every example in this directory is a Node.js program; any browser paths shown are content served by that program. CommonJS and ESM are Node.js module entry points, not browser entry points.
+
 | Example group | What it demonstrates | Default ports |
 |---|---|---|
 | [Basic servers](https://github.com/RIAEvangelist/node-http-server/tree/main/example/basic) | Static roots, logging, domains, clustering, and HTTPS | HTTP `8000`; HTTPS `4433` |

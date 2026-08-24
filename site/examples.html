@@ -3,7 +3,7 @@
     <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Copyable node-http-server CLI and library examples for SPA, HTTPS, domains, hooks, logging, limits, and shutdown."><meta name="theme-color" content="#08110d"><title>Examples — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/examples.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script></head>
     <body>
         <a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./why.html">Why</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./https.html">HTTPS</a><a href="./examples.html" aria-current="page">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
-        <main id="main"><header class="page-header page-header-compact"><p class="kicker">Copyable tasks</p><h1>Start from a working pattern.</h1><p class="lead">Each example states the expected result and its matching failure checks.</p></header>
+        <main id="main"><header class="page-header page-header-compact"><p class="kicker">Copyable Node.js tasks</p><h1>Start from a working pattern.</h1><p class="lead">Each example is a Node.js program and states the expected result and its matching failure checks. Browser paths are content served by that program, not browser execution of node-http-server.</p></header>
             <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#cli">CLI recipes</a><a href="#spa">SPA + compression</a><a href="#limits">Limits</a><a href="#shutdown">Multiple servers</a><a href="#https">HTTPS</a><a href="#domains">Domain roots</a><a href="#hook">API + files</a><a href="#logging">Logging</a><a href="#mime">MIME controls</a></aside>
                 <div class="doc-content">
                     <section class="doc-section" id="cli"><p class="kicker">CLI recipes</p><h2>Local first, public only when deliberate.</h2>
@@ -27,7 +27,7 @@ node-http-server --root ./dist --host 0.0.0.0 --port 8080</code></pre></div>
                     </section>
 
                     <section class="doc-section" id="spa"><p class="kicker">Single-page application</p><h2>Fallback only for application routes.</h2>
-                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-spa">Copy</button></div><pre><code id="examples-spa">import {Server} from 'node-http-server';
+                        <div class="code-block"><div class="code-head"><span class="code-label">Node.js ESM</span><button type="button" data-copy-target="examples-spa">Copy</button></div><pre><code id="examples-spa">import {Server} from 'node-http-server';
 
 new Server({
     root:'./dist',
@@ -58,7 +58,7 @@ new Server({
                     </section>
 
                     <section class="doc-section" id="shutdown"><p class="kicker">Multiple servers and shutdown</p><h2>Keep instances isolated and close both.</h2>
-                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-multi">Copy</button></div><pre><code id="examples-multi">import {Server} from 'node-http-server';
+                        <div class="code-block"><div class="code-head"><span class="code-label">Node.js ESM</span><button type="button" data-copy-target="examples-multi">Copy</button></div><pre><code id="examples-multi">import {Server} from 'node-http-server';
 
 const publicServer=new Server({
     root:'./public',
@@ -81,7 +81,7 @@ process.once('SIGTERM',async()=>{
                     </section>
 
                     <section class="doc-section" id="https"><p class="kicker">HTTPS only</p><h2>Load fresh local certificate paths.</h2>
-                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-https">Copy</button></div><pre><code id="examples-https">import {Server} from 'node-http-server';
+                        <div class="code-block"><div class="code-head"><span class="code-label">Node.js ESM</span><button type="button" data-copy-target="examples-https">Copy</button></div><pre><code id="examples-https">import {Server} from 'node-http-server';
 
 new Server({
     host:'127.0.0.1',
@@ -112,7 +112,7 @@ new Server({
                     </section>
 
                     <section class="doc-section" id="hook"><p class="kicker">JSON route plus static files</p><h2>Handle one route, then return to fallback.</h2>
-                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-hook">Copy</button></div><pre><code id="examples-hook">import {Server} from 'node-http-server';
+                        <div class="code-block"><div class="code-head"><span class="code-label">Node.js ESM</span><button type="button" data-copy-target="examples-hook">Copy</button></div><pre><code id="examples-hook">import {Server} from 'node-http-server';
 
 class AppServer extends Server{
     async onRequest(request,response,serve){
@@ -130,7 +130,7 @@ new AppServer({root:'./public'}).deploy();</code></pre></div>
                     </section>
 
                     <section class="doc-section" id="logging"><p class="kicker">Request logging</p><h2>Append redacted NDJSON.</h2>
-                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-log">Copy</button></div><pre><code id="examples-log">import {Server} from 'node-http-server';
+                        <div class="code-block"><div class="code-head"><span class="code-label">Node.js ESM</span><button type="button" data-copy-target="examples-log">Copy</button></div><pre><code id="examples-log">import {Server} from 'node-http-server';
 
 new Server({
     root:'./public',
@@ -143,7 +143,7 @@ new Server({
                     </section>
 
                     <section class="doc-section" id="mime"><p class="kicker">MIME and extension policy</p><h2>Add one type and deny secrets.</h2>
-                        <div class="code-block"><div class="code-head"><span class="code-label">ESM</span><button type="button" data-copy-target="examples-mime">Copy</button></div><pre><code id="examples-mime">import {Server} from 'node-http-server';
+                        <div class="code-block"><div class="code-head"><span class="code-label">Node.js ESM</span><button type="button" data-copy-target="examples-mime">Copy</button></div><pre><code id="examples-mime">import {Server} from 'node-http-server';
 
 new Server({
     contentType:{
@@ -161,6 +161,6 @@ new Server({
                 </div>
             </div>
         </main>
-        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p>Copyable v9 examples. <span data-year></span></p><div><a href="./testing.html">Testing</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p><span data-runtime-boundary>node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable.</span> Copyable v9 examples. <span data-year></span></p><div><a href="./testing.html">Testing</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
     </body>
 </html>

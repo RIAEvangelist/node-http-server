@@ -14,6 +14,8 @@ Security fixes target the current supported major release. Upgrade to the latest
 
 node-http-server provides native Node HTTP and HTTPS static listeners with extension hooks. Add authentication, authorization, application-firewall rules, secret storage, and reverse proxying at the application or edge.
 
+node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable. Browsers may consume the files it serves, but they do not execute the server package. CommonJS and ESM are Node.js module entry points, not browser entry points.
+
 Version 9 starts from these boundaries:
 
 - The default listen address is `127.0.0.1`.
