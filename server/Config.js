@@ -116,6 +116,7 @@ const defaultConfigs=deepFreeze({
     },
     https       : {
         options     : null,
+        enforce     : false,
         ca          : '',
         privateKey  : '',
         certificate : '',

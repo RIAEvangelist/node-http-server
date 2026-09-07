@@ -4,6 +4,10 @@
 
 Existing v9 callers retain their defaults. `https.options` accepts native Node.js
 HTTPS options and takes precedence over certificate-path fields when supplied.
+Opt-in `https.enforce:true` requires configured HTTPS. HTTPS-only mode retains
+one TLS listener; paired mode redirects HTTP with 308 before application hooks,
+preserving the request path, query and method. Other consumers retain the
+default `enforce:false` behavior.
 The new `serveRepresentation(request, response, {lastModified, contentType, body})`
 method checks a final representation's modification date before invoking a lazy
 body factory; HEAD and 304 responses skip body generation. Static callers may

@@ -164,11 +164,26 @@ function deploy(userConfig,readyCallback=function(){}){
         throw error;
     }
 
+    if (this.config.https.enforce && !httpsOptions) {
+        const error = new Error('https.enforce requires HTTPS options or a private key and certificate');
+        error.code = 'ERR_HTTPS_CONFIGURATION';
+        throw error;
+    }
+
     let nodeServer=null;
     let secureNodeServer=null;
 
     if(!this.config.https.only){
-        nodeServer=http.createServer(requestHandler);
+        const httpRequestHandler = this.config.https.enforce
+            ? async function redirectEnforcedHttpRequest(request, response) {
+                try {
+                    redirectToHttps.call(server, request, response);
+                } catch (error) {
+                    await handleRequestError.call(server, error, request, response);
+                }
+            }
+            : requestHandler;
+        nodeServer=http.createServer(httpRequestHandler);
         nodeServer.on('clientError',clientErrorHandler);
         configureNodeServer(nodeServer,this.config.server);
     }
@@ -197,6 +212,33 @@ function deploy(userConfig,readyCallback=function(){}){
     }
 
     return this;
+}
+
+function redirectToHttps(request, response) {
+    const address = this.secureServer.address();
+    if (!address || typeof address === 'string') {
+        throw new HttpError(503, 'HTTPS listener is not listening');
+    }
+
+    const target = request.url || '/';
+    const absoluteTarget = /^https?:\/\/([^/?#]*)(.*)$/i.exec(target);
+    const authority = absoluteTarget ? absoluteTarget[1] : request.headers.host;
+    if (!authority) {
+        throw new HttpError(400, 'Host header required');
+    }
+    let destination;
+    try {
+        destination = new URL(`https://${authority}`);
+    } catch {
+        throw new HttpError(400, 'Invalid request URL');
+    }
+    destination.port = String(address.port);
+    const requestPath = absoluteTarget ? absoluteTarget[2] || '/' : target;
+    const pathAndQuery = requestPath.startsWith('/') ? requestPath : `/${requestPath}`;
+
+    response.statusCode = 308;
+    response.setHeader('Location', `${destination.origin}${pathAndQuery}`);
+    completeResponse.call(this, request, response);
 }
 
 function listen(nodeServer,port,readyCallback,secure){
@@ -1474,6 +1516,7 @@ function sanitizedConfig(config){
         },
         https:{
             options:Boolean(config.https.options),
+            enforce:config.https.enforce,
             ca:Boolean(config.https.ca),
             privateKey:Boolean(config.https.privateKey),
             certificate:Boolean(config.https.certificate),

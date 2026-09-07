@@ -36,6 +36,7 @@ test(
                 port: 0,
                 https: {
                     options: rawOptions,
+                    enforce: true,
                     privateKey: 'unused-path',
                     certificate: 'unused-path',
                     port: 0,

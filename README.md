@@ -356,6 +356,7 @@ HTTPS is a first-class module API mode built on Node's `node:https`. It shares t
 |---|---|---|
 | `https.ca` | `''` | Optional CA certificate path |
 | `https.options` | `null` | Native Node.js HTTPS options; when supplied, used instead of the certificate-path fields |
+| `https.enforce` | `false` | Require configured HTTPS; paired HTTP requests receive 308 redirects before application hooks |
 | `https.privateKey` | `''` | Private-key path |
 | `https.certificate` | `''` | Certificate path |
 | `https.passphrase` | `false` | Optional private-key passphrase |
@@ -388,6 +389,21 @@ precedence over `https.privateKey`, `https.certificate`, `https.ca` and
 `https.passphrase`; the existing path-based behavior applies when it is absent.
 `https.port` and `https.only` continue to select the listener. Verbose logs do
 not include raw TLS option values.
+
+Set `https.enforce:true` when the application must serve through HTTPS. Deploy
+then requires `https.options` or the existing key/certificate configuration and
+reports `ERR_HTTPS_CONFIGURATION` before opening listeners if neither exists.
+With `https.only:true`, this keeps one TLS listener. Plain HTTP sent to that TLS
+port cannot receive an HTTP redirect.
+
+With `https.only:false`, the separate HTTP listener returns `308` with a
+`Location` on the actual HTTPS listener's port before `onRawRequest`, body
+parsing, `onRequest`, or `beforeServe`. The redirect preserves the original path
+and query, including escaping and repeated query fields; 308 preserves the
+request method when the client follows it. `afterServe` observes completion as
+usual. Both listeners need distinct ports. Requests received while the HTTPS
+listener is unavailable report 503. HTTPS requests use the ordinary pipeline.
+The default `enforce:false` retains HTTP-only and paired serving behavior.
 
 ### Generated representations
 
