@@ -60,7 +60,7 @@ function parseTap(output){
         failureCount=summaryCount(output,'fail'),
         passed=[],
         failed=[],
-        result=/^(ok|not ok) \d+ - (.+)\r?$/gm;
+        result=/^[ \t]*(ok|not ok) \d+ - (.+)\r?$/gm;
     let match;
 
     while((match=result.exec(output))){
