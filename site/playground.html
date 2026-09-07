@@ -140,30 +140,30 @@
 
                         <fieldset>
                             <legend>Timeouts <small>milliseconds</small></legend>
-                            <p class="field-doc">Keys: <code>server.timeout</code>, <code>requestTimeout</code>, <code>headersTimeout</code>, and <code>keepAliveTimeout</code>. <a href="./configuration.html#limits">Disable semantics and units →</a></p>
+                            <p class="field-doc">Keys: <code>server.timeout</code>, <code>server.requestTimeout</code>, <code>server.headersTimeout</code>, and <code>server.keepAliveTimeout</code>. <a href="./configuration.html#limits">Disable semantics and units →</a></p>
                             <div class="timeout-grid">
                                 <div class="timeout-field">
-                                    <label for="config-timeout">Socket inactivity</label>
+                                    <label for="config-timeout">Socket / session inactivity</label>
                                     <input id="config-timeout" type="number" min="0" step="1" value="30000">
                                     <label class="disable-check"><input id="disable-timeout" type="checkbox"> Off</label>
                                 </div>
                                 <div class="timeout-field">
-                                    <label for="config-request-timeout">Complete request</label>
+                                    <label for="config-request-timeout">HTTP/1 complete request</label>
                                     <input id="config-request-timeout" type="number" min="0" step="1" value="300000">
                                     <label class="disable-check"><input id="disable-request-timeout" type="checkbox"> Off</label>
                                 </div>
                                 <div class="timeout-field">
-                                    <label for="config-headers-timeout">Request headers</label>
+                                    <label for="config-headers-timeout">HTTP/1 request headers</label>
                                     <input id="config-headers-timeout" type="number" min="0" step="1" value="60000">
                                     <label class="disable-check"><input id="disable-headers-timeout" type="checkbox"> Off</label>
                                 </div>
                                 <div class="timeout-field">
-                                    <label for="config-keep-alive-timeout">Keep alive</label>
+                                    <label for="config-keep-alive-timeout">HTTP/1 keep alive</label>
                                     <input id="config-keep-alive-timeout" type="number" min="0" step="1" value="5000">
                                     <label class="disable-check"><input id="disable-keep-alive-timeout" type="checkbox"> Off</label>
                                 </div>
                             </div>
-                            <p class="form-help"><code>false</code> or <code>0</code> disables a timeout. The generated snippets use <code>false</code> when Off is checked.</p>
+                            <p class="form-help"><code>server.timeout</code> controls HTTP/1 socket or HTTP/2 session inactivity. The other three settings apply only to HTTP/1 requests, including HTTP/1.1 fallback over TLS. <code>false</code> or <code>0</code> disables a timeout. The generated snippets use <code>false</code> when Off is checked.</p>
                         </fieldset>
 
                         <fieldset>
@@ -222,7 +222,7 @@
 
                         <fieldset>
                             <legend>HTTPS</legend>
-                            <p class="field-doc">Keys: <code>https.privateKey</code>, <code>certificate</code>, <code>ca</code>, <code>passphrase</code>, <code>port</code>, and <code>only</code>. <a href="./configuration.html#https">HTTPS requirements →</a></p>
+                            <p class="field-doc">Keys: <code>https.privateKey</code>, <code>certificate</code>, <code>ca</code>, <code>passphrase</code>, <code>http2</code>, <code>port</code>, and <code>only</code>. <a href="./configuration.html#https">HTTPS requirements →</a></p>
                             <label class="switch-row standalone-switch">
                                 <span><strong>Configure HTTPS</strong><small>Both key and certificate are required to listen</small></span>
                                 <input id="config-https" name="httpsEnabled" type="checkbox">
@@ -251,6 +251,10 @@
                                 <label class="switch-row switch-field">
                                     <span><strong>HTTPS only</strong><small>Skip the HTTP listener</small></span>
                                     <input id="config-https-only" name="httpsOnly" type="checkbox" disabled>
+                                </label>
+                                <label class="switch-row switch-field field-wide">
+                                    <span><strong>HTTP/2 over TLS</strong><small>On by default, with HTTP/1.1 fallback. Off uses HTTP/1.1 only through node:https.</small></span>
+                                    <input id="config-https-http2" name="httpsHttp2" type="checkbox" checked disabled>
                                 </label>
                             </div>
                         </fieldset>

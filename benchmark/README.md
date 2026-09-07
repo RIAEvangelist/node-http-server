@@ -64,11 +64,12 @@ Results are written to standard output. Hardware, operating system load, Node.js
 
 ## Core release comparison
 
-`benchmark/core.js` exports the baseline `Server.js`, `Config.js`, and `MimeTypes.js` directly from Git into an OS temporary directory. The working tree stays in the canonical checkout. Baseline and candidate servers run in separate child processes; Config and lifecycle samples run in fresh `node --expose-gc` workers.
+`benchmark/core.js` exports the baseline `Server.js`, `Config.js`, and `MimeTypes.js` directly from Git into an OS temporary directory and reads the candidate from the current canonical checkout. Baseline and candidate servers run in separate child processes; Config and lifecycle samples run in fresh `node --expose-gc` workers.
 
 | Property | Contract |
 | --- | --- |
 | Baseline | Exact `9.0.2` Git tag by default; override with `--baseline <ref>`. |
+| Candidate | Current checkout source, identified by its package version, commit, and working-tree state. |
 | Order | Baseline-first and candidate-first order alternates for every recorded sample. |
 | Aggregation | Median, minimum, maximum, and every raw sample retained. |
 | HTTP isolation | One child server per source with validated preflight and warmup before timing. |
@@ -81,11 +82,12 @@ Results are written to standard output. Hardware, operating system load, Node.js
 
 | Command | Purpose |
 | --- | --- |
-| `npm run benchmark:core` | Run the standard nine-sample comparison against `9.0.2`. |
+| `npm run benchmark:core` | Compare the current checkout with `9.0.2` using the standard nine-sample profile. |
 | `npm run benchmark:core:smoke` | Run the short three-sample correctness profile. |
 | `node --expose-gc benchmark/core.js --only repeated-query-hook` | Run one scenario. Repeat `--only` to select several. |
 | `node --expose-gc benchmark/core.js --json` | Emit the complete result document to standard output. |
-| `node --expose-gc benchmark/core.js --output site/benchmarks/core-9.0.2-vs-9.1.0.json` | Record the raw result for GitHub Pages while keeping it outside the npm artifact. |
+
+To save a new result for GitHub Pages, pass `--output` with a new `.json` path inside `site/benchmarks/`; these results stay outside the npm artifact. The retained [`core-9.0.2-vs-9.1.0.json`](../site/benchmarks/core-9.0.2-vs-9.1.0.json) records the historical 9.1.0 comparison. Preserve that file when comparing a later checkout and identify the candidate version in each new result filename.
 
 ### Core scenarios
 

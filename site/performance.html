@@ -4,7 +4,7 @@
     <body>
         <a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./why.html">Why</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./https.html">HTTPS</a><a href="./examples.html">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html" aria-current="page">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
         <main id="main"><header class="page-header page-header-compact"><p class="kicker">9.0.2 → 9.1.0 · validated core comparison</p><h1>Measure the paths that changed.</h1><p class="lead">Nine alternating samples compare the exact 9.0.2 Git tag with the 9.1.0 working tree across request parsing, routing, hooks, file ranges, Brotli, Config allocation, and listener closure.</p><div class="header-actions"><a class="button button-primary" href="#results">Read the results</a><a class="button" href="./benchmarks/core-9.0.2-vs-9.1.0.json">Open raw JSON</a></div></header>
-            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#results">Core results</a><a href="#controls">Compatibility controls</a><a href="#contracts">Workload contracts</a><a href="#method">Method</a><a href="#reproduce">Reproduce</a></aside>
+            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#results">Core results</a><a href="#controls">Compatibility controls</a><a href="#contracts">Workload contracts</a><a href="#method">Method</a><a href="#reproduce">Run a comparison</a></aside>
                 <div class="doc-content">
                     <section class="doc-section" id="results"><p class="kicker">Recorded medians</p><h2>Targeted work per second and retained memory.</h2>
                         <p>These medians come from one recorded environment. Each row keeps its nine raw baseline and candidate samples in the linked JSON.</p>
@@ -60,11 +60,10 @@
                         <div class="callout"><strong>Interpretation:</strong> compare ratios within the recorded workload and environment. Run the same profile on deployment-class hardware when capacity planning needs host-specific numbers.</div>
                     </section>
 
-                    <section class="doc-section" id="reproduce"><p class="kicker">Reproduce</p><h2>Run the exact source comparison.</h2>
-                        <div class="code-block"><div class="code-head"><span class="code-label">shell · repository checkout with tag 9.0.2</span><button type="button" data-copy-target="performance-command">Copy</button></div><pre><code id="performance-command">npm run benchmark:core
-
-node --expose-gc benchmark/core.js \
-    --output site/benchmarks/core-9.0.2-vs-9.1.0.json</code></pre></div>
+                    <section class="doc-section" id="reproduce"><p class="kicker">Run a comparison</p><h2>Compare the current checkout with 9.0.2.</h2>
+                        <p>The command reads candidate source from the current canonical checkout and records its package version, commit, and working-tree state. The tables above retain the recorded 9.1.0 comparison.</p>
+                        <div class="code-block"><div class="code-head"><span class="code-label">shell · current checkout with tag 9.0.2</span><button type="button" data-copy-target="performance-command">Copy</button></div><pre><code id="performance-command">npm run benchmark:core</code></pre></div>
+                        <p>Use <code>node --expose-gc benchmark/core.js --json</code> for complete JSON output. To save a new result, pass <code>--output</code> with a new <code>.json</code> path inside <code>site/benchmarks/</code> that identifies the candidate version. Preserve the historical <code>core-9.0.2-vs-9.1.0.json</code> file.</p>
                         <div class="table-wrap"><table><thead><tr><th>File</th><th>Role</th></tr></thead><tbody>
                             <tr><td><code>benchmark/core.js</code></td><td>Exports the baseline, creates fixtures, alternates samples, validates results, and writes JSON.</td></tr>
                             <tr><td><code>benchmark/core-server.js</code></td><td>Runs one source variant and exposes the hook scenarios through IPC.</td></tr>

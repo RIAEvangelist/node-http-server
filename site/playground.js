@@ -50,6 +50,7 @@ const fields={
     httpsCertificate:document.querySelector('#config-https-certificate'),
     httpsCa:document.querySelector('#config-https-ca'),
     httpsPassphrase:document.querySelector('#config-https-passphrase'),
+    httpsHttp2:document.querySelector('#config-https-http2'),
     httpsPort:document.querySelector('#config-https-port'),
     httpsOnly:document.querySelector('#config-https-only')
 };
@@ -176,6 +177,7 @@ function currentConfig(){
             privateKey:fields.httpsKey.value.trim(),
             certificate:fields.httpsCertificate.value.trim(),
             passphrase:fields.httpsPassphrase.value || false,
+            http2:fields.httpsHttp2.checked,
             port:numberValue(fields.httpsPort,443,65535),
             only:fields.httpsOnly.checked
         };

@@ -499,7 +499,7 @@ Install the exact workspace state once with `npm ci`. Published installs have ze
 
 Vanilla Test 2.1 uses Node's native V8 coverage path and its project-owned reporter. Node's built-in test runner and assertion module execute the behavior suite.
 
-The 9.1.1 baseline contained 193 unique, focused leaf cases: 52 Unit, 58 Functional, 25 Integration, and 58 Regression. Version 10 adds seven HTTP/2 integration scenarios for negotiation, protocol compatibility, static responses, complete request bodies, concurrent streams, graceful closure, and cancellation. Each behavior has one owning case. Both the normal runner and coverage use the ordered manifest in `test/suites.js`; generated `coverage/node/test-results.json` records the cases from its associated run.
+The suite contains 213 unique, focused leaf cases: 57 Unit, 58 Functional, 40 Integration, and 58 Regression. HTTP/2 coverage includes five Config cases and fifteen integration scenarios for negotiation, protocol compatibility, static responses, complete request bodies, hooks, concurrent streams, errors, instance isolation, graceful closure, and cancellation. Each behavior has one owning case. Both the normal runner and coverage use the ordered manifest in `test/suites.js`. Node's summary also counts the HTTP/2 parent, giving 214 results; generated `coverage/node/test-results.json` records the associated run's totals and top-level descriptions, while native TAP output includes every nested case.
 
 For a non-unit behavioral pass, run `npm run test:behavioral`. It selects the Functional, Integration, and Regression cases from the same manifest, including HTTP/2. Its live CLI SPA journey verifies browser routes and assets served by the Node process; it does not execute node-http-server in a browser.
 
@@ -507,10 +507,10 @@ For a non-unit behavioral pass, run `npm run test:behavioral`. It selects the Fu
 |---|---|
 | `npm start` | Serve the current directory with the CLI |
 | `npm test` | Run all cases discovered by the shared suite manifest |
-| `npm run test:unit` | Run 52 isolated Config and suite-discovery tests from `test/unit/` |
+| `npm run test:unit` | Run 57 isolated Config and suite-discovery tests from `test/unit/` |
 | `npm run test:functional` | Run 58 public HTTP behavior tests from `test/functional/` |
-| `npm run test:behavioral` | Run non-unit behavioral contracts across Functional, Integration, and Regression |
-| `npm run test:integration` | Run module, CLI, benchmark, HTTP/2, listener, stream, and filesystem boundary tests from `test/integration/` |
+| `npm run test:behavioral` | Run 156 non-unit behavioral contracts across Functional, Integration, and Regression |
+| `npm run test:integration` | Run 40 module, CLI, benchmark, HTTP/2, listener, stream, and filesystem boundary tests from `test/integration/` |
 | `npm run test:regression` | Run 58 owned cases for previously fixed failures and security boundaries from `test/regression/` |
 | `npm run test:site` | Check docs pages, local links/fragments, IDs, label/ARIA targets, image alt text, nav state, CSS, and site JavaScript |
 | `npm run coverage` | Run `vanilla-test` Node coverage gates, write `coverage/node/`, and refresh measured badge JSON |
