@@ -101,6 +101,8 @@ const defaultConfigs=deepFreeze({
     server      : {
         index               : 'index.html',
         noCache             : true,
+        etag                : true,
+        nosniff             : true,
         allowDotfiles       : false,
         timeout             : 30000,
         requestTimeout      : 300000,
@@ -113,6 +115,7 @@ const defaultConfigs=deepFreeze({
         spaFallback         : false
     },
     https       : {
+        options     : null,
         ca          : '',
         privateKey  : '',
         certificate : '',
@@ -547,6 +550,13 @@ function mergeConfig(config,userConfig){
             requireRecord(value,`config.${key}`);
             if(!isRecord(config[key])){
                 config[key]=clone(defaultConfigs[key]);
+            }
+            if(key==='https'){
+                for(const option of Object.keys(value)){
+                    requireSafeKey(option,'config.https');
+                    config.https[option]=option==='options' ? value[option] : clone(value[option]);
+                }
+                continue;
             }
             mergeObject(config[key],value,`config.${key}`);
             continue;

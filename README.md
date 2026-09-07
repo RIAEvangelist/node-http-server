@@ -224,6 +224,7 @@ Each `Server` owns isolated configuration and listener state. The active Node li
 | `address()` | address object or `null` | Read the first active listener address |
 | `serve(request, response, body?, encoding?)` | `Promise` | Complete a manual response through `beforeServe` |
 | `serveFile(filename, request, response)` | `Promise<boolean>` | Serve a deliberate file from custom code |
+| `serveRepresentation(request, response, {lastModified, contentType, body})` | `Promise<void>` | Serve a caller-owned representation with Last-Modified validation before lazy body generation |
 | `config` | `Config` | Isolated active configuration |
 | `server` | Node HTTP server or `null` | Active HTTP listener |
 | `secureServer` | Node HTTPS server or `null` | Active HTTPS listener |
@@ -286,6 +287,8 @@ const config={
 |---|---|---|
 | `index` | `'index.html'` | File used for directory requests |
 | `noCache` | `true` | Send no-cache response directives |
+| `etag` | `true` | Set `false` to skip automatic static ETag calculation and emission; Last-Modified validation remains available |
+| `nosniff` | `true` | Set `false` to omit automatic X-Content-Type-Options headers on static and built-in error responses |
 | `allowDotfiles` | `false` | Allow any dot-prefixed path segment; only literal `true` opts in |
 | `timeout` | `30000` | Socket inactivity timeout in milliseconds |
 | `requestTimeout` | `300000` | Complete-request timeout in milliseconds |
@@ -352,6 +355,7 @@ HTTPS is a first-class module API mode built on Node's `node:https`. It shares t
 | Key | Default | Description |
 |---|---|---|
 | `https.ca` | `''` | Optional CA certificate path |
+| `https.options` | `null` | Native Node.js HTTPS options; when supplied, used instead of the certificate-path fields |
 | `https.privateKey` | `''` | Private-key path |
 | `https.certificate` | `''` | Certificate path |
 | `https.passphrase` | `false` | Optional private-key passphrase |
@@ -375,6 +379,51 @@ secureServer.deploy();
 ```
 
 Leave `only:false` to run HTTP and HTTPS together. `close()` closes both listeners.
+
+`https.options` passes the complete native Node.js HTTPS options object to
+`https.createServer()`. It supports in-memory `key`, `cert`, `ca`, `pfx`,
+passphrases, TLS callbacks and other Node.js HTTPS options. The object is passed
+by reference, preserving native values, callbacks and getters. When present, it takes
+precedence over `https.privateKey`, `https.certificate`, `https.ca` and
+`https.passphrase`; the existing path-based behavior applies when it is absent.
+`https.port` and `https.only` continue to select the listener. Verbose logs do
+not include raw TLS option values.
+
+### Generated representations
+
+Use `serveRepresentation()` when a response is generated or rewritten and its
+modification time belongs to the final representation. Supply `lastModified`
+as a `Date`, `contentType` as its MIME type, and `body` as a string, Buffer, or
+named zero-argument factory returning either value or a Promise for it. The
+caller owns when that final representation changes; a source file timestamp
+alone is insufficient if other inputs affect the result.
+
+The method handles conditional GET and HEAD through Last-Modified without
+creating an ETag. A matching request returns 304 before the body factory runs.
+Every HEAD skips the factory and body; Content-Length may be omitted because
+generating the representation is unnecessary. A changed GET resolves the body
+once and uses the ordinary `serve()` hooks. Completion invokes `afterServe`
+once. Errors reject to the owning request hook. Caller-set headers and status
+are retained except for the normal 304 status and removal of body headers.
+Omit `lastModified` when no modification metadata exists.
+
+```js
+await server.serveRepresentation(
+    request,
+    response,
+    {
+        lastModified: representationDate,
+        contentType: 'text/html; charset=utf-8',
+        async body() {
+            return renderCurrentPage();
+        }
+    }
+);
+```
+
+For static delivery without automatic ETags or content-type-options headers,
+set `server:{etag:false,nosniff:false}`. This preserves streaming, ranges and
+Last-Modified handling in `serveFile()`.
 
 ### Multiple domains
 

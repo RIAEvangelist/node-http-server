@@ -72,6 +72,10 @@ class Server{
         return serveFile.call(this,filename,exists,request,response);
     }
 
+    serveRepresentation(request,response,representation){
+        return serveRepresentation.call(this,request,response,representation);
+    }
+
     get Config(){
         return Config;
     }
@@ -133,7 +137,9 @@ function deploy(userConfig,readyCallback=function(){}){
     let httpsOptions;
     const secureConfigured=this.config.https.privateKey || this.config.https.certificate;
 
-    if(secureConfigured){
+    if(this.config.https.options){
+        httpsOptions=this.config.https.options;
+    }else if(secureConfigured){
         if(!this.config.https.privateKey || !this.config.https.certificate){
             const error=new Error('HTTPS requires both https.privateKey and https.certificate');
             error.code='ERR_HTTPS_CONFIGURATION';
@@ -839,12 +845,16 @@ async function serveStaticFile(filename,stat,request,response){
     }
 
     const contentType=configuredContentType || 'application/octet-stream';
-    const etag=weakEtag(stat);
+    const etag=this.config.server.etag===false ? null : weakEtag(stat);
 
     response.setHeader('Content-Type',contentType);
-    response.setHeader('X-Content-Type-Options','nosniff');
+    if(this.config.server.nosniff!==false){
+        response.setHeader('X-Content-Type-Options','nosniff');
+    }
     response.setHeader('Accept-Ranges','bytes');
-    response.setHeader('ETag',etag);
+    if(etag!==null){
+        response.setHeader('ETag',etag);
+    }
     response.setHeader('Last-Modified',stat.mtime.toUTCString());
 
     if(this.config.server.noCache){
@@ -968,7 +978,7 @@ function ifRangeMatches(ifRange,stat,etag){
     }
 
     if(ifRange.startsWith('"') || ifRange.startsWith('W/')){
-        return !etag.startsWith('W/') && ifRange==etag;
+        return etag!==null && !etag.startsWith('W/') && ifRange==etag;
     }
 
     const time=Date.parse(ifRange);
@@ -1161,6 +1171,39 @@ function streamFile(filename,start,end,compression,request,response){
     );
 }
 
+async function serveRepresentation(request,response,{lastModified,contentType,body=''}={}){
+    if(response.writableEnded){
+        invokeAfterServe.call(this,request,response);
+        return;
+    }
+
+    if(contentType!==undefined){
+        response.setHeader('Content-Type',contentType);
+    }
+    if(lastModified!==undefined){
+        response.setHeader('Last-Modified',lastModified.toUTCString());
+        if((request.method==='GET' || request.method==='HEAD') && isNotModified(
+            request,
+            {mtimeMs:lastModified.getTime()},
+            null
+        )){
+            response.statusCode=304;
+            response.removeHeader('Content-Type');
+            response.removeHeader('Content-Length');
+            completeResponse.call(this,request,response);
+            return;
+        }
+    }
+
+    if(request.method==='HEAD'){
+        completeResponse.call(this,request,response);
+        return;
+    }
+
+    const representation=typeof body==='function' ? await body() : body;
+    await this.serve(request,response,representation);
+}
+
 async function serve(request,response,body='',encoding='utf8'){
     if(response.writableEnded){
         invokeAfterServe.call(this,request,response);
@@ -1291,19 +1334,22 @@ async function sendError(status,request,response,headers={}){
     }
 
     response.statusCode=status;
-    setHeaders(response,this.config.errors.headers);
+    setHeaders(response,this.config.errors.headers,this.config.server.nosniff!==false);
     setHeaders(response,headers);
 
     const body=this.config.errors[String(status)] || this.config.errors[status] || `${status} ${http.STATUS_CODES[status] || 'Error'}`;
     await this.serve(request,response,body,'utf8');
 }
 
-function setHeaders(response,headers){
+function setHeaders(response,headers,contentTypeOptions=true){
     if(!headers){
         return;
     }
 
     for(const key of Object.keys(headers)){
+        if(!contentTypeOptions && key.toLowerCase()==='x-content-type-options'){
+            continue;
+        }
         response.setHeader(key,headers[key]);
     }
 }
@@ -1413,6 +1459,8 @@ function sanitizedConfig(config){
         server:{
             index:config.server.index,
             noCache:config.server.noCache,
+            etag:config.server.etag,
+            nosniff:config.server.nosniff,
             allowDotfiles:config.server.allowDotfiles,
             timeout:config.server.timeout,
             requestTimeout:config.server.requestTimeout,
@@ -1425,6 +1473,7 @@ function sanitizedConfig(config){
             spaFallback:config.server.spaFallback
         },
         https:{
+            options:Boolean(config.https.options),
             ca:Boolean(config.https.ca),
             privateKey:Boolean(config.https.privateKey),
             certificate:Boolean(config.https.certificate),

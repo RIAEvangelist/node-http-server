@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [9.2.0] - 2026-09-06
+
+### Added
+
+- Added `serveRepresentation(request, response, {lastModified, contentType, body})` for conditional generated responses. Last-Modified handling precedes lazy body generation; HEAD and 304 responses do not invoke the body factory.
+- Added `https.options` for native Node.js HTTPS options, including in-memory credentials and TLS callbacks, while preserving existing certificate-path configuration.
+- Added `server.etag:false` to skip automatic static ETag calculation and emission, and `server.nosniff:false` to omit automatic content-type-options headers on static and built-in error responses. Existing defaults remain unchanged.
+
 ## [9.1.1] - 2026-08-23
 
 ### Added
