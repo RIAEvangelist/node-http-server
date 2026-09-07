@@ -1,19 +1,5 @@
 # Migrating from node-http-server v8 to v9
 
-## Additive 9.2 APIs
-
-Existing v9 callers retain their defaults. `https.options` accepts native Node.js
-HTTPS options and takes precedence over certificate-path fields when supplied.
-Opt-in `https.enforce:true` requires configured HTTPS. HTTPS-only mode retains
-one TLS listener; paired mode redirects HTTP with 308 before application hooks,
-preserving the request path, query and method. Other consumers retain the
-default `enforce:false` behavior.
-The new `serveRepresentation(request, response, {lastModified, contentType, body})`
-method checks a final representation's modification date before invoking a lazy
-body factory; HEAD and 304 responses skip body generation. Static callers may
-set `server.etag:false` and `server.nosniff:false` to omit those automatic behaviors
-while retaining Last-Modified validation, streaming and ranges.
-
 Version 9 keeps native HTTP and HTTPS listeners, the small server surface, default singleton, hooks, and `key=value` CLI. The major changes make network exposure explicit, isolate multiple servers, and bring static delivery behavior up to date.
 
 ## Runtime
