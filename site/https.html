@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Run node-http-server with HTTP/2 over HTTPS and HTTP/1.1 negotiation, including HTTPS-only and paired listeners, certificate configuration, lifecycle, and hooks.">
+        <meta name="description" content="Run node-http-server with HTTP/2 over HTTPS and HTTP/1.1 negotiation, including Let's Encrypt certificates, Certbot renewal, HTTPS-only and paired listeners, lifecycle, and hooks.">
         <meta name="theme-color" content="#08110d">
         <meta property="og:title" content="HTTPS — node-http-server">
         <meta property="og:description" content="Native Node HTTP/2 over HTTPS with HTTP/1.1 compatibility and zero runtime dependencies.">
@@ -29,7 +29,7 @@
             </header>
 
             <div class="doc-layout">
-                <aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#modes">Transport modes</a><a href="#http2">HTTP/2 negotiation</a><a href="#https-only">HTTPS-only</a><a href="#dual">HTTP + HTTPS</a><a href="#configuration">TLS configuration</a><a href="#lifecycle">Lifecycle</a><a href="#certificates">Certificates</a><a href="#troubleshooting">Troubleshooting</a></aside>
+                <aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#modes">Transport modes</a><a href="#http2">HTTP/2 negotiation</a><a href="#https-only">HTTPS-only</a><a href="#dual">HTTP + HTTPS</a><a href="#configuration">TLS configuration</a><a href="#lifecycle">Lifecycle</a><a href="#certificates">Certificates</a><a href="#letsencrypt">Let's Encrypt</a><a href="#troubleshooting">Troubleshooting</a></aside>
                 <div class="doc-content">
                     <section class="doc-section" id="modes">
                         <p class="kicker">Transport modes</p>
@@ -141,11 +141,61 @@ server.secureServer.once('error',error=>console.error(error));</code></pre></div
                         <h2>Use material issued for the deployment.</h2>
                         <div class="table-wrap"><table><thead><tr><th>Deployment</th><th>Certificate source</th><th>Operator action</th></tr></thead><tbody>
                             <tr><td>Local development</td><td>Local CA or development certificate tooling</td><td>Trust the CA deliberately and match the requested hostname.</td></tr>
-                            <tr><td>Direct production listener</td><td>Maintained public or private CA</td><td>Protect key files, monitor expiry, and redeploy after rotation.</td></tr>
+                            <tr><td>Direct production listener</td><td><a href="#letsencrypt">Let's Encrypt</a> or another maintained public or private CA</td><td>Protect key files, monitor expiry, and redeploy after rotation.</td></tr>
                             <tr><td>Reverse proxy or hosting edge</td><td>Edge-managed certificate</td><td>Terminate TLS at the edge and run the server on the protected upstream network.</td></tr>
                         </tbody></table></div>
                         <div class="callout-warning callout"><strong>Private keys:</strong> store them outside every served root with narrow filesystem permissions. Generate fresh material for each environment.</div>
                         <div class="page-links"><a href="https://github.com/RIAEvangelist/node-http-server/blob/main/local-certs/readme.md">Local certificate guide →</a><a href="./operations.html#certificates">Operations checklist →</a><a href="https://github.com/RIAEvangelist/node-http-server/blob/main/SECURITY.md">Security policy →</a></div>
+                    </section>
+
+                    <section class="doc-section" id="letsencrypt">
+                        <p class="kicker">Let's Encrypt · Linux + Certbot</p>
+                        <h2>Issue a certificate and keep the listener current.</h2>
+                        <p><a href="https://letsencrypt.org/getting-started/">Let's Encrypt</a> issues public certificates through ACME clients such as Certbot. Certificate issuance and renewal run outside node-http-server; the module loads the resulting PEM files through its existing HTTPS settings. If your hosting provider manages TLS, use its certificate automation at that edge.</p>
+                        <h3>1. Obtain a certificate for your domain</h3>
+                        <p>This walkthrough targets a Linux host with Certbot installed using its <a href="https://certbot.eff.org/instructions?ws=other&amp;os=snap">official instructions for other web servers</a>. For another operating system, choose a supported client from the <a href="https://letsencrypt.org/docs/client-options/">ACME client list</a>. Replace <code>example.com</code> with a domain you control; the localhost certificate examples remain separate.</p>
+                        <p>Point the domain's DNS records at the challenge host, including any published IPv6 record. <a href="https://letsencrypt.org/docs/challenge-types/#http-01-challenge">HTTP-01 validation</a> requires public inbound TCP port <code>80</code>, even when the application uses HTTPS on another port. Route that traffic through any firewall, NAT, or load balancer to the challenge responder.</p>
+                        <p><a href="https://eff-certbot.readthedocs.io/en/stable/using.html#standalone">Standalone mode</a> lets Certbot own port 80 during validation. The port must be free; if another service owns it, arrange its stop/start through that service's operator or choose a different challenge method.</p>
+                        <div class="code-block"><div class="code-head"><span class="code-label">Linux shell · initial issuance</span><button type="button" data-copy-target="https-le-issue">Copy</button></div><pre><code id="https-le-issue">sudo certbot certonly --standalone --cert-name example.com -d example.com
+sudo certbot certificates</code></pre></div>
+                        <p>Follow Certbot's account prompts and use the paths it reports. For the selected certificate name, map <code>/etc/letsencrypt/live/example.com/privkey.pem</code> to <code>https.privateKey</code> and <code>/etc/letsencrypt/live/example.com/fullchain.pem</code> to <code>https.certificate</code>. Certbot updates these live paths during renewal; see <a href="https://eff-certbot.readthedocs.io/en/stable/using.html#where-are-my-certificates">certificate files</a>.</p>
+                        <h3>2. Load the certificate in node-http-server</h3>
+                        <div class="code-block"><div class="code-head"><span class="code-label">CommonJS · direct HTTPS</span><button type="button" data-copy-target="https-le-server">Copy</button></div><pre><code id="https-le-server">const {Server}=require('node-http-server');
+
+const server=new Server({
+    root:'/var/www/example/public',
+    host:'0.0.0.0',
+    domain:'example.com',
+    https:{
+        privateKey:'/etc/letsencrypt/live/example.com/privkey.pem',
+        certificate:'/etc/letsencrypt/live/example.com/fullchain.pem',
+        port:443,
+        only:true
+    }
+});
+
+server.deploy();
+server.secureServer.once('error',function listenerFailed(error){
+    console.error(error);
+    process.exitCode=1;
+});</code></pre></div>
+                        <p>Replace the content root and domain, and use a bind address matching your deployment; this example binds IPv4. The application account needs read access to the certificate and private key through their directories, plus permission to bind port 443. Keep the private key outside the content root. Clients connect to <code>https://example.com</code>; HTTPS negotiates HTTP/2 or HTTP/1.1. <code>only:true</code> leaves port 80 available for Certbot.</p>
+                        <p><code>fullchain.pem</code> supplies the leaf certificate followed by its intermediates, as required by <a href="https://nodejs.org/docs/latest-v22.x/api/tls.html#tlscreatesecurecontextoptions">Node's TLS <code>cert</code> option</a>. Leave <code>https.ca</code> unset for this setup; it is not the place to supply the server's intermediate chain. The module reads files at <code>deploy()</code> and does not automatically watch or reload renewed certificates.</p>
+                        <h3>3. Renew and restart the application</h3>
+                        <p>Use the renewal scheduler supplied by your <a href="https://certbot.eff.org/instructions?ws=other&amp;os=snap">Certbot installation</a>. Keep port 80 available for each standalone renewal. An operator can rehearse ACME renewal with:</p>
+                        <div class="code-block"><div class="code-head"><span class="code-label">Linux shell · renewal rehearsal</span><button type="button" data-copy-target="https-le-renew">Copy</button></div><pre><code id="https-le-renew">sudo certbot renew --cert-name example.com --dry-run</code></pre></div>
+                        <p>For an existing systemd application service, save the following as <code>/etc/letsencrypt/renewal-hooks/deploy/restart-example-web</code> and make it executable. Replace the lineage and <code>example-web.service</code> with the certificate path and service you own.</p>
+                        <div class="code-block"><div class="code-head"><span class="code-label">Executable deploy-hook file · Linux systemd</span><button type="button" data-copy-target="https-le-hook">Copy</button></div><pre><code id="https-le-hook">#!/bin/sh
+if [ "$RENEWED_LINEAGE" = "/etc/letsencrypt/live/example.com" ]; then
+    systemctl restart example-web.service
+fi</code></pre></div>
+                        <p>Certbot runs <a href="https://eff-certbot.readthedocs.io/en/stable/using.html#renewing-certificates">deploy hooks</a> after successful renewal. A dry run does not run them by default. The application's existing shutdown/startup lifecycle must load the new files; a restart can briefly interrupt service. Inspect the certificate presented by the application after deployment to confirm it loaded the renewed certificate.</p>
+                        <p>If another listener must stop for standalone validation, use Certbot's <a href="https://eff-certbot.readthedocs.io/en/stable/using.html#automated-renewals">pre/post hooks</a> to stop and restore that service, including when renewal fails. The successful-renewal deploy hook cannot restore a service after failed validation.</p>
+                        <h3>When standalone does not fit</h3>
+                        <ul>
+                            <li><strong>Port 80 unavailable or wildcard certificate:</strong> use automated <a href="https://letsencrypt.org/docs/challenge-types/#dns-01-challenge">DNS-01 validation</a> through your DNS provider. Its challenge TXT records can be managed independently of the application listener. Manual DNS entry needs another manual step at renewal unless the client has automation hooks.</li>
+                            <li><strong>Existing web server on port 80:</strong> <a href="https://eff-certbot.readthedocs.io/en/stable/using.html#webroot">webroot validation</a> needs <code>/.well-known/acme-challenge/</code> served from its selected root. node-http-server's default <code>server.allowDotfiles:false</code> rejects that path. An existing edge can serve the challenge; pointing Certbot at the ordinary application root alone is insufficient.</li>
+                        </ul>
                     </section>
 
                     <section class="doc-section" id="troubleshooting">

@@ -11,6 +11,8 @@ node-http-server is Node.js-only; native-browser execution, import maps, and bro
 
 Run only one example that uses a given port at a time. Some HTTPS examples start both HTTP and HTTPS listeners. Set `config.https.only=true` when the secure listener should run alone.
 
+For a public deployment domain, use the [Let's Encrypt certificate walkthrough](https://riaevangelist.github.io/node-http-server/https.html#letsencrypt), including renewal and application restart. The session below uses a local development certificate.
+
 ### HTTP/2 and HTTP/1.1 on one HTTPS port
 
 Use Node.js 22.12.0 or newer and run the commands below from the repository root. These examples are repository files; they are not included in the npm package.

@@ -27,3 +27,7 @@ openssl x509 -req -in local-certs/private/server.csr -CA local-certs/private/roo
 ```
 
 The repository ignores all generated key and certificate material. Treat generated private keys as secrets even when they are only for localhost.
+
+## Public certificates with Let's Encrypt
+
+For a deployment domain, follow the [Let's Encrypt and Certbot walkthrough](https://riaevangelist.github.io/node-http-server/https.html#letsencrypt). It covers domain validation, the existing `https.privateKey` and `https.certificate` settings, renewal, and loading renewed certificates into the running application. Keep the local development examples above for their existing purpose.
