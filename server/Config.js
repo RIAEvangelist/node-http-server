@@ -117,6 +117,7 @@ const defaultConfigs=deepFreeze({
         privateKey  : '',
         certificate : '',
         passphrase  : false,
+        http2       : true,
         port        : 443,
         only        : false
     },

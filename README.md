@@ -19,11 +19,11 @@
 
 [![Sponsor RIAEvangelist to help development of node-http-server](https://img.shields.io/static/v1?label=Sponsor%20Me%20On%20GitHub&message=%E2%9D%A4&logo=GitHub)](https://github.com/sponsors/RIAEvangelist)
 
-node-http-server serves static files over HTTP and HTTPS. TLS uses Node's built-in `node:https` and adds zero runtime dependencies. The CLI starts HTTP; CommonJS and ESM support HTTP, HTTPS-only, and paired HTTP + HTTPS listeners. The sole direct development dependency is the owner-maintained `vanilla-test@2.1.1`, used for project-owned native V8 coverage.
+node-http-server serves static files over HTTP and HTTPS. HTTPS defaults to HTTP/2 through Node's built-in `node:http2`, with HTTP/1.1 negotiated on the same port for clients that need it, and adds zero runtime dependencies. The CLI starts HTTP/1.1; CommonJS and ESM support HTTP, HTTPS-only, and paired HTTP + HTTPS listeners. The sole direct development dependency is the owner-maintained `vanilla-test@2.1.1`, used for project-owned native V8 coverage.
 
 > **Runtime boundary:** node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable. It serves files to browsers; the package itself does not execute in browsers. CommonJS and ESM are Node.js module entry points, not browser entry points. A bundler is supported only when it targets Node.js; browser-targeted bundles and `file://` are not supported runtime paths. The documentation site and configuration playground run in a browser only to display or generate Node.js examples—they never import or execute this package. Because the package has zero runtime dependencies, consumer-root dependency-conflict and scoped import-map tests are also not applicable.
 
-Version 9 is a focused static-server toolkit with streaming files, clean multi-server lifecycle, modern cache and range behavior, optional compression and SPA fallback, configurable request limits, and strict root containment.
+Version 10 adds HTTP/2 to the static-server toolkit with streaming files, clean multi-server lifecycle, modern cache and range behavior, optional compression and SPA fallback, configurable request limits, and strict root containment.
 
 ## HTTP and HTTPS modes
 
@@ -33,7 +33,7 @@ Version 9 is a focused static-server toolkit with streaming files, clean multi-s
 | HTTPS only | CommonJS or ESM with key/certificate paths and `https.only:true` | `server.secureServer` |
 | HTTP + HTTPS | CommonJS or ESM with key/certificate paths and `https.only:false` | `server.server` and `server.secureServer` |
 
-Both transports use the same roots, hooks, limits, timeouts, range behavior, cache validation, and static-file pipeline. See the focused [HTTPS guide](https://riaevangelist.github.io/node-http-server/https.html) for complete CommonJS and ESM examples.
+Both transports use the same roots, hooks, request-body handling, range behavior, cache validation, and static-file pipeline. HTTPS selects HTTP/2 or HTTP/1.1 during the TLS handshake using ALPN; no failed HTTP/2 request or retry is needed. Plain HTTP remains HTTP/1.1. See the focused [HTTPS guide](https://riaevangelist.github.io/node-http-server/https.html) for complete CommonJS and ESM examples and protocol-specific timeouts.
 
 ## Why node-http-server
 
@@ -41,10 +41,10 @@ Both transports use the same roots, hooks, limits, timeouts, range behavior, cac
 |---|---|
 | Zero runtime dependencies | A compact install and an inspectable runtime surface. |
 | CLI + CommonJS + ESM | One server fits shell tasks, existing Node applications, and modern modules. |
-| Native HTTP + HTTPS | Node's built-in `node:http` and `node:https`, with HTTP-only, HTTPS-only, and paired listeners. |
+| Native HTTP + HTTPS | Node's built-in `node:http`, `node:http2`, and `node:https`, with negotiated HTTP/2 over HTTPS and HTTP/1.1 compatibility. |
 | Modern static delivery | Streaming, HEAD, ranges, validators, Brotli/gzip, SPA fallback, and MIME controls across both transports. |
 | Explicit security and operations | Localhost binding, root containment, dotfile policy, Host routing, HTTPS, limits, timeouts, and logs. |
-| Measured delivery | 193 focused cases, per-file native V8 coverage, packed-package smoke checks, and reproducible benchmarks. |
+| Measured delivery | Focused protocol tests, per-file native V8 coverage, packed-package smoke checks, and reproducible benchmarks. |
 
 See the compact [decision guide](https://riaevangelist.github.io/node-http-server/why.html) for project fit and source links.
 
@@ -187,7 +187,7 @@ Use the module API for HTTPS certificates, virtual hosts, hooks, Brotli quality,
 
 `deploy(config?, readyCallback?)` starts the configured HTTP listener and optional HTTPS listener, then returns the `Server` instance. The callback receives the instance and its ready Node listener. It runs once for each listener when both protocols are enabled.
 
-`close(callback?)` closes every listener owned by the instance and returns a Promise. The same instance can be deployed again after it closes.
+`close(callback?)` closes every listener owned by the instance and returns a Promise. HTTP/2 sessions close gracefully after their active streams finish. The same instance can be deployed again after it closes.
 
 ```js
 import {Server} from 'node-http-server';
@@ -226,8 +226,8 @@ Each `Server` owns isolated configuration and listener state. The active Node li
 | `serveFile(filename, request, response)` | `Promise<boolean>` | Serve a deliberate file from custom code |
 | `config` | `Config` | Isolated active configuration |
 | `server` | Node HTTP server or `null` | Active HTTP listener |
-| `secureServer` | Node HTTPS server or `null` | Active HTTPS listener |
-| `lastError` | error or `null` | Last captured request, hook, stream, or logging error |
+| `secureServer` | Node `Http2SecureServer`, `https.Server`, or `null` | Active HTTPS listener; `https.http2:false` selects `https.Server` |
+| `lastError` | error or `null` | Last captured request, hook, stream, HTTP/2 session, or logging error |
 
 Node listener errors keep Node's native event contract. Attach an error handler after `deploy()` when the application needs to handle bind failures:
 
@@ -287,10 +287,10 @@ const config={
 | `index` | `'index.html'` | File used for directory requests |
 | `noCache` | `true` | Send no-cache response directives |
 | `allowDotfiles` | `false` | Allow any dot-prefixed path segment; only literal `true` opts in |
-| `timeout` | `30000` | Socket inactivity timeout in milliseconds |
-| `requestTimeout` | `300000` | Complete-request timeout in milliseconds |
-| `headersTimeout` | `60000` | Request-header timeout in milliseconds |
-| `keepAliveTimeout` | `5000` | Keep-alive timeout in milliseconds |
+| `timeout` | `30000` | HTTP/1 socket or HTTP/2 session inactivity timeout in milliseconds |
+| `requestTimeout` | `300000` | HTTP/1 complete-request timeout in milliseconds |
+| `headersTimeout` | `60000` | HTTP/1 request-header timeout in milliseconds |
+| `keepAliveTimeout` | `5000` | HTTP/1 keep-alive timeout in milliseconds |
 | `maxRequestBodyBytes` | `false` | Maximum body size in bytes; `false`, `null`, or `0` means unlimited |
 | `compression` | `false` | Negotiate Brotli or gzip through Node's built-in `node:zlib`; runtime dependencies stay at zero |
 | `compressionThreshold` | `1024` | Minimum uncompressed size in bytes |
@@ -298,6 +298,8 @@ const config={
 | `spaFallback` | `false` | `true` uses `server.index`; a string selects another fallback file |
 
 Every timeout accepts a nonnegative millisecond value. Programmatic configuration accepts `false`, `null`, or `0` to disable it. Limits and compression stay under your control; no request-body limit or compression is enabled by default.
+
+`requestTimeout`, `headersTimeout`, and `keepAliveTimeout` apply to HTTP/1 connections, including those negotiated on the HTTPS listener. They do not impose HTTP/2 stream deadlines; `timeout` controls HTTP/2 session inactivity.
 
 ### Disable and opt-out values
 
@@ -347,7 +349,7 @@ Unknown extensions use `application/octet-stream`. Set `contentType:false` to re
 
 ### HTTPS
 
-HTTPS is a first-class module API mode built on Node's `node:https`. It shares the HTTP request pipeline and keeps runtime dependencies at zero. Use the [focused HTTPS guide](https://riaevangelist.github.io/node-http-server/https.html) for HTTPS-only, paired-listener, lifecycle, and certificate examples.
+HTTPS is a first-class module API mode built on Node's `node:http2.createSecureServer()` with `allowHTTP1:true`. Clients negotiate HTTP/2 or HTTP/1.1 on the same HTTPS port. It shares the HTTP request pipeline and keeps runtime dependencies at zero on Node.js 22.12 or newer. Use the [focused HTTPS guide](https://riaevangelist.github.io/node-http-server/https.html) for HTTPS-only, paired-listener, lifecycle, and certificate examples.
 
 | Key | Default | Description |
 |---|---|---|
@@ -357,6 +359,7 @@ HTTPS is a first-class module API mode built on Node's `node:https`. It shares t
 | `https.passphrase` | `false` | Optional private-key passphrase |
 | `https.port` | `443` | HTTPS port |
 | `https.only` | `false` | Skip the HTTP listener when HTTPS is configured |
+| `https.http2` | `true` | Enable HTTP/2 with HTTP/1.1 negotiation; `false` selects the original `node:https` listener |
 
 ```js
 const secureServer=new Server({
@@ -374,7 +377,9 @@ const secureServer=new Server({
 secureServer.deploy();
 ```
 
-Leave `only:false` to run HTTP and HTTPS together. `close()` closes both listeners.
+Leave `only:false` to run HTTP and HTTPS together. `close()` closes both listeners and gracefully closes active HTTP/2 sessions. HTTPS still requires your configured key and certificate paths; HTTP/2 does not enable TLS for the plain HTTP listener.
+
+Set `https.http2:false` when an application needs the original `https.Server` type or HTTP/1-specific native APIs. With the default, `server.secureServer` is a Node `Http2SecureServer`, and hooks receive Node's HTTP/2 compatibility request/response objects for HTTP/2 requests. Cleartext HTTP/2 (h2c), HTTP/2-only mode, and HTTP/3 are not provided.
 
 ### Multiple domains
 
@@ -391,7 +396,7 @@ new Server({
 
 `deploy()` compiles `domain`, `domains`, and their canonical roots into an O(1) routing table. Assigning `server.config.root` or `server.config.domain`, or changing entries in `server.config.domains`, invalidates the table; the next request rebuilds it with the live values.
 
-`host` decides which network interface listens. `domain` and `domains` decide which Host headers and roots the server accepts. A wildcard primary `domain` (`'0.0.0.0'` or `'*'`) selects the primary root before the `domains` map; set a non-wildcard primary domain when using virtual hosts.
+`host` decides which network interface listens. `domain` and `domains` decide which HTTP/1 Host values or HTTP/2 `:authority` values and roots the server accepts. A wildcard primary `domain` (`'0.0.0.0'` or `'*'`) selects the primary root before the `domains` map; set a non-wildcard primary domain when using virtual hosts.
 
 ### Error responses and extension controls
 
@@ -432,6 +437,8 @@ The parsed request passed to `onRequest` includes both body forms:
 
 When `maxRequestBodyBytes` is set and the request crosses it, the static lifecycle stops with `413 Payload Too Large`.
 
+HTTP/2 request bodies are read through the request stream even without `Content-Length`. The same complete body forms reach `onRequest` for both protocols.
+
 ## Hooks
 
 Subclass `Server` or assign hook functions to intercept the lifecycle. The first three hooks may return a value directly or through a Promise.
@@ -444,6 +451,8 @@ Subclass `Server` or assign hook functions to intercept the lifecycle. The first
 | `afterServe` | `request, response` | After a library completion path finishes |
 
 Return a truthy value from the first three hooks when the hook is taking over that step. Complete the response with the supplied `serve` function or the Node response object.
+
+Hooks receive native Node request/response objects for the negotiated protocol. Use public methods such as `response.setHeader()` and `response.end()` and the supplied `serve` continuation. HTTP/2 hooks must use HTTP/2-compatible headers: connection-specific headers such as `Connection` and `Transfer-Encoding`, and raw HTTP/1 socket writes, cannot be used on HTTP/2 streams. `request.httpVersionMajor` identifies the request protocol; see [Node's HTTP/2 compatibility API](https://nodejs.org/api/http2.html#compatibility-api).
 
 `onRawRequest` and `onRequest` receive the public safe `serve` path. The fifth `beforeServe` argument is a one-shot completion continuation: call it after manual or asynchronous body work. It completes the response once and bypasses another `beforeServe` pass.
 
@@ -490,18 +499,18 @@ Install the exact workspace state once with `npm ci`. Published installs have ze
 
 Vanilla Test 2.1 uses Node's native V8 coverage path and its project-owned reporter. Node's built-in test runner and assertion module execute the behavior suite.
 
-The suite contains 193 unique, focused leaf cases: 52 Unit, 58 Functional, 25 Integration, and 58 Regression. Each behavior has one owning case. Both the normal runner and coverage use the ordered manifest in `test/suites.js`; generated `coverage/node/test-results.json` is the authoritative ordered case evidence.
+The 9.1.1 baseline contained 193 unique, focused leaf cases: 52 Unit, 58 Functional, 25 Integration, and 58 Regression. Version 10 adds seven HTTP/2 integration scenarios for negotiation, protocol compatibility, static responses, complete request bodies, concurrent streams, graceful closure, and cancellation. Each behavior has one owning case. Both the normal runner and coverage use the ordered manifest in `test/suites.js`; generated `coverage/node/test-results.json` records the cases from its associated run.
 
-For a non-unit behavioral pass, run `npm run test:behavioral`. It selects the 141 Functional, Integration, and Regression cases from the same manifest rather than maintaining duplicate test sources. Its live CLI SPA journey verifies browser routes and assets served by the Node process; it does not execute node-http-server in a browser.
+For a non-unit behavioral pass, run `npm run test:behavioral`. It selects the Functional, Integration, and Regression cases from the same manifest, including HTTP/2. Its live CLI SPA journey verifies browser routes and assets served by the Node process; it does not execute node-http-server in a browser.
 
 | Script | Purpose |
 |---|---|
 | `npm start` | Serve the current directory with the CLI |
-| `npm test` | Run all 193 cases discovered by the shared suite manifest |
+| `npm test` | Run all cases discovered by the shared suite manifest |
 | `npm run test:unit` | Run 52 isolated Config and suite-discovery tests from `test/unit/` |
 | `npm run test:functional` | Run 58 public HTTP behavior tests from `test/functional/` |
-| `npm run test:behavioral` | Run 141 non-unit behavioral contracts across Functional, Integration, and Regression |
-| `npm run test:integration` | Run 25 module, CLI, benchmark, listener, stream, and filesystem boundary tests from `test/integration/` |
+| `npm run test:behavioral` | Run non-unit behavioral contracts across Functional, Integration, and Regression |
+| `npm run test:integration` | Run module, CLI, benchmark, HTTP/2, listener, stream, and filesystem boundary tests from `test/integration/` |
 | `npm run test:regression` | Run 58 owned cases for previously fixed failures and security boundaries from `test/regression/` |
 | `npm run test:site` | Check docs pages, local links/fragments, IDs, label/ARIA targets, image alt text, nav state, CSS, and site JavaScript |
 | `npm run coverage` | Run `vanilla-test` Node coverage gates, write `coverage/node/`, and refresh measured badge JSON |
@@ -519,7 +528,7 @@ For a non-unit behavioral pass, run `npm run test:behavioral`. It selects the 14
 
 GitHub Actions tests Node.js 22.12 and Node.js 24, validates the dependency-free static docs, runs the Node-only `vanilla-test` coverage gate, smoke-tests the packed npm artifact, measures real HTTP paths on Ubuntu Node 24.18.0, and publishes the reports, badges, and latest benchmark JSON with the static project site from `main`.
 
-When upgrading from v8, read [MIGRATION.md](MIGRATION.md). Release details are in [CHANGELOG.md](CHANGELOG.md).
+When upgrading from v8 or v9, read [MIGRATION.md](MIGRATION.md). Release details are in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

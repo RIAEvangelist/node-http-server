@@ -1,6 +1,7 @@
 'use strict';
 
 const http=require('node:http'),
+    http2=require('node:http2'),
     https=require('node:https'),
     path=require('node:path'),
     fs=require('node:fs'),
@@ -26,6 +27,7 @@ class Server{
         this._deployed=false;
         this._closing=null;
         this._routing=null;
+        this._http2Sessions=new Set;
     }
 
     deploy(userConfig,readyCallback){
@@ -116,6 +118,11 @@ function deploy(userConfig,readyCallback=function(){}){
     const server=this;
 
     const requestHandler=async function(request,response){
+        if(request.httpVersionMajor===2){
+            request.stream.once('error',function streamFailed(err){
+                server.lastError=err;
+            });
+        }
         try{
             await requestReceived.call(server,request,response);
         }catch(err){
@@ -125,6 +132,10 @@ function deploy(userConfig,readyCallback=function(){}){
 
     const clientErrorHandler=function(err,socket){
         server.lastError=err;
+        if(socket.alpnProtocol==='h2'){
+            socket.destroy(err);
+            return;
+        }
         if(socket.writable){
             socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 0\r\n\r\n');
         }
@@ -168,7 +179,24 @@ function deploy(userConfig,readyCallback=function(){}){
     }
 
     if(httpsOptions){
-        secureNodeServer=https.createServer(httpsOptions,requestHandler);
+        if(this.config.https.http2!==false){
+            httpsOptions.allowHTTP1=true;
+            secureNodeServer=http2.createSecureServer(httpsOptions,requestHandler);
+            secureNodeServer.on('session',function sessionOpened(session){
+                server._http2Sessions.add(session);
+                session.once('close',function sessionClosed(){
+                    server._http2Sessions.delete(session);
+                });
+                if(server._closing){
+                    session.close();
+                }
+            });
+            secureNodeServer.on('sessionError',function sessionFailed(err){
+                server.lastError=err;
+            });
+        }else{
+            secureNodeServer=https.createServer(httpsOptions,requestHandler);
+        }
         secureNodeServer.on('clientError',clientErrorHandler);
         configureNodeServer(secureNodeServer,this.config.server);
     }
@@ -241,7 +269,7 @@ async function close(callback){
     const server=this;
     server._closing=Promise.all([
         closeNodeServer(server.server),
-        closeNodeServer(server.secureServer)
+        closeNodeServer(server.secureServer,server._http2Sessions)
     ]).then(
         function(){
             server._deployed=false;
@@ -261,7 +289,7 @@ async function close(callback){
     return server._closing;
 }
 
-function closeNodeServer(nodeServer){
+function closeNodeServer(nodeServer,sessions){
     if(!nodeServer){
         return Promise.resolve();
     }
@@ -281,6 +309,11 @@ function closeNodeServer(nodeServer){
                     resolve();
                 }
             );
+            if(sessions){
+                for(const session of sessions){
+                    session.close();
+                }
+            }
         }
     );
 }
@@ -348,7 +381,7 @@ async function hookServe(request,response,body,encoding){
 function decorateRequest(request){
     const encrypted=Boolean(request.socket && request.socket.encrypted);
     const protocol=encrypted ? 'https' : 'http';
-    const authority=request.headers.host;
+    const authority=request.authority || request.headers.host;
 
     if(!authority){
         throw new HttpError(400,'Host header required');
@@ -401,7 +434,17 @@ function decorateRequest(request){
     }
 
     request.originalUrl=request.url;
-    request.url=pathname;
+    if(request.httpVersionMajor===2){
+        // Node's HTTP/2 url setter rewrites :path; keep the received headers intact.
+        Object.defineProperty(request,'url',{
+            configurable:true,
+            enumerable:true,
+            writable:true,
+            value:pathname
+        });
+    }else{
+        request.url=pathname;
+    }
     request.uri={
         protocol:protocol,
         host:hostname,
@@ -512,6 +555,10 @@ function selectRoot(hostname){
 }
 
 function hasRequestBody(request){
+    if(request.httpVersionMajor===2){
+        return !request.stream.endAfterHeaders;
+    }
+
     if(request.headers['transfer-encoding']!==undefined){
         return true;
     }
@@ -1112,6 +1159,11 @@ function streamFile(filename,start,end,compression,request,response){
                 if(settled){
                     return;
                 }
+                // HTTP/2 also emits finish for a cancelled, incomplete response.
+                if(request.httpVersionMajor===2 && response.stream.aborted){
+                    close();
+                    return;
+                }
                 settled=true;
                 invokeAfterServe.call(server,request,response);
                 resolve();
@@ -1430,6 +1482,7 @@ function sanitizedConfig(config){
             certificate:Boolean(config.https.certificate),
             passphrase:Boolean(config.https.passphrase),
             port:config.https.port,
+            http2:config.https.http2,
             only:config.https.only
         }
     };

@@ -3,10 +3,10 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Run node-http-server with native Node HTTPS, including HTTPS-only and paired HTTP + HTTPS listeners, certificate configuration, lifecycle, and troubleshooting.">
+        <meta name="description" content="Run node-http-server with HTTP/2 over HTTPS and HTTP/1.1 negotiation, including HTTPS-only and paired listeners, certificate configuration, lifecycle, and hooks.">
         <meta name="theme-color" content="#08110d">
         <meta property="og:title" content="HTTPS — node-http-server">
-        <meta property="og:description" content="Native Node HTTPS static serving with zero runtime dependencies.">
+        <meta property="og:description" content="Native Node HTTP/2 over HTTPS with HTTP/1.1 compatibility and zero runtime dependencies.">
         <meta property="og:image" content="https://riaevangelist.github.io/node-http-server/assets/node-http-server-header-https.webp">
         <title>HTTPS — node-http-server</title>
         <link rel="canonical" href="https://riaevangelist.github.io/node-http-server/https.html">
@@ -22,26 +22,36 @@
 
         <main id="main">
             <header class="page-header page-header-compact">
-                <p class="kicker">Native Node HTTPS · zero runtime dependencies</p>
-                <h1>Serve static files over HTTPS.</h1>
-                <p class="lead">Provide key and certificate paths through CommonJS or ESM. Run HTTPS-only or pair HTTP and HTTPS listeners through one isolated <code>Server</code> instance.</p>
+                <p class="kicker">Native Node HTTP/2 · zero runtime dependencies</p>
+                <h1>Serve HTTP/2 over HTTPS.</h1>
+                <p class="lead">Provide key and certificate paths through CommonJS or ESM. HTTPS defaults to HTTP/2 and accepts HTTP/1.1 on the same port. Run HTTPS-only or pair HTTP and HTTPS listeners through one isolated <code>Server</code> instance.</p>
                 <div class="header-actions"><a class="button button-primary" href="#https-only">Start HTTPS-only</a><a class="button" href="#dual">Run both listeners</a></div>
             </header>
 
             <div class="doc-layout">
-                <aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#modes">Transport modes</a><a href="#https-only">HTTPS-only</a><a href="#dual">HTTP + HTTPS</a><a href="#configuration">TLS configuration</a><a href="#lifecycle">Lifecycle</a><a href="#certificates">Certificates</a><a href="#troubleshooting">Troubleshooting</a></aside>
+                <aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#modes">Transport modes</a><a href="#http2">HTTP/2 negotiation</a><a href="#https-only">HTTPS-only</a><a href="#dual">HTTP + HTTPS</a><a href="#configuration">TLS configuration</a><a href="#lifecycle">Lifecycle</a><a href="#certificates">Certificates</a><a href="#troubleshooting">Troubleshooting</a></aside>
                 <div class="doc-content">
                     <section class="doc-section" id="modes">
                         <p class="kicker">Transport modes</p>
                         <h2>Choose one listener plan.</h2>
-                        <div class="facts" aria-label="HTTPS implementation facts"><div class="fact"><strong>node:https</strong><span>Built-in TLS server</span></div><div class="fact"><strong>0</strong><span>Runtime dependencies</span></div><div class="fact"><strong>CJS + ESM</strong><span>HTTPS configuration</span></div><div class="fact"><strong>1 pipeline</strong><span>Shared static behavior</span></div></div>
+                        <div class="facts" aria-label="HTTPS implementation facts"><div class="fact"><strong>node:http2</strong><span>Built-in HTTPS server</span></div><div class="fact"><strong>0</strong><span>Runtime dependencies</span></div><div class="fact"><strong>CJS + ESM</strong><span>HTTPS configuration</span></div><div class="fact"><strong>1 pipeline</strong><span>Shared static behavior</span></div></div>
                         <div class="table-wrap"><table><thead><tr><th>Mode</th><th>Configuration</th><th>Listeners</th><th>Use it for</th></tr></thead><tbody>
                             <tr><td>HTTP</td><td>Default configuration</td><td><code>server.server</code></td><td>CLI tasks, local assets, trusted networks, or TLS at an edge.</td></tr>
                             <tr><td>HTTPS only</td><td>Key + certificate + <code>https.only:true</code></td><td><code>server.secureServer</code></td><td>Direct encrypted local or network serving.</td></tr>
                             <tr><td>HTTP + HTTPS</td><td>Key + certificate + <code>https.only:false</code></td><td><code>server.server</code> and <code>server.secureServer</code></td><td>Paired listener deployments and controlled migration.</td></tr>
                         </tbody></table></div>
-                        <p>Both transports use the same roots, Host routing, hooks, request limits, timeouts, range handling, validators, compression, logging, and shutdown contract.</p>
+                        <p>Both transports use the same roots, hooks, request-body handling, ranges, validators, compression, and logging. Routing uses HTTP/1 Host or HTTP/2 <code>:authority</code>. Plain HTTP remains HTTP/1.1; the HTTPS listener negotiates the protocol separately for each connection.</p>
                         <div class="callout"><strong>Interface choice:</strong> the CLI starts an HTTP listener. CommonJS and ESM carry certificate paths and HTTPS listener modes.</div>
+                    </section>
+
+                    <section class="doc-section" id="http2">
+                        <p class="kicker">HTTP/2 negotiation</p>
+                        <h2>One HTTPS port serves both protocols.</h2>
+                        <p>Starting with 10.0.0, configured HTTPS uses <code>node:http2.createSecureServer()</code> with <code>allowHTTP1:true</code>. TLS ALPN selects HTTP/2 when the client supports it and HTTP/1.1 for clients that need it. This happens before HTTP requests begin, with no failed HTTP/2 request or retry. HTTP/1.1 compatibility also serves application clients and reverse proxies whose upstream connections use HTTP/1.1.</p>
+                        <p><code>https.http2</code> defaults to <code>true</code>. Set it to <code>false</code> alongside the certificate configuration to select the original <code>node:https</code> listener when an application needs its native HTTP/1 APIs. <code>https.only</code> controls whether the separate plain HTTP listener starts; it does not select an HTTP version. Cleartext HTTP/2 (h2c), HTTP/2-only mode, and HTTP/3 are not provided.</p>
+                        <p>Hooks receive Node's HTTP/2 compatibility request/response objects on HTTP/2 requests. Use public response methods and the supplied <code>serve</code> continuation. HTTP/2 uses streams, so raw HTTP/1 socket writes and connection-specific headers such as <code>Connection</code> and <code>Transfer-Encoding</code> cannot be used. Read <code>request.httpVersionMajor</code> when a hook needs the negotiated protocol. HTTP/2 request bodies reach the existing complete body fields even without <code>Content-Length</code>.</p>
+                        <p><code>server.timeout</code> applies to HTTP/2 session inactivity and HTTP/1 socket inactivity. <code>requestTimeout</code>, <code>headersTimeout</code>, and <code>keepAliveTimeout</code> apply only to HTTP/1 connections, including those negotiated on HTTPS; they do not set HTTP/2 stream deadlines.</p>
+                        <p>Node.js 22.12 or newer is still required. HTTP/2 adds no runtime dependency. See <a href="https://nodejs.org/api/http2.html#compatibility-api">Node's HTTP/2 compatibility API</a> for the native request/response contract.</p>
                     </section>
 
                     <section class="doc-section" id="https-only">
@@ -107,8 +117,9 @@ server.secureServer.once('error',error=>console.error(error));</code></pre></div
                             <tr><td><code>https.passphrase</code></td><td><code>false</code></td><td>Optional private-key passphrase.</td></tr>
                             <tr><td><code>https.port</code></td><td><code>443</code></td><td>HTTPS port; <code>0</code> requests an OS-selected free port.</td></tr>
                             <tr><td><code>https.only</code></td><td><code>false</code></td><td><code>true</code> selects HTTPS-only; <code>false</code> keeps HTTP and HTTPS.</td></tr>
+                            <tr><td><code>https.http2</code></td><td><code>true</code></td><td>HTTP/2 with HTTP/1.1 negotiation; <code>false</code> selects the original <code>node:https</code> listener.</td></tr>
                         </tbody></table></div>
-                        <p>Deployment reads the configured files and constructs the Node HTTPS server before listeners open. Missing, incomplete, unreadable, or invalid material fails startup as one atomic operation.</p>
+                        <p>Deployment reads the configured files and constructs the selected native Node HTTPS listener before listeners open. Missing, incomplete, unreadable, or invalid material fails startup as one atomic operation.</p>
                         <div class="page-links"><a href="./configuration.html#https">Complete Config reference →</a><a href="./playground.html">Generate HTTPS configuration →</a></div>
                     </section>
 
@@ -117,12 +128,12 @@ server.secureServer.once('error',error=>console.error(error));</code></pre></div
                         <h2>Inspect and close the listeners you own.</h2>
                         <div class="table-wrap"><table><thead><tr><th>Member</th><th>HTTPS-only</th><th>HTTP + HTTPS</th></tr></thead><tbody>
                             <tr><td><code>server.server</code></td><td><code>null</code></td><td>Active Node HTTP server</td></tr>
-                            <tr><td><code>server.secureServer</code></td><td>Active Node HTTPS server</td><td>Active Node HTTPS server</td></tr>
+                            <tr><td><code>server.secureServer</code></td><td>Node <code>Http2SecureServer</code> by default</td><td>Node <code>Http2SecureServer</code> by default</td></tr>
                             <tr><td><code>server.address()</code></td><td>HTTPS address</td><td>HTTP address</td></tr>
                             <tr><td><code>server.secureServer.address()</code></td><td>HTTPS address</td><td>HTTPS address</td></tr>
                             <tr><td><code>await server.close()</code></td><td>Closes HTTPS</td><td>Closes both listeners</td></tr>
                         </tbody></table></div>
-                        <p>Listener bind failures use Node's native <code>error</code> event. Attach handlers to every active listener. Repeated and concurrent <code>close()</code> calls share the same close operation.</p>
+                        <p>With <code>https.http2:false</code>, <code>secureServer</code> is the original Node <code>https.Server</code>. Listener bind failures use Node's native <code>error</code> event. Attach handlers to every active listener. HTTP/2 session and stream failures are captured in <code>lastError</code>. Repeated and concurrent <code>close()</code> calls share the same close operation; HTTP/2 sessions close gracefully after their active streams finish.</p>
                     </section>
 
                     <section class="doc-section" id="certificates">
@@ -148,13 +159,15 @@ server.secureServer.once('error',error=>console.error(error));</code></pre></div
                             <tr><td>Deploy callback runs twice</td><td>Both listeners became ready.</td><td>Compare the callback listener with <code>secureServer</code>.</td></tr>
                             <tr><td><code>address()</code> shows the HTTP port</td><td>Dual mode prefers the HTTP address.</td><td>Read <code>secureServer.address()</code> for HTTPS.</td></tr>
                             <tr><td>CLI output starts with <code>http://</code></td><td>The command owns the HTTP interface.</td><td>Use the CommonJS or ESM configuration above for HTTPS.</td></tr>
+                            <tr><td>HTTPS request uses HTTP/1.1</td><td>The client negotiated HTTP/1.1, or HTTP/2 was disabled.</td><td>Read <code>request.httpVersionMajor</code>, the client's HTTP/2 support, and <code>https.http2</code>.</td></tr>
+                            <tr><td>Custom hook fails on HTTP/2</td><td>The hook may use an HTTP/1-only API or header.</td><td>Use the native compatibility request/response APIs and HTTP/2-compatible headers, or select <code>https.http2:false</code> when the application requires the original listener.</td></tr>
                         </tbody></table></div>
-                        <div class="callout"><strong>Redirect and edge policy:</strong> route HTTP-to-HTTPS redirects, certificate automation, SNI, HTTP/2, and advanced TLS policy through application code or a maintained edge.</div>
+                        <div class="callout"><strong>Redirect and edge policy:</strong> route HTTP-to-HTTPS redirects, certificate automation, SNI, and advanced TLS policy through application code or a maintained edge.</div>
                     </section>
                 </div>
             </div>
         </main>
 
-        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p><span data-runtime-boundary>node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable.</span> Native Node HTTPS with zero runtime dependencies. <span data-year></span></p><div><a href="./configuration.html#https">Config</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p><span data-runtime-boundary>node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable.</span> Native Node HTTP/2 over HTTPS with zero runtime dependencies. <span data-year></span></p><div><a href="./configuration.html#https">Config</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
     </body>
 </html>

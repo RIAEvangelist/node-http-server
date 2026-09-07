@@ -57,6 +57,7 @@ test('Integration | HTTPS-only deploy wires credentials and exposes only secureS
         port:0,
         verbose:true,
         https:{
+            http2:false,
             ca:certificate,
             privateKey:key,
             certificate,

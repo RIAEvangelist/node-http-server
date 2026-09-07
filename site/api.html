@@ -37,7 +37,7 @@ process.once('SIGTERM',async()=>{
                         <div class="table-wrap"><table><thead><tr><th>Step</th><th>Contract</th></tr></thead><tbody>
                             <tr><td><code>new Server(config?)</code></td><td>Creates isolated configuration and listener state.</td></tr>
                             <tr><td><code>deploy(config?, callback?)</code></td><td>Overlays current config, starts HTTP and optional HTTPS, returns the same instance immediately, and calls the callback once as each listener becomes ready. A function first argument is accepted as the callback.</td></tr>
-                            <tr><td><code>close(callback?)</code></td><td>Returns a Promise that resolves after every owned listener closes. Concurrent calls share it; idle close is safe; callback receives no arguments or an error.</td></tr>
+                            <tr><td><code>close(callback?)</code></td><td>Returns a Promise that resolves after every owned listener closes. HTTP/2 sessions close gracefully after their active streams finish. Concurrent calls share it; idle close is safe; callback receives no arguments or an error.</td></tr>
                             <tr><td>Redeploy</td><td>The same instance may deploy again after <code>close()</code> resolves.</td></tr>
                         </tbody></table></div>
                         <div class="callout-error callout"><strong>One active deployment per instance:</strong> a second active deployment throws <code>ERR_SERVER_ALREADY_DEPLOYED</code>. Await <code>close()</code> before reusing it. Omitted settings persist across later deployment overlays.</div>
@@ -52,8 +52,8 @@ process.once('SIGTERM',async()=>{
                             <tr><td><code>serveFile(filename,request,response)</code></td><td><code>Promise&lt;boolean&gt;</code></td><td>Serve a deliberate trusted file; legacy <code>(filename,exists,request,response)</code> remains accepted.</td></tr>
                             <tr><td><code>config</code></td><td><code>Config</code></td><td>Read the instance's isolated active configuration.</td></tr>
                             <tr><td><code>server</code></td><td>Node HTTP server or <code>null</code></td><td>Access the active HTTP listener.</td></tr>
-                            <tr><td><code>secureServer</code></td><td>Node HTTPS server or <code>null</code></td><td>Access the active HTTPS listener.</td></tr>
-                            <tr><td><code>lastError</code></td><td>Error or <code>null</code></td><td>Last captured request, hook, stream, or logging failure.</td></tr>
+                            <tr><td><code>secureServer</code></td><td>Node <code>Http2SecureServer</code>, <code>https.Server</code>, or <code>null</code></td><td>Access the active HTTPS listener. HTTP/2 with HTTP/1.1 negotiation is the default; <code>https.http2:false</code> selects the original <code>https.Server</code>.</td></tr>
+                            <tr><td><code>lastError</code></td><td>Error or <code>null</code></td><td>Last captured request, hook, stream, HTTP/2 session, or logging failure.</td></tr>
                         </tbody></table></div>
                     </section>
 
@@ -62,9 +62,11 @@ process.once('SIGTERM',async()=>{
                             <tr><td><code>request.body</code></td><td>string</td><td>UTF-8 request body.</td></tr><tr><td><code>request.bodyBuffer</code></td><td>Buffer</td><td>Original request bytes.</td></tr><tr><td><code>request.uri</code></td><td>object</td><td>Parsed URL and query information.</td></tr><tr><td><code>request.url</code></td><td>string</td><td>Processed request path.</td></tr><tr><td><code>request.serverRoot</code></td><td>string</td><td>Selected static root after Host routing.</td></tr>
                         </tbody></table></div>
                         <p>When <a href="./configuration.html#limits"><code>maxRequestBodyBytes</code></a> is set and the request crosses it, parsing stops with <code>413 Payload Too Large</code>.</p>
+                        <p>HTTP/2 request bodies are read through the request stream even without <code>Content-Length</code>, and the complete body forms reach <code>onRequest</code>. Virtual-host routing uses HTTP/2 <code>:authority</code> or HTTP/1 Host values to select <code>request.serverRoot</code>.</p>
                     </section>
 
                     <section class="doc-section" id="hooks"><p class="kicker">Hooks</p><h2>Take over only the step you need.</h2>
+                        <p>Hooks receive native Node request/response objects for the negotiated protocol, including Node's HTTP/2 compatibility objects when HTTPS selects HTTP/2. Use public methods such as <code>response.setHeader()</code> and <code>response.end()</code>, or the supplied <code>serve</code> continuation. HTTP/2 streams cannot use raw HTTP/1 socket writes or connection-specific headers such as <code>Connection</code> and <code>Transfer-Encoding</code>. <code>request.httpVersionMajor</code> identifies the request protocol. See <a href="https://nodejs.org/api/http2.html#compatibility-api">Node's compatibility API</a> for protocol-specific behavior.</p>
                         <div class="table-wrap"><table><thead><tr><th>Hook</th><th>Arguments</th><th>When</th><th>Takeover</th></tr></thead><tbody>
                             <tr><td><code>onRawRequest</code></td><td><code>request,response,serve</code></td><td>Immediately after receipt, before body parsing.</td><td>Return truthy; supplied <code>serve</code> is the public safe serve path.</td></tr>
                             <tr><td><code>onRequest</code></td><td><code>request,response,serve</code></td><td>After URL helpers and body forms are ready.</td><td>Return truthy; supplied <code>serve</code> is the public safe serve path.</td></tr>
@@ -110,12 +112,12 @@ server.deploy();
 server.server.once('error',error=>{
     console.error(error);
 });</code></pre></div>
-                        <p><code>lastError</code> captures request, hook, stream, and logging failures. Node listener failures arrive through the listener's <code>error</code> event. Attach handlers to both <code>server.server</code> and <code>server.secureServer</code> when both protocols run. Synchronous deployment validation—invalid roots, ports, timeout values, or incomplete HTTPS configuration—throws before a usable listener is ready.</p>
+                        <p><code>lastError</code> captures request, hook, stream, HTTP/2 session, and logging failures. Node listener failures arrive through the listener's <code>error</code> event. Attach handlers to both <code>server.server</code> and <code>server.secureServer</code> when both protocols run. Synchronous deployment validation—invalid roots, ports, timeout values, or incomplete HTTPS configuration—throws before a usable listener is ready.</p>
                         <div class="page-links"><a href="./https.html">HTTPS lifecycle →</a><a href="./configuration.html">Configuration reference →</a><a href="./examples.html">Copyable examples →</a><a href="./operations.html#failures">HTTP and operational failures →</a></div>
                     </section>
                 </div>
             </div>
         </main>
-        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p><span data-runtime-boundary>node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable.</span> Library API for v9. <span data-year></span></p><div><a href="./configuration.html">Config</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p><span data-runtime-boundary>node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable.</span> Library API for v10. <span data-year></span></p><div><a href="./configuration.html">Config</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
     </body>
 </html>

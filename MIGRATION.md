@@ -1,6 +1,24 @@
-# Migrating from node-http-server v8 to v9
+# Migrating to node-http-server v10
 
-Version 9 keeps native HTTP and HTTPS listeners, the small server surface, default singleton, hooks, and `key=value` CLI. The major changes make network exposure explicit, isolate multiple servers, and bring static delivery behavior up to date.
+The v9-to-v10 upgrade changes the default native HTTPS listener to support HTTP/2. The earlier v8-to-v9 guidance remains below for applications upgrading across both versions.
+
+## HTTP/2 defaults in 10.0.0
+
+Configured HTTPS now uses Node's `Http2SecureServer` with HTTP/1.1 compatibility enabled. TLS negotiates HTTP/2 or HTTP/1.1 on the same port before requests begin. Existing key and certificate paths continue to configure HTTPS; the CLI and plain HTTP listener remain HTTP/1.1. Node.js 22.12 remains the minimum version, and no runtime dependency is added.
+
+`https.http2` defaults to `true`. Set `https.http2:false` alongside the existing certificate configuration when an application requires the original `https.Server` listener or HTTP/1-specific native APIs. `https.only` still controls whether a separate plain HTTP listener starts; it does not select the HTTP version.
+
+The hook names and takeover contract remain the same. HTTP/2 requests use Node's compatibility request/response objects. Use their public APIs and HTTP/2-compatible headers; raw HTTP/1 socket writes and connection-specific headers such as `Connection` and `Transfer-Encoding` cannot serve an HTTP/2 stream. `request.httpVersionMajor` identifies the negotiated request protocol.
+
+Virtual hosts use HTTP/2 `:authority` or HTTP/1 Host values. Complete HTTP/2 request bodies reach the existing body fields without requiring `Content-Length`. Static streaming, ranges, conditional caching, compression, and manual serving share the existing pipeline.
+
+`server.timeout` controls HTTP/2 session inactivity as well as HTTP/1 socket inactivity. `requestTimeout`, `headersTimeout`, and `keepAliveTimeout` apply only to HTTP/1 connections, including HTTPS fallback connections. They do not create HTTP/2 stream deadlines. `close()` gracefully closes HTTP/2 sessions after their active streams finish, and `lastError` includes captured HTTP/2 session failures.
+
+See the [HTTPS guide](https://riaevangelist.github.io/node-http-server/https.html) and [Node's compatibility API](https://nodejs.org/api/http2.html#compatibility-api) for the listener and hook contracts.
+
+## Earlier v8-to-v9 migration
+
+The remaining sections describe the v8-to-v9 changes. Version 9 kept native HTTP and HTTPS listeners, the small server surface, default singleton, hooks, and `key=value` CLI. Its major changes made network exposure explicit, isolated multiple servers, and brought static delivery behavior up to date.
 
 ## Runtime
 

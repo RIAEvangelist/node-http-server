@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [10.0.0] - 2026-09-07
+
+### Changed
+
+- The default `secureServer` is now Node's `Http2SecureServer`. Applications depending on the original `https.Server` native API must select `https.http2:false`.
+
+### Added
+
+- HTTPS listeners prefer HTTP/2 through Node's built-in compatibility API and negotiate HTTP/1.1 on the same port for other clients, with no runtime dependencies.
+- Added `https.http2:false` to select the original HTTP/1.1 HTTPS listener. Plain HTTP remains HTTP/1.1.
+- HTTP/2 shares the existing hooks, virtual hosts, static streaming, HEAD, ranges, conditional responses, and compression. Request bodies use the stream's end-of-input indication, including bodies without a Content-Length header.
+- Track each instance's HTTP/2 sessions for graceful shutdown and redeployment; expose session failures through `lastError` while preserving Node's native events.
+
 ## [9.1.1] - 2026-08-23
 
 ### Added
