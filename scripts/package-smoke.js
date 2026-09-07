@@ -92,6 +92,9 @@ fs.mkdirSync(packed);
 fs.mkdirSync(installed);
 
 try{
+    // Keep npm's installation root here instead of an ancestor temporary project.
+    fs.writeFileSync(path.join(installed, 'package.json'), '{}\n');
+
     const packOutput = runNpm([
         'pack',
         '--json',
