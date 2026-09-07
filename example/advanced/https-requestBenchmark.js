@@ -40,6 +40,10 @@ function beforeServe(request,response,body,encoding){
         return;
     }
 
+    // Decode this UTF-8 template before replacing its placeholders.
+    body.value = body.value.toString('utf8');
+    encoding.value = 'utf8';
+
     //dynamically detect available interfaces
     var content='<li>refresh to get more benchmark times</li><li>';
     for(var i in benchmarks){

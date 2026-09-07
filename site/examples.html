@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
-    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Copyable node-http-server CLI and library examples for SPA, HTTPS, domains, hooks, logging, limits, and shutdown."><meta name="theme-color" content="#08110d"><title>Examples — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/examples.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script></head>
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Copyable node-http-server CLI and library examples for SPA, HTTPS, HTTP/2, domains, hooks, logging, limits, and shutdown."><meta name="theme-color" content="#08110d"><title>Examples — node-http-server</title><link rel="canonical" href="https://riaevangelist.github.io/node-http-server/examples.html"><link rel="stylesheet" href="./styles.css"><script src="./script.js" defer></script></head>
     <body>
         <a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="./guide.html" aria-label="node-http-server documentation hub"><span class="wordmark-mark" aria-hidden="true">n</span><span>node-http-server</span></a><nav aria-label="Documentation"><a href="./index.html">Start</a><a href="./why.html">Why</a><a href="./cli.html">CLI</a><a href="./api.html">Library</a><a href="./configuration.html">Config</a><a href="./https.html">HTTPS</a><a href="./examples.html" aria-current="page">Examples</a><a href="./playground.html">Playground</a><a href="./testing.html">Testing</a><a href="./performance.html">Performance</a><a href="./benchmarks.html">Benchmarks</a><a href="./operations.html">Operations</a><a class="nav-github" href="https://github.com/RIAEvangelist/node-http-server">GitHub ↗</a></nav></header>
         <main id="main"><header class="page-header page-header-compact"><p class="kicker">Copyable Node.js tasks</p><h1>Start from a working pattern.</h1><p class="lead">Each example is a Node.js program and states the expected result and its matching failure checks. Browser paths are content served by that program, not browser execution of node-http-server.</p></header>
-            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#cli">CLI recipes</a><a href="#spa">SPA + compression</a><a href="#limits">Limits</a><a href="#shutdown">Multiple servers</a><a href="#https">HTTPS</a><a href="#domains">Domain roots</a><a href="#hook">API + files</a><a href="#logging">Logging</a><a href="#mime">MIME controls</a></aside>
+            <div class="doc-layout"><aside class="toc" aria-label="On this page"><strong>On this page</strong><a href="#cli">CLI recipes</a><a href="#spa">SPA + compression</a><a href="#limits">Limits</a><a href="#shutdown">Multiple servers</a><a href="#https">HTTPS</a><a href="#http2">HTTP/2 + HTTP/1.1</a><a href="#domains">Domain roots</a><a href="#hook">API + files</a><a href="#logging">Logging</a><a href="#mime">MIME controls</a></aside>
                 <div class="doc-content">
                     <section class="doc-section" id="cli"><p class="kicker">CLI recipes</p><h2>Local first, public only when deliberate.</h2>
                         <div class="code-block"><div class="code-head"><span class="code-label">shell</span><button type="button" data-copy-target="examples-cli">Copy</button></div><pre><code id="examples-cli"># Local static build
@@ -87,13 +87,55 @@ new Server({
     host:'127.0.0.1',
     https:{
         privateKey:'./local-certs/private/server.key',
-        certificate:'./local-certs/server.crt',
+        certificate:'./local-certs/server.pub',
         port:8443,
         only:true
     }
 }).deploy();</code></pre></div>
-                        <p><strong>Expected:</strong> only <code>secureServer</code> listens on <code>https://127.0.0.1:8443</code>. Set <code>only:false</code> to run HTTP and HTTPS; <code>close()</code> closes both. The <a href="./https.html">HTTPS guide</a> includes a complete paired-listener example.</p>
+                        <p><strong>Expected:</strong> only <code>secureServer</code> listens on <code>https://127.0.0.1:8443</code>, negotiating HTTP/2 with HTTP/1.1 fallback on that port. Set <code>only:false</code> to add a separate plain HTTP listener; <code>close()</code> closes both. The <a href="./https.html">HTTPS guide</a> includes a complete paired-listener example.</p>
                         <div class="callout-warning callout"><strong>Failure:</strong> key and certificate are both required. Generate fresh local material; old v8 fixture keys are public and untrusted.</div>
+                    </section>
+
+                    <section class="doc-section" id="http2">
+                        <p class="kicker">HTTP/2 and HTTP/1.1</p>
+                        <h2>Compare both protocols on one HTTPS port.</h2>
+                        <p>Use Node.js 22.12.0 or newer and the repository's existing <a href="https://github.com/RIAEvangelist/node-http-server/blob/main/example/proxy/https-and-http-basic.js">HTTPS echo server</a> with the <a href="https://github.com/RIAEvangelist/node-http-server/blob/main/example/advanced/https-http2-client.js">HTTP/2 client</a>. These files live in the repository, outside the npm package. The client uses built-in <code>node:http2</code> and <code>node:https</code>.</p>
+                        <p>Run these commands from the repository root. Following the <a href="https://github.com/RIAEvangelist/node-http-server/blob/main/local-certs/readme.md">local certificate setup</a>, select the existing <code>v3_req</code> extension so the certificate covers <code>localhost</code> and <code>127.0.0.1</code>:</p>
+                        <div class="code-block">
+                            <div class="code-head"><span class="code-label">Local certificate setup</span><button type="button" data-copy-target="examples-http2-certs">Copy</button></div>
+                            <pre><code id="examples-http2-certs">openssl genrsa -out local-certs/private/server.key 2048
+openssl req -new -x509 -key local-certs/private/server.key -out local-certs/server.pub -days 30 -config local-certs/private/openssl.cnf -extensions v3_req -subj /CN=localhost</code></pre>
+                        </div>
+                        <div class="code-block">
+                            <div class="code-head"><span class="code-label">Terminal 1 — server</span><button type="button" data-copy-target="examples-http2-server">Copy</button></div>
+                            <pre><code id="examples-http2-server">node example/proxy/https-and-http-basic.js</code></pre>
+                        </div>
+                        <p>After the server's listeners are ready, run the client in a second terminal:</p>
+                        <div class="code-block">
+                            <div class="code-head"><span class="code-label">Terminal 2 — client</span><button type="button" data-copy-target="examples-http2-client">Copy</button></div>
+                            <pre><code id="examples-http2-client">node example/advanced/https-http2-client.js</code></pre>
+                        </div>
+                        <p>The default origin is <code>https://127.0.0.1:4433</code>. The client reads <code>local-certs/server.pub</code> once and supplies it through Node's native <code>ca</code> option. To use another HTTPS origin and certificate authority file, pass them in that order:</p>
+                        <div class="code-block">
+                            <div class="code-head"><span class="code-label">Optional client arguments</span><button type="button" data-copy-target="examples-http2-arguments">Copy</button></div>
+                            <pre><code id="examples-http2-arguments">node example/advanced/https-http2-client.js https://127.0.0.1:4433 ./local-certs/server.pub</code></pre>
+                        </div>
+                        <ul>
+                            <li><strong>Expected HTTP/2:</strong> three concurrent requests to <code>/one?request=1</code>, <code>/two?request=2</code>, and <code>/three?request=3</code> share one HTTP/2 session. Each response record includes its own stream ID, negotiated protocol, status, and complete body. Completion order may vary.</li>
+                            <li><strong>Expected HTTP/1.1:</strong> an independent request to <code>/one?request=http1</code> uses the same HTTPS port and prints its observed protocol, status, and complete body.</li>
+                            <li><strong>Hook output:</strong> each echoed JSON body preserves the request URI and headers and adds <code>httpVersion</code> and <code>httpVersionMajor</code>. HTTP/2 bodies also include <code>streamId</code>, and their headers include pseudo-headers such as <code>:path</code> and <code>:authority</code>.</li>
+                            <li><strong>Plain HTTP:</strong> the separate listener uses port <code>8000</code>. <code>https.only:true</code> removes this listener while retaining HTTP/1.1 fallback on the HTTPS port.</li>
+                        </ul>
+                        <p>The server hook uses the same public <code>serve(request,response,body)</code> function for both protocols. HTTP/1.1 supplies native <code>IncomingMessage</code>/<code>ServerResponse</code> objects; HTTP/2 supplies <code>Http2ServerRequest</code>/<code>Http2ServerResponse</code>. Use shared response methods such as <code>setHeader()</code> and branch on <code>request.httpVersionMajor===2</code> before reading <code>request.stream</code>. HTTP/2 responses cannot use HTTP/1.1 connection-specific headers such as <code>Connection</code> or <code>Transfer-Encoding</code>. See <a href="https://nodejs.org/docs/latest-v22.x/api/http2.html#compatibility-api">Node's compatibility API</a> for native differences.</p>
+                        <h3>Choose HTTP/1.1-only HTTPS</h3>
+                        <p>Replace the server example's current <code>http2</code> assignment with the following before its existing <code>deploy()</code> call, then restart the server:</p>
+                        <div class="code-block">
+                            <div class="code-head"><span class="code-label">Server configuration variant</span><button type="button" data-copy-target="examples-http2-disabled">Copy</button></div>
+                            <pre><code id="examples-http2-disabled">config.https.http2 = false;</code></pre>
+                        </div>
+                        <p>With HTTP/2 disabled, the client reports HTTP/2 connection/request failures while its independent HTTP/1.1 request can still complete. Restore <code>http2:true</code> or remove the override to negotiate both protocols again.</p>
+                        <p>The client closes its HTTP/2 session after its requests settle. Ctrl+C stops the server through its signal handler, which awaits <code>server.close()</code> for the owned listeners and HTTP/2 sessions. Active requests may finish before shutdown completes. Use the existing <a href="#shutdown">multiple-server shutdown pattern</a> when more than one instance is owned.</p>
+                        <div class="page-links"><a href="https://github.com/RIAEvangelist/node-http-server/blob/main/example/readme.md">Repository example guide →</a><a href="#hook">Route takeover and static fallback →</a></div>
                     </section>
 
                     <section class="doc-section" id="domains"><p class="kicker">Host-based roots</p><h2>Map accepted hostnames to directories.</h2>
@@ -127,6 +169,7 @@ class AppServer extends Server{
 new AppServer({root:'./public'}).deploy();</code></pre></div>
                         <div class="output-block"><span class="expected-label">Expected GET /health body</span><pre>{"ok":true}</pre></div>
                         <p>All other requests continue to static fallback. Return truthy only after the hook takes over. See the <a href="./api.html#hooks">hook contract</a> before asynchronous or buffered customization.</p>
+                        <p>For text transformations in <code>beforeServe</code>, the <a href="https://github.com/RIAEvangelist/node-http-server/tree/main/example/advanced">advanced template, CSS, and request-timing examples</a> decode the static Buffer with <code>body.value.toString('utf8')</code> before replacing text and set <code>encoding.value='utf8'</code> for the resulting string. Binary responses do not need text decoding.</p>
                     </section>
 
                     <section class="doc-section" id="logging"><p class="kicker">Request logging</p><h2>Append redacted NDJSON.</h2>
@@ -161,6 +204,6 @@ new Server({
                 </div>
             </div>
         </main>
-        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p><span data-runtime-boundary>node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable.</span> Copyable v9 examples. <span data-year></span></p><div><a href="./testing.html">Testing</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
+        <footer><a class="wordmark" href="./guide.html"><span class="wordmark-mark" aria-hidden="true">n</span><span>Docs hub</span></a><p><span data-runtime-boundary>node-http-server is Node.js-only; native-browser execution, import maps, and browser-bundler conformance are not applicable.</span> Copyable library examples. <span data-year></span></p><div><a href="./testing.html">Testing</a><a href="https://github.com/RIAEvangelist/node-http-server">GitHub</a></div></footer>
     </body>
 </html>

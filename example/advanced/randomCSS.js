@@ -19,6 +19,10 @@ function beforeServe(request,response,body,encoding){
         return;
     }
 
+    // Decode this UTF-8 template before replacing its placeholders.
+    body.value = body.value.toString('utf8');
+    encoding.value = 'utf8';
+
     var values={
         bgr:getRand(),
         bgg:getRand(),
